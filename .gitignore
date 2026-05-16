@@ -1,0 +1,7 @@
+drawing-ai-backend/.venv/
+drawing-ai-backend/**/__pycache__/
+drawing-ai-backend/**/*.pyc
+drawing-ai-backend/inputs/
+drawing-ai-backend/outputs/
+Thumbs.db
+.DS_Store
