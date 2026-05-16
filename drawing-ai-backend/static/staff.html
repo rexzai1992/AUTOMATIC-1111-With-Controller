@@ -1,0 +1,164 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drawing AI Staff Control</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="staff-body">
+  <main class="staff-dashboard">
+    <header class="staff-header staff-card">
+      <div>
+        <h1>Drawing AI Staff Control</h1>
+        <p>Scan, upload, or capture drawings and generate gallery-ready artwork.</p>
+      </div>
+      <nav class="quick-links" aria-label="Quick links">
+        <a href="/gallery" target="_blank" rel="noopener noreferrer">Open Gallery Wall</a>
+        <a href="/reports/tuning.txt" target="_blank" rel="noopener noreferrer">Open Tuning Report</a>
+      </nav>
+    </header>
+
+    <section class="staff-column left-column" aria-label="Input controls">
+      <section class="staff-card">
+        <h2>Visitor</h2>
+        <label class="field-label" for="visitorName">Visitor Name</label>
+        <input id="visitorName" type="text" placeholder="Enter visitor name">
+
+        <label class="field-label" for="visitorNotes">Notes (optional)</label>
+        <textarea id="visitorNotes" rows="4" placeholder="Add staff notes for this session"></textarea>
+      </section>
+
+      <section class="staff-card">
+        <h2>Input Method</h2>
+        <div class="method-tabs" role="tablist" aria-label="Input method tabs">
+          <button type="button" class="method-tab active" data-method="upload" aria-selected="true">Upload Drawing</button>
+          <button type="button" class="method-tab" data-method="webcam" aria-selected="false">Webcam Capture</button>
+          <button type="button" class="method-tab" data-method="scanner" aria-selected="false">Scanner Auto Import</button>
+        </div>
+
+        <div class="method-panel active" data-panel="upload">
+          <label class="field-label" for="drawingFile">Drawing File</label>
+          <input id="drawingFile" type="file" accept="image/*">
+          <p class="panel-hint">Upload a photo or scan from this station.</p>
+        </div>
+
+        <div class="method-panel" data-panel="webcam" hidden>
+          <p class="panel-hint">Use the backend webcam index 0 to capture and generate in one step.</p>
+        </div>
+
+        <div class="method-panel" data-panel="scanner" hidden>
+          <p class="panel-hint">Scanner jobs are automatic. Drop files into <code>scanner_inputs/</code> and monitor live events.</p>
+        </div>
+      </section>
+
+      <section class="staff-card">
+        <h2>Generation Control</h2>
+        <button id="generateBtn" class="action-btn primary-btn" type="button">Generate Artwork</button>
+        <button id="clearBtn" class="action-btn ghost-btn" type="button">Clear / Reset</button>
+        <p id="controlHint" class="panel-hint">Upload a drawing or choose webcam capture to start.</p>
+      </section>
+    </section>
+
+    <section class="staff-column right-column" aria-label="Generation status and previews">
+      <section class="staff-card">
+        <h2>Status</h2>
+        <div class="status-grid">
+          <article class="status-card">
+            <span>Status</span>
+            <strong id="statusText">Idle</strong>
+          </article>
+          <article class="status-card">
+            <span>Job ID</span>
+            <strong id="jobIdText">-</strong>
+          </article>
+          <article class="status-card">
+            <span>Visitor</span>
+            <strong id="visitorText">-</strong>
+          </article>
+          <article class="status-card">
+            <span>Preset</span>
+            <strong id="presetText">-</strong>
+          </article>
+          <article class="status-card">
+            <span>Prompt Mode</span>
+            <strong id="promptModeText">-</strong>
+          </article>
+          <article class="status-card">
+            <span>Estimated Time</span>
+            <strong id="estimatedTimeText">-</strong>
+          </article>
+          <article class="status-card">
+            <span>Elapsed Time</span>
+            <strong id="elapsedTimeText">00:00</strong>
+          </article>
+          <article class="status-card">
+            <span>Final Duration</span>
+            <strong id="finalDurationText">-</strong>
+          </article>
+        </div>
+      </section>
+
+      <section class="staff-card">
+        <h2>Preview</h2>
+        <div class="preview-grid">
+          <article>
+            <h3>Original Drawing</h3>
+            <a id="inputPreviewLink" class="preview-box is-empty" href="#" target="_blank" rel="noopener noreferrer" aria-disabled="true">
+              <img id="inputPreviewImage" class="preview-image" alt="Original drawing preview">
+              <div class="preview-placeholder">Original drawing will appear here</div>
+              <div class="preview-loading" aria-hidden="true">Loading...</div>
+            </a>
+          </article>
+
+          <article>
+            <h3>Generated Result</h3>
+            <a id="outputPreviewLink" class="preview-box is-empty" href="#" target="_blank" rel="noopener noreferrer" aria-disabled="true">
+              <img id="outputPreviewImage" class="preview-image" alt="Generated image preview">
+              <div class="preview-placeholder">Generated image will appear here</div>
+              <div class="preview-loading" aria-hidden="true">Generating...</div>
+            </a>
+          </article>
+        </div>
+      </section>
+
+      <section id="ratingSection" class="staff-card rating-card" hidden>
+        <h2>Rating</h2>
+        <p class="panel-hint">Rate quality to improve tuning over time.</p>
+
+        <div id="starGroup" class="star-group" aria-label="Rating stars">
+          <button type="button" class="star-btn" data-star="1">1 Star</button>
+          <button type="button" class="star-btn" data-star="2">2 Stars</button>
+          <button type="button" class="star-btn" data-star="3">3 Stars</button>
+          <button type="button" class="star-btn" data-star="4">4 Stars</button>
+          <button type="button" class="star-btn" data-star="5">5 Stars</button>
+        </div>
+
+        <div id="tagGroup" class="tag-grid"></div>
+
+        <label class="field-label" for="feedbackNote">Feedback Note</label>
+        <textarea id="feedbackNote" rows="3" placeholder="Optional quality notes"></textarea>
+
+        <button id="saveRatingBtn" class="action-btn primary-btn" type="button">Save Rating</button>
+        <p id="ratingStatus" class="rating-status">No rating saved yet.</p>
+      </section>
+
+      <section class="staff-card">
+        <div class="subheader-row">
+          <h2>Gallery Control</h2>
+          <button id="refreshGalleryControlBtn" class="small-action-btn" type="button">Refresh</button>
+        </div>
+        <p class="panel-hint">Manage gallery items here: rename visitor, hide from public wall, or delete permanently.</p>
+        <div id="galleryControlList" class="gallery-control-list" aria-live="polite"></div>
+      </section>
+
+      <section class="staff-card events-card">
+        <h2>Live Events</h2>
+        <ul id="eventLog" class="event-log"></ul>
+      </section>
+    </section>
+  </main>
+
+  <script src="/static/staff.js"></script>
+</body>
+</html>

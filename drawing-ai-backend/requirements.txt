@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+websockets
+opencv-python
+pillow
+requests
+python-multipart
+watchdog
