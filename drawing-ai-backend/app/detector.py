@@ -121,21 +121,24 @@ COLORED_DRAWING = PresetSettings(
 )
 DEFAULT = PresetSettings(
     name="default",
-    control_weight=0.55,
-    denoising_strength=0.74,
+    control_weight=0.45,
+    denoising_strength=0.78,
     control_mode="My prompt is more important",
-    cfg_scale=8.2,
-    steps=30,
+    cfg_scale=8.8,
+    steps=35,
     sampler_name="DPM++ 2M Karras",
     prompt=(
-        "Transform the submitted drawing into a lively colorful enhanced storybook illustration. Preserve the "
-        "original composition, subject, main shapes, and creative idea, then push stronger stylization, richer "
-        "colors, warm cinematic lighting, soft shading, expressive details, and playful character energy. Deliver a "
-        "fully colored cheerful scene with clean shapes, charming depth, and high quality animated movie style."
+        "Transform the submitted child drawing into a complete colorful storybook illustration. Preserve the main "
+        "subject, original idea, rough shape, and childlike creativity, but repaint it into a finished cheerful "
+        "artwork. Add a full colorful background, playful environment, warm lighting, soft shadows, vibrant colors, "
+        "clean bold shapes, expressive cute details, and animated movie style. Fill the whole image with color and "
+        "scenery. Avoid empty white space. Make it look like a polished children's book illustration while still "
+        "respecting the original drawing."
     ),
     negative_prompt=(
-        "unfinished sketch, monochrome, black and white, flat colors, dull colors, low detail, messy lines, "
-        "blurry, ugly, deformed, distorted, bad anatomy, extra limbs, text, watermark, logo, photorealistic"
+        "empty white background, blank space, same as input, unchanged sketch, unfinished, monochrome, black and "
+        "white, dull colors, low detail, weak color, messy output, blurry, distorted, ugly, deformed, bad anatomy, "
+        "extra limbs, text, watermark, logo, photorealistic"
     ),
     prompt_mode="lively_storybook",
 )

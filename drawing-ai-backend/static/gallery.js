@@ -1,21 +1,74 @@
 const galleryGrid = document.getElementById("galleryGrid");
 const wsStatusBadge = document.getElementById("wsStatusBadge");
 
-const FEEDBACK_TAGS = [
-  "too_close_to_drawing",
-  "changed_too_much",
-  "not_lively_enough",
-  "too_realistic",
-  "too_cartoon",
-  "bad_face",
-  "bad_hands",
-  "bad_colors",
-  "too_dark",
-  "too_empty",
-  "good_preserve_shape",
-  "good_lively",
-  "good_colors",
-  "good_overall"
+const BAD_FEEDBACK_TAG_GROUPS = [
+  {
+    title: "Quick bad tags",
+    tags: [
+      { id: "wrong_subject", label: "Wrong subject" },
+      { id: "same_as_input", label: "Same as input" },
+      { id: "person_missing", label: "Person missing" },
+      { id: "main_object_missing", label: "Main object missing" },
+      { id: "wrong_composition", label: "Wrong composition" },
+      { id: "too_empty", label: "Too empty" },
+      { id: "bad_colors", label: "Bad colors" },
+      { id: "low_quality", label: "Low quality" },
+      { id: "over_changed", label: "Over changed" },
+      { id: "too_realistic", label: "Too realistic" },
+      { id: "scary_or_creepy", label: "Scary or creepy" }
+    ]
+  },
+  {
+    title: "Legacy / detailed tags",
+    tags: [
+      { id: "wrong_generation", label: "Wrong generation (legacy)" },
+      { id: "person_changed", label: "Person changed" },
+      { id: "face_changed", label: "Face changed" },
+      { id: "artwork_missing", label: "Artwork missing" },
+      { id: "artwork_changed", label: "Artwork changed" },
+      { id: "object_missing", label: "Object missing" },
+      { id: "object_changed", label: "Object changed" },
+      { id: "background_wrong", label: "Background wrong" },
+      { id: "composition_wrong", label: "Composition wrong (legacy)" }
+    ]
+  },
+  {
+    title: "Style and artifact tags",
+    tags: [
+      { id: "style_wrong", label: "Style wrong" },
+      { id: "not_lively_enough", label: "Not lively enough" },
+      { id: "changed_too_much", label: "Changed too much (legacy)" },
+      { id: "too_cartoon", label: "Too cartoon" }
+    ]
+  },
+  {
+    title: "Quality problems",
+    tags: [
+      { id: "too_messy", label: "Too messy" },
+      { id: "bad_face", label: "Bad face" },
+      { id: "bad_hands", label: "Bad hands" },
+      { id: "blurry", label: "Blurry" },
+      { id: "creepy", label: "Creepy (legacy)" },
+      { id: "text_or_watermark", label: "Text or watermark" }
+    ]
+  },
+  {
+    title: "Color / lighting problems",
+    tags: [
+      { id: "bad_colors", label: "Bad colors" },
+      { id: "too_dark", label: "Too dark" }
+    ]
+  }
+];
+
+const GOOD_FEEDBACK_TAGS = [
+  { id: "good_preserve_shape", label: "Good preserve shape" },
+  { id: "good_preserve_person", label: "Good preserve person" },
+  { id: "good_preserve_artwork", label: "Good preserve artwork" },
+  { id: "good_lively", label: "Good lively" },
+  { id: "good_colors", label: "Good colors" },
+  { id: "good_style", label: "Good style" },
+  { id: "good_overall", label: "Good overall" }
 ];
 
 function formatTime(isoString) {
@@ -55,22 +108,44 @@ function setWsStatus(connected) {
 function createTagCheckboxes(container, selectedTags) {
   const selected = new Set(Array.isArray(selectedTags) ? selectedTags : []);
   container.innerHTML = "";
-  FEEDBACK_TAGS.forEach((tag) => {
-    const label = document.createElement("label");
-    label.className = "mini-tag";
 
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.value = tag;
-    checkbox.checked = selected.has(tag);
+  const createGroup = (title, tags, variant) => {
+    const section = document.createElement("section");
+    section.className = "mini-tag-category";
 
-    const text = document.createElement("span");
-    text.textContent = tag;
+    const heading = document.createElement("p");
+    heading.className = "mini-tag-category-title";
+    heading.textContent = title;
+    section.appendChild(heading);
 
-    label.appendChild(checkbox);
-    label.appendChild(text);
-    container.appendChild(label);
+    const grid = document.createElement("div");
+    grid.className = "mini-tags-grid";
+
+    tags.forEach((tagMeta) => {
+      const label = document.createElement("label");
+      label.className = `mini-tag ${variant}`;
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.value = tagMeta.id;
+      checkbox.checked = selected.has(tagMeta.id);
+
+      const text = document.createElement("span");
+      text.textContent = tagMeta.label;
+
+      label.appendChild(checkbox);
+      label.appendChild(text);
+      grid.appendChild(label);
+    });
+
+    section.appendChild(grid);
+    container.appendChild(section);
+  };
+
+  BAD_FEEDBACK_TAG_GROUPS.forEach((group) => {
+    createGroup(group.title, group.tags, "bad");
   });
+  createGroup("Good feedback tags", GOOD_FEEDBACK_TAGS, "good");
 }
 
 function getSelectedTags(container) {
@@ -200,7 +275,7 @@ function createCard(item) {
   panel.appendChild(ratingSelect);
 
   const tagsContainer = document.createElement("div");
-  tagsContainer.className = "mini-tags-grid";
+  tagsContainer.className = "mini-tags-wrap";
   createTagCheckboxes(tagsContainer, item.feedbackTags || []);
   panel.appendChild(tagsContainer);
 
@@ -288,7 +363,9 @@ function createCard(item) {
   return card;
 }
 
-function upsertItem(item) {
+function upsertItem(item, options = {}) {
+  const preservePosition = Boolean(options.preservePosition);
+
   if (item.hidden) {
     const toRemove = galleryGrid.querySelector(`[data-job-id="${item.jobId}"]`);
     if (toRemove) {
@@ -301,14 +378,27 @@ function upsertItem(item) {
   }
 
   const existing = galleryGrid.querySelector(`[data-job-id="${item.jobId}"]`);
-  if (existing) {
-    existing.remove();
-  }
-
-  const card = createCard(item);
   const emptyState = galleryGrid.querySelector(".empty-state");
   if (emptyState) {
     emptyState.remove();
+  }
+
+  const card = createCard(item);
+
+  if (existing && preservePosition) {
+    const parent = existing.parentElement || galleryGrid;
+    const next = existing.nextSibling;
+    existing.remove();
+    if (next) {
+      parent.insertBefore(card, next);
+    } else {
+      parent.appendChild(card);
+    }
+    return;
+  }
+
+  if (existing) {
+    existing.remove();
   }
   galleryGrid.prepend(card);
 }
@@ -355,7 +445,7 @@ function connectWebSocket() {
       if (payload.type === "generation_complete") {
         upsertItem(payload);
       } else if (payload.type === "gallery_item_updated" && payload.item) {
-        upsertItem(payload.item);
+        upsertItem(payload.item, { preservePosition: true });
       } else if (payload.type === "gallery_item_deleted" && payload.jobId) {
         const existing = galleryGrid.querySelector(`[data-job-id="${payload.jobId}"]`);
         if (existing) {

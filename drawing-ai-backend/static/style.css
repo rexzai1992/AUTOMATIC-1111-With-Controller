@@ -372,6 +372,70 @@ button:focus {
   background: linear-gradient(180deg, #ffffff 0%, #f6faff 100%);
 }
 
+.auto-review-box {
+  border: 1px solid #d4e2fa;
+  border-radius: 12px;
+  background: #f8fbff;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.auto-review-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.auto-review-head h3 {
+  margin: 0;
+  font-size: 0.92rem;
+  color: #2a4f87;
+}
+
+.auto-review-box p {
+  margin: 4px 0;
+  font-size: 0.82rem;
+  color: #274266;
+  line-height: 1.35;
+}
+
+.comparison-review-box {
+  border: 1px solid #d8e5fa;
+  border-radius: 12px;
+  background: #fbfdff;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.comparison-review-box h3 {
+  margin: 0 0 6px;
+  font-size: 0.9rem;
+  color: #2a4f87;
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(170px, 1fr));
+  gap: 8px;
+}
+
+.comparison-field {
+  display: grid;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: #2f4c75;
+}
+
+.comparison-field select {
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid #cddcf4;
+  background: #ffffff;
+  padding: 6px 9px;
+}
+
 .star-group {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -396,8 +460,8 @@ button:focus {
 
 .tag-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(150px, 1fr));
-  gap: 8px;
+  grid-template-columns: 1fr;
+  gap: 10px;
   margin-bottom: 12px;
 }
 
@@ -412,9 +476,39 @@ button:focus {
   font-size: 0.85rem;
 }
 
+.tag-item.bad {
+  border-color: #efd3da;
+  background: #fff7f9;
+}
+
+.tag-item.good {
+  border-color: #c7e8dc;
+  background: #f3fcf8;
+}
+
 .tag-item input {
   width: auto;
   margin: 0;
+}
+
+.tag-category {
+  border: 1px solid #dbe7fa;
+  border-radius: 12px;
+  background: #fbfdff;
+  padding: 8px;
+}
+
+.tag-category-title {
+  margin: 0 0 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #385b8d;
+}
+
+.tag-category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(150px, 1fr));
+  gap: 8px;
 }
 
 .rating-status {
@@ -536,7 +630,7 @@ button:focus {
   position: relative;
   display: inline-flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
 }
 
 .gallery-control-preview-btn {
@@ -545,7 +639,8 @@ button:focus {
 
 .gallery-control-preview-popover {
   position: absolute;
-  right: 0;
+  left: 50%;
+  transform: translateX(-50%);
   top: calc(100% + 8px);
   z-index: 40;
   border: 1px solid #d9e3f5;
@@ -553,7 +648,7 @@ button:focus {
   background: #f7fbff;
   padding: 8px;
   box-shadow: 0 14px 30px rgba(18, 44, 88, 0.25);
-  width: min(320px, calc(100vw - 70px));
+  width: min(420px, calc(100vw - 70px));
 }
 
 .gallery-control-preview-popover[hidden] {
@@ -754,7 +849,7 @@ button:focus {
   position: relative;
   display: inline-flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
 }
 
 .before-after-btn {
@@ -769,7 +864,8 @@ button:focus {
 
 .before-after-popover {
   position: absolute;
-  right: 0;
+  left: 50%;
+  transform: translateX(-50%);
   bottom: calc(100% + 8px);
   z-index: 30;
   border: 1px solid rgba(140, 173, 235, 0.36);
@@ -777,7 +873,7 @@ button:focus {
   background: rgba(8, 18, 33, 0.7);
   padding: 8px;
   box-shadow: 0 14px 28px rgba(1, 8, 18, 0.55);
-  width: min(260px, calc(100vw - 42px));
+  width: min(360px, calc(100vw - 42px));
 }
 
 .before-after-popover[hidden] {
@@ -849,13 +945,32 @@ button:focus {
   margin-bottom: 8px;
 }
 
-.mini-tags-grid {
+.mini-tags-wrap {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 4px;
-  max-height: 110px;
+  gap: 6px;
+  max-height: 200px;
   overflow-y: auto;
   margin-bottom: 8px;
+}
+
+.mini-tag-category {
+  border: 1px solid rgba(140, 173, 235, 0.24);
+  border-radius: 10px;
+  background: rgba(8, 18, 33, 0.5);
+  padding: 6px;
+}
+
+.mini-tag-category-title {
+  margin: 0 0 6px;
+  font-size: 0.7rem;
+  color: #aecaef;
+  font-weight: 700;
+}
+
+.mini-tags-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
 }
 
 .mini-tag {
@@ -864,6 +979,14 @@ button:focus {
   gap: 8px;
   font-size: 0.74rem;
   color: #d6e5ff;
+}
+
+.mini-tag.bad {
+  color: #f1d8de;
+}
+
+.mini-tag.good {
+  color: #cdeede;
 }
 
 .save-mini-rating-btn {
@@ -942,6 +1065,18 @@ button:focus {
     grid-template-columns: 1fr;
   }
 
+  .tag-category-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparison-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mini-tags-grid {
+    grid-template-columns: 1fr;
+  }
+
   .star-group {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -955,7 +1090,7 @@ button:focus {
   }
 
   .gallery-control-preview-popover {
-    width: min(280px, calc(100vw - 38px));
+    width: min(340px, calc(100vw - 26px));
   }
 
   .before-after-grid {
@@ -963,6 +1098,6 @@ button:focus {
   }
 
   .before-after-popover {
-    width: min(280px, calc(100vw - 38px));
+    width: min(320px, calc(100vw - 26px));
   }
 }

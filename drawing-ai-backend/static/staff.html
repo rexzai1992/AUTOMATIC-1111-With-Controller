@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Drawing AI Staff Control</title>
-  <link rel="stylesheet" href="/static/style.css?v=20260517b">
+  <link rel="stylesheet" href="/static/style.css?v=20260517f">
 </head>
 <body class="staff-body">
   <main class="staff-dashboard">
@@ -132,6 +132,82 @@
         <h2>Rating</h2>
         <p class="panel-hint">Rate quality to improve tuning over time.</p>
 
+        <div id="autoReviewBox" class="auto-review-box">
+          <div class="auto-review-head">
+            <h3>Auto Review</h3>
+            <button id="applyAutoReviewBtn" class="small-action-btn" type="button">Use Auto Review</button>
+          </div>
+          <p><strong>Auto rating:</strong> <span id="autoRatingText">-</span></p>
+          <p><strong>Confidence:</strong> <span id="autoConfidenceText">-</span></p>
+          <p><strong>Auto bad tags:</strong> <span id="autoBadTagsText">-</span></p>
+          <p><strong>Auto good tags:</strong> <span id="autoGoodTagsText">-</span></p>
+          <p><strong>Auto notes:</strong> <span id="autoNotesText">-</span></p>
+          <p class="panel-hint">Staff rating is final. You can accept or override auto review before saving.</p>
+        </div>
+
+        <div class="comparison-review-box">
+          <h3>Before/After Comparison Scores</h3>
+          <p class="panel-hint">Score each area from 1 (bad) to 5 (excellent) while comparing input vs output.</p>
+          <div class="comparison-grid">
+            <label class="comparison-field" for="scoreSubjectPreserved">
+              Subject preserved
+              <select id="scoreSubjectPreserved">
+                <option value="">-</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </label>
+            <label class="comparison-field" for="scoreColorImprovement">
+              Color improvement
+              <select id="scoreColorImprovement">
+                <option value="">-</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </label>
+            <label class="comparison-field" for="scoreBackgroundFullness">
+              Background fullness
+              <select id="scoreBackgroundFullness">
+                <option value="">-</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </label>
+            <label class="comparison-field" for="scoreStyleQuality">
+              Style quality
+              <select id="scoreStyleQuality">
+                <option value="">-</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </label>
+            <label class="comparison-field" for="scoreChildFriendlyResult">
+              Child-friendly result
+              <select id="scoreChildFriendlyResult">
+                <option value="">-</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </label>
+          </div>
+          <p class="panel-hint">Overall rating: use the 1-5 star buttons below.</p>
+        </div>
+
         <div id="starGroup" class="star-group" aria-label="Rating stars">
           <button type="button" class="star-btn" data-star="1">1 Star</button>
           <button type="button" class="star-btn" data-star="2">2 Stars</button>
@@ -165,6 +241,6 @@
     </section>
   </main>
 
-  <script src="/static/staff.js?v=20260517a"></script>
+  <script src="/static/staff.js?v=20260517e"></script>
 </body>
 </html>

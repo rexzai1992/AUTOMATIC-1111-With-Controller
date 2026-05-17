@@ -27,6 +27,18 @@ const tagGroup = document.getElementById("tagGroup");
 const feedbackNoteInput = document.getElementById("feedbackNote");
 const saveRatingBtn = document.getElementById("saveRatingBtn");
 const ratingStatus = document.getElementById("ratingStatus");
+const scoreSubjectPreserved = document.getElementById("scoreSubjectPreserved");
+const scoreColorImprovement = document.getElementById("scoreColorImprovement");
+const scoreBackgroundFullness = document.getElementById("scoreBackgroundFullness");
+const scoreStyleQuality = document.getElementById("scoreStyleQuality");
+const scoreChildFriendlyResult = document.getElementById("scoreChildFriendlyResult");
+const autoReviewBox = document.getElementById("autoReviewBox");
+const autoRatingText = document.getElementById("autoRatingText");
+const autoConfidenceText = document.getElementById("autoConfidenceText");
+const autoBadTagsText = document.getElementById("autoBadTagsText");
+const autoGoodTagsText = document.getElementById("autoGoodTagsText");
+const autoNotesText = document.getElementById("autoNotesText");
+const applyAutoReviewBtn = document.getElementById("applyAutoReviewBtn");
 
 const galleryControlList = document.getElementById("galleryControlList");
 const refreshGalleryControlBtn = document.getElementById("refreshGalleryControlBtn");
@@ -37,22 +49,74 @@ const methodPanels = Array.from(document.querySelectorAll(".method-panel"));
 const webcamPermissionStatus = document.getElementById("webcamPermissionStatus");
 const requestWebcamPermissionBtn = document.getElementById("requestWebcamPermissionBtn");
 
-const FEEDBACK_TAGS = [
-  { id: "too_close_to_drawing", label: "Too close to drawing" },
-  { id: "changed_too_much", label: "Changed too much" },
-  { id: "not_lively_enough", label: "Not lively enough" },
-  { id: "too_realistic", label: "Too realistic" },
-  { id: "too_cartoon", label: "Too cartoon" },
-  { id: "bad_face", label: "Bad face" },
-  { id: "bad_hands", label: "Bad hands" },
-  { id: "bad_colors", label: "Bad colors" },
-  { id: "too_dark", label: "Too dark" },
-  { id: "too_empty", label: "Too empty" },
+const BAD_FEEDBACK_TAG_GROUPS = [
+  {
+    title: "1. Identity / subject problems",
+    tags: [
+      { id: "wrong_subject", label: "Wrong subject" },
+      { id: "same_as_input", label: "Same as input" },
+      { id: "person_missing", label: "Person missing" },
+      { id: "main_object_missing", label: "Main object missing" },
+      { id: "wrong_composition", label: "Wrong composition" },
+      { id: "over_changed", label: "Over changed" }
+    ]
+  },
+  {
+    title: "2. Quality and color problems",
+    tags: [
+      { id: "too_empty", label: "Too empty" },
+      { id: "bad_colors", label: "Bad colors" },
+      { id: "low_quality", label: "Low quality" },
+      { id: "too_realistic", label: "Too realistic" },
+      { id: "scary_or_creepy", label: "Scary or creepy" }
+    ]
+  },
+  {
+    title: "3. Legacy / advanced tags",
+    tags: [
+      { id: "wrong_generation", label: "Wrong generation (legacy)" },
+      { id: "person_changed", label: "Person changed" },
+      { id: "face_changed", label: "Face changed" },
+      { id: "artwork_missing", label: "Artwork missing" },
+      { id: "artwork_changed", label: "Artwork changed" },
+      { id: "object_missing", label: "Object missing" },
+      { id: "object_changed", label: "Object changed" },
+      { id: "composition_wrong", label: "Composition wrong (legacy)" },
+      { id: "changed_too_much", label: "Changed too much (legacy)" },
+      { id: "creepy", label: "Creepy (legacy)" },
+      { id: "background_wrong", label: "Background wrong" },
+      { id: "too_messy", label: "Too messy" },
+      { id: "style_wrong", label: "Style wrong" },
+      { id: "not_lively_enough", label: "Not lively enough" },
+      { id: "too_cartoon", label: "Too cartoon" }
+    ]
+  },
+  {
+    title: "4. Technical artifacts",
+    tags: [
+      { id: "bad_face", label: "Bad face" },
+      { id: "bad_hands", label: "Bad hands" },
+      { id: "blurry", label: "Blurry" },
+      { id: "too_dark", label: "Too dark" },
+      { id: "text_or_watermark", label: "Text or watermark" }
+    ]
+  }
+];
+
+const GOOD_FEEDBACK_TAGS = [
   { id: "good_preserve_shape", label: "Good preserve shape" },
+  { id: "good_preserve_person", label: "Good preserve person" },
+  { id: "good_preserve_artwork", label: "Good preserve artwork" },
   { id: "good_lively", label: "Good lively" },
   { id: "good_colors", label: "Good colors" },
+  { id: "good_style", label: "Good style" },
   { id: "good_overall", label: "Good overall" }
 ];
+
+const ALL_FEEDBACK_TAG_IDS = new Set([
+  ...BAD_FEEDBACK_TAG_GROUPS.flatMap((group) => group.tags.map((tag) => tag.id)),
+  ...GOOD_FEEDBACK_TAGS.map((tag) => tag.id)
+]);
 
 const DEFAULT_ESTIMATE = {
   estimatedSeconds: 60,
@@ -73,6 +137,20 @@ let galleryControlItems = [];
 let latestQueueStatus = null;
 let webcamPermissionState = "unknown";
 let webcamPermissionPending = null;
+let currentAutoReview = {
+  autoRating: 0,
+  autoBadTags: [],
+  autoGoodTags: [],
+  autoNotes: "",
+  confidence: 0,
+  metrics: {
+    similarityScore: 0,
+    whiteBackgroundRatio: 0,
+    colorRatio: 0,
+    edgeRatio: 0,
+    colorGain: 0
+  }
+};
 
 function appendEvent(text, isError = false) {
   const item = document.createElement("li");
@@ -306,21 +384,43 @@ async function fetchGenerationEstimate() {
 
 function renderTagCheckboxes() {
   tagGroup.innerHTML = "";
-  FEEDBACK_TAGS.forEach((tagMeta) => {
-    const label = document.createElement("label");
-    label.className = "tag-item";
 
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.value = tagMeta.id;
+  const createTagGroup = (title, tags, variant) => {
+    const group = document.createElement("section");
+    group.className = "tag-category";
 
-    const text = document.createElement("span");
-    text.textContent = tagMeta.label;
+    const heading = document.createElement("p");
+    heading.className = "tag-category-title";
+    heading.textContent = title;
+    group.appendChild(heading);
 
-    label.appendChild(checkbox);
-    label.appendChild(text);
-    tagGroup.appendChild(label);
+    const grid = document.createElement("div");
+    grid.className = "tag-category-grid";
+
+    tags.forEach((tagMeta) => {
+      const label = document.createElement("label");
+      label.className = `tag-item ${variant}`;
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.value = tagMeta.id;
+
+      const text = document.createElement("span");
+      text.textContent = tagMeta.label;
+
+      label.appendChild(checkbox);
+      label.appendChild(text);
+      grid.appendChild(label);
+    });
+
+    group.appendChild(grid);
+    tagGroup.appendChild(group);
+  };
+
+  BAD_FEEDBACK_TAG_GROUPS.forEach((group) => {
+    createTagGroup(group.title, group.tags, "bad");
   });
+  createTagGroup("Good feedback tags", GOOD_FEEDBACK_TAGS, "good");
 }
 
 function setSelectedRating(ratingValue) {
@@ -346,6 +446,166 @@ function setSelectedFeedbackTags(tags) {
   tagGroup.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
     checkbox.checked = selectedSet.has(checkbox.value);
   });
+}
+
+function getComparisonScoresFromForm() {
+  const fields = [
+    ["subjectPreserved", scoreSubjectPreserved],
+    ["colorImprovement", scoreColorImprovement],
+    ["backgroundFullness", scoreBackgroundFullness],
+    ["styleQuality", scoreStyleQuality],
+    ["childFriendlyResult", scoreChildFriendlyResult]
+  ];
+  const payload = {};
+  fields.forEach(([key, element]) => {
+    if (!element) {
+      return;
+    }
+    const numeric = Number(element.value);
+    if (Number.isInteger(numeric) && numeric >= 1 && numeric <= 5) {
+      payload[key] = numeric;
+    }
+  });
+  return payload;
+}
+
+function setComparisonScoresToForm(scores) {
+  const safe = scores && typeof scores === "object" ? scores : {};
+  const fields = [
+    ["subjectPreserved", scoreSubjectPreserved],
+    ["colorImprovement", scoreColorImprovement],
+    ["backgroundFullness", scoreBackgroundFullness],
+    ["styleQuality", scoreStyleQuality],
+    ["childFriendlyResult", scoreChildFriendlyResult]
+  ];
+  fields.forEach(([key, element]) => {
+    if (!element) {
+      return;
+    }
+    const numeric = Number(safe[key]);
+    element.value = Number.isInteger(numeric) && numeric >= 1 && numeric <= 5 ? String(numeric) : "";
+  });
+}
+
+function normalizeAutoReview(rawReview) {
+  const fallback = {
+    autoRating: 0,
+    autoBadTags: [],
+    autoGoodTags: [],
+    autoNotes: "",
+    confidence: 0,
+    metrics: {
+      similarityScore: 0,
+      whiteBackgroundRatio: 0,
+      colorRatio: 0,
+      edgeRatio: 0,
+      colorGain: 0
+    }
+  };
+
+  if (!rawReview || typeof rawReview !== "object") {
+    return fallback;
+  }
+
+  const autoRating = Number(rawReview.autoRating);
+  const badTags = Array.isArray(rawReview.autoBadTags)
+    ? rawReview.autoBadTags.filter((tag) => typeof tag === "string" && ALL_FEEDBACK_TAG_IDS.has(tag))
+    : [];
+  const goodTags = Array.isArray(rawReview.autoGoodTags)
+    ? rawReview.autoGoodTags.filter((tag) => typeof tag === "string" && ALL_FEEDBACK_TAG_IDS.has(tag))
+    : [];
+  const confidenceValue = Number(rawReview.confidence);
+  const rawMetrics = rawReview.metrics && typeof rawReview.metrics === "object" ? rawReview.metrics : {};
+  const metricNumber = (value, min = 0, max = 1) => {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) {
+      return 0;
+    }
+    return Math.max(min, Math.min(max, numeric));
+  };
+
+  return {
+    autoRating: Number.isInteger(autoRating) && autoRating >= 1 && autoRating <= 5 ? autoRating : 0,
+    autoBadTags: Array.from(new Set(badTags)),
+    autoGoodTags: Array.from(new Set(goodTags)),
+    autoNotes: String(rawReview.autoNotes || "").trim(),
+    confidence:
+      Number.isFinite(confidenceValue) && confidenceValue >= 0
+        ? Math.max(0, Math.min(1, confidenceValue))
+        : 0,
+    metrics: {
+      similarityScore: metricNumber(rawMetrics.similarityScore, 0, 1),
+      whiteBackgroundRatio: metricNumber(rawMetrics.whiteBackgroundRatio, 0, 1),
+      colorRatio: metricNumber(rawMetrics.colorRatio, 0, 1),
+      edgeRatio: metricNumber(rawMetrics.edgeRatio, 0, 1),
+      colorGain: metricNumber(rawMetrics.colorGain, -1, 1)
+    }
+  };
+}
+
+function renderAutoReview(rawReview) {
+  currentAutoReview = normalizeAutoReview(rawReview);
+  if (!autoReviewBox) {
+    return;
+  }
+
+  autoRatingText.textContent = currentAutoReview.autoRating
+    ? `${currentAutoReview.autoRating}/5`
+    : "-";
+  autoConfidenceText.textContent = `${Math.round(currentAutoReview.confidence * 100)}%`;
+  autoBadTagsText.textContent = currentAutoReview.autoBadTags.length
+    ? currentAutoReview.autoBadTags.join(", ")
+    : "-";
+  autoGoodTagsText.textContent = currentAutoReview.autoGoodTags.length
+    ? currentAutoReview.autoGoodTags.join(", ")
+    : "-";
+  autoNotesText.textContent = currentAutoReview.autoNotes || "-";
+
+  if (applyAutoReviewBtn) {
+    applyAutoReviewBtn.disabled = currentAutoReview.autoRating <= 0;
+  }
+}
+
+function applyAutoReviewToForm() {
+  if (!currentAutoReview || currentAutoReview.autoRating <= 0) {
+    ratingStatus.textContent = "Auto review rating is not available yet.";
+    return;
+  }
+
+  setSelectedRating(currentAutoReview.autoRating);
+  const mergedTags = Array.from(new Set([
+    ...currentAutoReview.autoBadTags,
+    ...currentAutoReview.autoGoodTags
+  ]));
+  setSelectedFeedbackTags(mergedTags);
+
+  const clampScore = (value) => Math.max(1, Math.min(5, Math.round(value)));
+  const metrics = currentAutoReview.metrics || {};
+  const similarity = Number(metrics.similarityScore || 0);
+  const whiteRatio = Number(metrics.whiteBackgroundRatio || 0);
+  const colorRatio = Number(metrics.colorRatio || 0);
+  const edgeRatio = Number(metrics.edgeRatio || 0);
+  const colorGain = Number(metrics.colorGain || 0);
+  const hasCreepy = currentAutoReview.autoBadTags.includes("scary_or_creepy") || currentAutoReview.autoBadTags.includes("creepy");
+
+  setComparisonScoresToForm({
+    subjectPreserved: clampScore(1 + similarity * 4),
+    colorImprovement: clampScore(3 + colorGain * 6),
+    backgroundFullness: clampScore(5 - whiteRatio * 4),
+    styleQuality: clampScore(1 + (edgeRatio * 2.4 + colorRatio * 1.8)),
+    childFriendlyResult: hasCreepy ? 2 : clampScore(3 + (0.5 - whiteRatio) * 2)
+  });
+
+  const notePrefix = "AUTO REVIEW:";
+  const autoNoteLine = currentAutoReview.autoNotes
+    ? `${notePrefix} ${currentAutoReview.autoNotes}`
+    : `${notePrefix} autoRating=${currentAutoReview.autoRating}/5 confidence=${Math.round(currentAutoReview.confidence * 100)}%`;
+
+  const currentNote = String(feedbackNoteInput.value || "").trim();
+  if (!currentNote.includes(notePrefix)) {
+    feedbackNoteInput.value = currentNote ? `${currentNote}\n${autoNoteLine}` : autoNoteLine;
+  }
+  ratingStatus.textContent = "Auto review applied. You can edit before saving.";
 }
 
 function setWebcamPermissionState(state, message) {
@@ -529,13 +789,35 @@ function updateStatusFromResult(result, source = "response") {
     finalDurationText.textContent = "-";
   }
 
-  const existingRating = Number(result.rating);
+  const rawStaffRating = result.staffRating ?? result.rating;
+  const existingRating = Number(rawStaffRating);
   if (Number.isInteger(existingRating) && existingRating >= 1 && existingRating <= 5) {
     setSelectedRating(existingRating);
   } else {
     setSelectedRating(null);
   }
+
+  const autoReviewFromResult =
+    result.autoReview && typeof result.autoReview === "object"
+      ? result.autoReview
+      : {
+          autoRating: Number(result.autoRating) || 0,
+          autoBadTags: [],
+          autoGoodTags: [],
+          autoNotes: "",
+          confidence: 0,
+          metrics: {
+            similarityScore: 0,
+            whiteBackgroundRatio: 0,
+            colorRatio: 0,
+            edgeRatio: 0,
+            colorGain: 0
+          }
+        };
+  renderAutoReview(autoReviewFromResult);
+
   setSelectedFeedbackTags(result.feedbackTags || []);
+  setComparisonScoresToForm(result.comparisonScores || {});
   feedbackNoteInput.value = result.feedbackNote || "";
 
   ratingStatus.textContent = result.ratedAt
@@ -564,6 +846,8 @@ function clearDashboard() {
 
   setSelectedRating(null);
   setSelectedFeedbackTags([]);
+  setComparisonScoresToForm({});
+  renderAutoReview(null);
   feedbackNoteInput.value = "";
   ratingStatus.textContent = "No rating saved yet.";
   ratingSection.hidden = true;
@@ -690,7 +974,8 @@ async function saveRating() {
   const payload = {
     rating: selectedRating,
     feedbackTags: getSelectedFeedbackTags(),
-    feedbackNote: feedbackNoteInput.value.trim()
+    feedbackNote: feedbackNoteInput.value.trim(),
+    comparisonScores: getComparisonScoresFromForm()
   };
 
   saveRatingBtn.disabled = true;
@@ -1199,6 +1484,12 @@ if (requestWebcamPermissionBtn) {
   });
 }
 
+if (applyAutoReviewBtn) {
+  applyAutoReviewBtn.addEventListener("click", () => {
+    applyAutoReviewToForm();
+  });
+}
+
 generateBtn.addEventListener("click", submitGeneration);
 clearBtn.addEventListener("click", clearDashboard);
 saveRatingBtn.addEventListener("click", saveRating);
@@ -1208,6 +1499,7 @@ setupLanHelper();
 setActiveMethod("upload");
 setStatus("Idle");
 ratingSection.hidden = true;
+renderAutoReview(null);
 setPreview(inputPreviewLink, inputPreviewImage, null);
 setPreview(outputPreviewLink, outputPreviewImage, null);
 wirePreviewLinkSafety(inputPreviewLink);

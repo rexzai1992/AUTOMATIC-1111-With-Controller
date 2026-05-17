@@ -60,6 +60,7 @@ from app.generator import (
     StableDiffusionGenerator,
     StableDiffusionUnavailableError,
 )
+from app.quality_reviewer import default_auto_review, review_generation_quality
 from app.queue_store import QueueStore, utc_now_iso
 from app.scanner_service import ScannerService
 from app.websocket_manager import WebSocketManager
@@ -99,42 +100,72 @@ api_key_state_lock = threading.Lock()
 API_KEY_STATE_PATH = BASE_DIR / "data" / "api_key_state.json"
 API_DOCS_MARKDOWN_PATH = BASE_DIR / "docs" / "API.md"
 
-ALLOWED_FEEDBACK_TAGS = {
-    "too_close_to_drawing",
-    "changed_too_much",
-    "not_lively_enough",
-    "too_realistic",
-    "too_cartoon",
-    "bad_face",
-    "bad_hands",
-    "bad_colors",
-    "too_dark",
-    "too_empty",
-    "good_preserve_shape",
-    "good_lively",
-    "good_colors",
-    "good_overall",
-}
-
 BAD_FEEDBACK_TAGS = {
-    "too_close_to_drawing",
-    "changed_too_much",
-    "not_lively_enough",
+    # New primary tags
+    "wrong_subject",
+    "person_missing",
+    "main_object_missing",
+    "wrong_composition",
+    "too_empty",
+    "same_as_input",
+    "bad_colors",
+    "low_quality",
+    "over_changed",
     "too_realistic",
+    "scary_or_creepy",
+    # Existing tags kept for compatibility and richer tuning
+    "wrong_generation",
+    "person_changed",
+    "face_changed",
+    "artwork_missing",
+    "artwork_changed",
+    "object_missing",
+    "object_changed",
+    "background_wrong",
+    "too_messy",
+    "not_lively_enough",
+    "changed_too_much",
     "too_cartoon",
     "bad_face",
     "bad_hands",
-    "bad_colors",
     "too_dark",
-    "too_empty",
+    "blurry",
+    "creepy",
+    "text_or_watermark",
+    "composition_wrong",
+    "style_wrong",
+    # Legacy compatibility tag kept to avoid rejecting existing flows.
+    "too_close_to_drawing",
 }
 
 GOOD_FEEDBACK_TAGS = {
     "good_preserve_shape",
+    "good_preserve_person",
+    "good_preserve_artwork",
     "good_lively",
     "good_colors",
+    "good_style",
     "good_overall",
 }
+
+ALLOWED_FEEDBACK_TAGS = BAD_FEEDBACK_TAGS | GOOD_FEEDBACK_TAGS
+WRONG_SUBJECT_TAGS = {"wrong_subject", "wrong_generation"}
+OVER_CHANGED_TAGS = {"over_changed", "changed_too_much"}
+WRONG_COMPOSITION_TAGS = {"wrong_composition", "composition_wrong"}
+SCARY_TAGS = {"scary_or_creepy", "creepy"}
+MISSING_SUBJECT_TAGS = {
+    "person_missing",
+    "main_object_missing",
+    "artwork_missing",
+    "object_missing",
+}
+COMPARISON_SCORE_KEYS = (
+    "subjectPreserved",
+    "colorImprovement",
+    "backgroundFullness",
+    "styleQuality",
+    "childFriendlyResult",
+)
 
 KNOWN_PRESETS = [
     "toddler_abstract_people",
@@ -148,14 +179,41 @@ DEFAULT_GENERATION_ESTIMATE_SECONDS = 60
 MAX_RETRY_COUNT = 3
 
 ALLOWED_REGENERATE_PROBLEM_TAGS = {
+    # New primary tags
+    "wrong_subject",
+    "person_missing",
+    "main_object_missing",
+    "wrong_composition",
+    "too_empty",
+    "same_as_input",
+    "bad_colors",
+    "low_quality",
+    "over_changed",
+    "too_realistic",
+    "scary_or_creepy",
+    # Existing tags kept for compatibility
+    "wrong_generation",
+    "person_changed",
+    "face_changed",
+    "artwork_missing",
+    "artwork_changed",
+    "object_missing",
+    "object_changed",
+    "background_wrong",
+    "too_messy",
     "not_lively_enough",
     "changed_too_much",
+    "too_cartoon",
     "bad_face",
     "bad_hands",
-    "bad_colors",
     "too_dark",
-    "artwork_changed",
-    "person_changed",
+    "blurry",
+    "creepy",
+    "text_or_watermark",
+    "composition_wrong",
+    "style_wrong",
+    # Legacy compatibility tag kept to avoid rejecting existing flows.
+    "too_close_to_drawing",
 }
 
 REGENERATE_BRIGHT_PROMPT = (
@@ -167,16 +225,61 @@ REGENERATE_FACE_NEGATIVE = (
 REGENERATE_HAND_NEGATIVE = (
     "bad hands, malformed hands, extra fingers, fused fingers, extra limbs"
 )
+REGENERATE_WRONG_GENERATION_PROMPT = (
+    "Use the selected generation mode and style routing exactly. Keep the same source image and regenerate "
+    "with correct subject intent."
+)
+REGENERATE_PRESERVE_PERSON_PROMPT = (
+    "preserve exact person, face, pose, expression, body proportions, and clothing from the original input"
+)
+REGENERATE_PRESERVE_ARTWORK_PROMPT = (
+    "preserve exact artwork design, paper position, drawing lines, and layout from the original input"
+)
+REGENERATE_RICH_BACKGROUND_PROMPT = (
+    "rich environment, full background, playful scene, no empty white areas, lively storytelling atmosphere"
+)
+
+GENERATION_MODE_PROMPT_HINTS = {
+    "drawing_to_artwork": (
+        "Convert drawing to artwork while preserving composition, character identity, and object placement."
+    ),
+    "person_holding_artwork": (
+        "Preserve exact person, face, pose, clothing, and exact artwork design and paper position in hands."
+    ),
+}
+
+STYLE_PROMPT_HINTS = {
+    "storybook": "children's storybook illustration style",
+    "storybook_plus": "highly polished children's storybook illustration style",
+    "watercolor": "soft watercolor illustration style",
+    "cartoon": "playful stylized cartoon illustration style",
+    "anime": "clean anime-inspired illustration style",
+    "pixel": "pixel art illustration style",
+    "auto": "",
+}
 
 DEFAULT_GENERATION_MODE = "drawing_to_artwork"
 DEFAULT_STYLE_ID = "auto"
 API_KEY_HEADER = "X-API-Key"
 
 
+class ComparisonScoresRequest(BaseModel):
+    subjectPreserved: Optional[conint(ge=1, le=5)] = None  # type: ignore[valid-type]
+    colorImprovement: Optional[conint(ge=1, le=5)] = None  # type: ignore[valid-type]
+    backgroundFullness: Optional[conint(ge=1, le=5)] = None  # type: ignore[valid-type]
+    styleQuality: Optional[conint(ge=1, le=5)] = None  # type: ignore[valid-type]
+    childFriendlyResult: Optional[conint(ge=1, le=5)] = None  # type: ignore[valid-type]
+
+    def to_payload(self) -> Dict[str, int]:
+        payload = self.dict(exclude_none=True)
+        return {str(key): int(value) for key, value in payload.items()}
+
+
 class RatingRequest(BaseModel):
     rating: conint(ge=1, le=5)  # type: ignore[valid-type]
     feedbackTags: List[str] = Field(default_factory=list)
     feedbackNote: str = ""
+    comparisonScores: Optional[ComparisonScoresRequest] = None
 
     @validator("feedbackTags")
     def validate_feedback_tags(cls, value: List[str]) -> List[str]:
@@ -212,6 +315,8 @@ class GalleryVisibilityRequest(BaseModel):
 
 class RegenerateRequest(BaseModel):
     problemTags: List[str] = Field(default_factory=list)
+    generationMode: Optional[str] = None
+    styleId: Optional[str] = None
 
     @validator("problemTags")
     def validate_problem_tags(cls, value: List[str]) -> List[str]:
@@ -227,6 +332,18 @@ class RegenerateRequest(BaseModel):
                 seen.add(normalized)
                 cleaned.append(normalized)
         return cleaned
+
+    @validator("generationMode")
+    def normalize_generation_mode_value(cls, value: Optional[str]) -> Optional[str]:
+        if value is None:
+            return None
+        return _normalize_generation_mode(value)
+
+    @validator("styleId")
+    def normalize_style_id_value(cls, value: Optional[str]) -> Optional[str]:
+        if value is None:
+            return None
+        return _normalize_style_id(value)
 
 
 class CleanupRequest(BaseModel):
@@ -254,6 +371,35 @@ def _normalize_source(value: Optional[str]) -> str:
     if cleaned == "api":
         return "api"
     return "staff"
+
+
+def _append_prompt_sentence(base_prompt: str, sentence: str) -> str:
+    prompt = str(base_prompt or "").strip()
+    addition = str(sentence or "").strip().rstrip(".")
+    if not addition:
+        return prompt
+    if addition.lower() in prompt.lower():
+        return prompt
+    if prompt and not prompt.endswith("."):
+        prompt = f"{prompt}."
+    if prompt:
+        return f"{prompt} {addition}."
+    return f"{addition}."
+
+
+def _apply_mode_style_prompt(base_prompt: str, generation_mode: str, style_id: str) -> str:
+    prompt = str(base_prompt or "").strip()
+    mode_hint = GENERATION_MODE_PROMPT_HINTS.get(generation_mode, "")
+    if mode_hint:
+        prompt = _append_prompt_sentence(prompt, mode_hint)
+
+    normalized_style = str(style_id or "").strip().lower()
+    style_hint = STYLE_PROMPT_HINTS.get(normalized_style, "")
+    if normalized_style and normalized_style != "auto" and not style_hint:
+        style_hint = f"Use {normalized_style} illustration style consistently."
+    if style_hint:
+        prompt = _append_prompt_sentence(prompt, style_hint)
+    return prompt
 
 
 def _to_public_image_url(request: Request, url_value: Any, absolute: bool) -> str:
@@ -538,8 +684,12 @@ def _build_gallery_item(
         "hiddenAt": None,
         "updatedAt": None,
         "rating": None,
+        "staffRating": None,
+        "autoRating": 0,
+        "autoReview": _default_auto_review_payload(),
         "feedbackTags": [],
         "feedbackNote": "",
+        "comparisonScores": {},
         "ratedAt": None,
         "generationMode": DEFAULT_GENERATION_MODE,
         "styleId": DEFAULT_STYLE_ID,
@@ -574,6 +724,13 @@ def _build_generation_complete_event(item: Dict[str, Any]) -> Dict[str, Any]:
         "hiddenAt": item.get("hiddenAt"),
         "updatedAt": item.get("updatedAt"),
         "rating": item.get("rating"),
+        "staffRating": item.get("staffRating"),
+        "autoRating": item.get("autoRating"),
+        "autoReview": _normalize_auto_review_payload(item.get("autoReview")),
+        "feedbackTags": item.get("feedbackTags", []),
+        "feedbackNote": item.get("feedbackNote", ""),
+        "comparisonScores": item.get("comparisonScores", {}),
+        "ratedAt": item.get("ratedAt"),
     }
 
 
@@ -612,6 +769,9 @@ async def _run_generation_pipeline(
     estimated_seconds = int(
         estimate_payload.get("estimatedSeconds", DEFAULT_GENERATION_ESTIMATE_SECONDS)
     )
+    extra_fields = dict(extra_item_fields or {})
+    generation_mode = _normalize_generation_mode(extra_fields.get("generationMode"))
+    style_id = _normalize_style_id(extra_fields.get("styleId"))
 
     detection: Optional[DetectionResult] = None
     if preset_override is None:
@@ -621,6 +781,20 @@ async def _run_generation_pipeline(
     else:
         preset = preset_override
         detection_payload = detection_payload_override or {}
+
+    routed_prompt = _apply_mode_style_prompt(preset.prompt, generation_mode, style_id)
+    preset = PresetSettings(
+        name=preset.name,
+        control_weight=preset.control_weight,
+        denoising_strength=preset.denoising_strength,
+        control_mode=preset.control_mode,
+        cfg_scale=preset.cfg_scale,
+        steps=preset.steps,
+        sampler_name=preset.sampler_name,
+        prompt=routed_prompt,
+        negative_prompt=preset.negative_prompt,
+        prompt_mode=preset.prompt_mode,
+    )
 
     output_path = OUTPUT_DIR / f"{job_id}.png"
     prompt_mode = preset.prompt_mode
@@ -663,8 +837,22 @@ async def _run_generation_pipeline(
         preset=preset,
         detection_payload=detection_payload,
         generation_settings=resolved_generation_settings,
-        extra_fields=extra_item_fields,
+        extra_fields=extra_fields,
     )
+
+    auto_review = await run_in_threadpool(
+        review_generation_quality,
+        input_path=input_path,
+        output_path=output_path,
+        generation_mode=generation_mode,
+        preset=preset.name,
+        style_id=style_id,
+        generation_settings=resolved_generation_settings,
+    )
+    normalized_auto_review = _normalize_auto_review_payload(auto_review)
+    item["autoReview"] = normalized_auto_review
+    item["autoRating"] = int(normalized_auto_review.get("autoRating") or 0)
+    item["staffRating"] = _get_staff_rating(item)
 
     if persist_result:
         await run_in_threadpool(gallery_store.add_item, item)
@@ -891,47 +1079,189 @@ def _safe_int(value: Any) -> Optional[int]:
         return None
 
 
+def _default_auto_review_payload() -> Dict[str, Any]:
+    payload = dict(default_auto_review())
+    metrics = payload.get("metrics")
+    if not isinstance(metrics, dict):
+        metrics = {}
+    payload["metrics"] = {
+        "similarityScore": round(max(0.0, min(1.0, _safe_float(metrics.get("similarityScore")))), 4),
+        "whiteBackgroundRatio": round(max(0.0, min(1.0, _safe_float(metrics.get("whiteBackgroundRatio")))), 4),
+        "colorRatio": round(max(0.0, min(1.0, _safe_float(metrics.get("colorRatio")))), 4),
+        "edgeRatio": round(max(0.0, min(1.0, _safe_float(metrics.get("edgeRatio")))), 4),
+        "colorGain": round(max(-1.0, min(1.0, _safe_float(metrics.get("colorGain")))), 4),
+    }
+    return payload
+
+
+def _normalize_comparison_scores(value: Any) -> Dict[str, int]:
+    if not isinstance(value, dict):
+        return {}
+    cleaned: Dict[str, int] = {}
+    for key in COMPARISON_SCORE_KEYS:
+        numeric = _safe_int(value.get(key))
+        if numeric is None:
+            continue
+        if 1 <= numeric <= 5:
+            cleaned[key] = int(numeric)
+    return cleaned
+
+
+def _normalize_auto_review_payload(value: Any) -> Dict[str, Any]:
+    base = _default_auto_review_payload()
+    if not isinstance(value, dict):
+        return base
+
+    auto_rating = _safe_int(value.get("autoRating"))
+    if auto_rating is not None and 1 <= auto_rating <= 5:
+        base["autoRating"] = auto_rating
+    else:
+        base["autoRating"] = 0
+
+    bad_tags = [str(tag) for tag in value.get("autoBadTags", []) if isinstance(tag, str)]
+    good_tags = [str(tag) for tag in value.get("autoGoodTags", []) if isinstance(tag, str)]
+    base["autoBadTags"] = list(dict.fromkeys(bad_tags))
+    base["autoGoodTags"] = list(dict.fromkeys(good_tags))
+    base["autoNotes"] = str(value.get("autoNotes") or "").strip()
+    base["confidence"] = round(max(0.0, min(1.0, _safe_float(value.get("confidence")))), 3)
+    metrics = value.get("metrics")
+    metric_payload = _default_auto_review_payload().get("metrics", {})
+    if isinstance(metrics, dict):
+        metric_payload["similarityScore"] = round(
+            max(0.0, min(1.0, _safe_float(metrics.get("similarityScore")))),
+            4,
+        )
+        metric_payload["whiteBackgroundRatio"] = round(
+            max(0.0, min(1.0, _safe_float(metrics.get("whiteBackgroundRatio")))),
+            4,
+        )
+        metric_payload["colorRatio"] = round(
+            max(0.0, min(1.0, _safe_float(metrics.get("colorRatio")))),
+            4,
+        )
+        metric_payload["edgeRatio"] = round(
+            max(0.0, min(1.0, _safe_float(metrics.get("edgeRatio")))),
+            4,
+        )
+        metric_payload["colorGain"] = round(
+            max(-1.0, min(1.0, _safe_float(metrics.get("colorGain")))),
+            4,
+        )
+    base["metrics"] = metric_payload
+    return base
+
+
+def _get_staff_rating(item: Dict[str, Any]) -> Optional[int]:
+    staff_rating = _safe_int(item.get("staffRating"))
+    if staff_rating is not None and 1 <= staff_rating <= 5:
+        return staff_rating
+    legacy_rating = _safe_int(item.get("rating"))
+    if legacy_rating is not None and 1 <= legacy_rating <= 5:
+        return legacy_rating
+    return None
+
+
+def _get_auto_rating(item: Dict[str, Any]) -> Optional[int]:
+    auto_review = _normalize_auto_review_payload(item.get("autoReview"))
+    auto_rating = _safe_int(auto_review.get("autoRating"))
+    if auto_rating is not None and 1 <= auto_rating <= 5:
+        return auto_rating
+    fallback = _safe_int(item.get("autoRating"))
+    if fallback is not None and 1 <= fallback <= 5:
+        return fallback
+    return None
+
+
 def _is_many(tag_count: int, rated_count: int) -> bool:
     if rated_count <= 0:
         return False
     return tag_count >= 2 or (tag_count / rated_count) >= 0.35
 
 
-def _generate_recommendations(tag_counter: Counter, rated_count: int, preset_name: str) -> List[str]:
+def _generate_recommendations(tag_counter: Counter, rated_count: int, context_label: str) -> List[str]:
     recommendations: List[str] = []
+    prefix = f"{context_label}: "
 
-    too_close_score = tag_counter["too_close_to_drawing"] + tag_counter["not_lively_enough"]
-    if _is_many(too_close_score, rated_count):
+    wrong_subject_count = sum(tag_counter.get(tag, 0) for tag in WRONG_SUBJECT_TAGS)
+    if wrong_subject_count > 0:
         recommendations.append(
-            f"{preset_name} has many close/not lively outputs. Try increasing denoisingStrength by 0.05-0.1, "
-            f"decreasing controlWeight by 0.05-0.1, and using 'My prompt is more important'."
+            f"{prefix}Detected wrong_subject/wrong_generation. Check generationMode routing, prompt routing, and "
+            "confirm the correct preset/styleId is selected."
         )
 
-    changed_too_much_score = tag_counter["changed_too_much"]
-    if _is_many(changed_too_much_score, rated_count):
+    if tag_counter["same_as_input"] > 0 or tag_counter["too_close_to_drawing"] > 0:
         recommendations.append(
-            f"{preset_name} changes composition too much. Try decreasing denoisingStrength by 0.05-0.1, "
-            f"increasing controlWeight by 0.05-0.1, and using 'Balanced'."
+            f"{prefix}Detected same_as_input. Increase denoisingStrength by 0.08 and lower controlWeight by 0.05."
         )
 
-    if _is_many(tag_counter["too_realistic"], rated_count):
+    person_identity_score = (
+        tag_counter["person_missing"] + tag_counter["person_changed"] + tag_counter["face_changed"]
+    )
+    if person_identity_score > 0:
         recommendations.append(
-            f"{preset_name} trends too realistic. Strengthen storybook/cartoon prompt language and keep "
-            f"'photorealistic' in the negative prompt."
+            f"{prefix}Detected person identity drift. Increase controlWeight by 0.05-0.1, lower denoisingStrength "
+            "by 0.05, use 'person_holding_artwork' mode, and strengthen 'preserve exact person, face, pose, clothing'."
         )
 
-    face_hand_score = tag_counter["bad_face"] + tag_counter["bad_hands"]
-    if _is_many(face_hand_score, rated_count):
+    main_object_missing_score = (
+        tag_counter["main_object_missing"]
+        + tag_counter["artwork_missing"]
+        + tag_counter["object_missing"]
+        + tag_counter["artwork_changed"]
+        + tag_counter["object_changed"]
+    )
+    if main_object_missing_score > 0:
         recommendations.append(
-            f"{preset_name} has frequent face/hand issues. Add stronger face/hand negative terms and slightly "
-            f"lower denoisingStrength; enable face restoration only if needed."
+            f"{prefix}Detected main object missing/changed. Increase controlWeight by 0.05-0.1 and lower "
+            "denoisingStrength by 0.05 while reinforcing main object preservation."
         )
 
-    color_dark_score = tag_counter["bad_colors"] + tag_counter["too_dark"]
-    if _is_many(color_dark_score, rated_count):
+    if tag_counter["object_missing"] > 0 or tag_counter["object_changed"] > 0:
         recommendations.append(
-            f"{preset_name} has color/brightness issues. Reinforce vibrant warm palette in prompt and consider "
-            f"a slight CFG scale increase."
+            f"{prefix}Detected object drift. Increase controlWeight by 0.08 and lower denoisingStrength by 0.05."
+        )
+
+    if tag_counter["not_lively_enough"] > 0 or tag_counter["too_empty"] > 0:
+        recommendations.append(
+            f"{prefix}Detected dull/empty scenes. Increase denoisingStrength by 0.05-0.1, increase cfgScale by "
+            "0.5, and add full background / lively environment prompt guidance."
+        )
+
+    if tag_counter["changed_too_much"] > 0 or tag_counter["over_changed"] > 0:
+        recommendations.append(
+            f"{prefix}Detected over-change. Increase controlWeight by 0.05-0.1 and lower denoisingStrength by 0.05-0.1."
+        )
+
+    if tag_counter["bad_face"] > 0 or tag_counter["bad_hands"] > 0:
+        recommendations.append(
+            f"{prefix}Detected face/hand artifacts. Use stronger negative prompt terms and lower denoisingStrength slightly."
+        )
+
+    if tag_counter["style_wrong"] > 0:
+        recommendations.append(
+            f"{prefix}Detected style mismatch. Check selected styleId and style prompt routing."
+        )
+
+    wrong_composition_count = sum(tag_counter.get(tag, 0) for tag in WRONG_COMPOSITION_TAGS)
+    if wrong_composition_count > 0:
+        recommendations.append(
+            f"{prefix}Detected wrong composition. Increase controlWeight by 0.05 and reduce denoisingStrength by 0.05 "
+            "to preserve composition and object placement."
+        )
+
+    if tag_counter["too_messy"] > 0:
+        recommendations.append(
+            f"{prefix}Detected messy outputs. Increase controlWeight by 0.05 and lower denoisingStrength by 0.05."
+        )
+
+    if tag_counter["bad_colors"] > 0 or tag_counter["too_dark"] > 0:
+        recommendations.append(
+            f"{prefix}Detected color/lighting issues. Increase cfgScale by 0.5 and reinforce bright, warm palette prompting."
+        )
+
+    if tag_counter["blurry"] > 0 or tag_counter["low_quality"] > 0:
+        recommendations.append(
+            f"{prefix}Detected low quality/detail. Increase steps to 35-40 and add stronger quality prompt emphasis."
         )
 
     return recommendations
@@ -939,33 +1269,69 @@ def _generate_recommendations(tag_counter: Counter, rated_count: int, preset_nam
 
 def _build_tuning_summary(items: List[Dict[str, Any]]) -> Dict[str, Any]:
     total_images = len(items)
-    rated_items = [item for item in items if _safe_int(item.get("rating")) is not None]
-    rated_count = len(rated_items)
-    average_rating = (
-        round(sum(_safe_int(item.get("rating")) or 0 for item in rated_items) / rated_count, 3)
-        if rated_count > 0
+    staff_rated_items = [item for item in items if _get_staff_rating(item) is not None]
+    staff_rated_count = len(staff_rated_items)
+    average_staff_rating = (
+        round(
+            sum(_get_staff_rating(item) or 0 for item in staff_rated_items) / staff_rated_count,
+            3,
+        )
+        if staff_rated_count > 0
+        else 0
+    )
+
+    auto_rated_items = [item for item in items if _get_auto_rating(item) is not None]
+    auto_rated_count = len(auto_rated_items)
+    average_auto_rating = (
+        round(sum(_get_auto_rating(item) or 0 for item in auto_rated_items) / auto_rated_count, 3)
+        if auto_rated_count > 0
         else 0
     )
 
     by_preset: Dict[str, Dict[str, Any]] = {}
     low_rated_items: List[Dict[str, Any]] = []
+    mismatch_examples: List[Dict[str, Any]] = []
+    mismatch_total_delta = 0.0
+
     global_bad_counter: Counter = Counter()
     global_good_counter: Counter = Counter()
+    global_auto_bad_counter: Counter = Counter()
+    global_auto_good_counter: Counter = Counter()
+    bad_by_preset_counter: Dict[str, Counter] = {}
+    good_by_preset_counter: Dict[str, Counter] = {}
+    bad_by_generation_mode_counter: Dict[str, Counter] = {}
+    bad_by_style_id_counter: Dict[str, Counter] = {}
+    similarity_score_sum = 0.0
+    similarity_score_count = 0
+    white_background_ratio_sum = 0.0
+    white_background_ratio_count = 0
 
     def _new_preset_stats() -> Dict[str, Any]:
         return {
             "count": 0,
             "ratedCount": 0,
+            "autoRatedCount": 0,
             "averageRating": 0,
+            "averageStaffRating": 0,
+            "averageAutoRating": 0,
             "averageControlWeight": 0,
             "averageDenoisingStrength": 0,
             "commonBadTags": [],
             "commonGoodTags": [],
+            "commonAutoBadTags": [],
+            "commonAutoGoodTags": [],
+            "badTagCounts": {},
+            "goodTagCounts": {},
+            "autoBadTagCounts": {},
+            "autoGoodTagCounts": {},
             "_ratingSum": 0.0,
+            "_autoRatingSum": 0.0,
             "_controlWeightSum": 0.0,
             "_denoiseSum": 0.0,
             "_badCounter": Counter(),
             "_goodCounter": Counter(),
+            "_autoBadCounter": Counter(),
+            "_autoGoodCounter": Counter(),
         }
 
     for preset_name in KNOWN_PRESETS:
@@ -973,40 +1339,75 @@ def _build_tuning_summary(items: List[Dict[str, Any]]) -> Dict[str, Any]:
 
     for item in items:
         preset = str(item.get("preset") or "unknown")
-        stats = by_preset.setdefault(
-            preset,
-            {
-                **_new_preset_stats(),
-            },
-        )
+        generation_mode = _normalize_generation_mode(item.get("generationMode"))
+        style_id = _normalize_style_id(item.get("styleId"))
+        stats = by_preset.setdefault(preset, {**_new_preset_stats()})
+        bad_by_preset_counter.setdefault(preset, Counter())
+        good_by_preset_counter.setdefault(preset, Counter())
+        bad_by_generation_mode_counter.setdefault(generation_mode, Counter())
+        bad_by_style_id_counter.setdefault(style_id, Counter())
 
         stats["count"] += 1
         generation_settings = item.get("generationSettings") or {}
         stats["_controlWeightSum"] += _safe_float(generation_settings.get("controlWeight"))
         stats["_denoiseSum"] += _safe_float(generation_settings.get("denoisingStrength"))
 
-        rating = _safe_int(item.get("rating"))
-        if rating is not None:
+        auto_review = _normalize_auto_review_payload(item.get("autoReview"))
+        auto_rating = _safe_int(auto_review.get("autoRating"))
+        if auto_rating is not None and 1 <= auto_rating <= 5:
+            stats["autoRatedCount"] += 1
+            stats["_autoRatingSum"] += auto_rating
+
+        auto_bad_tags = [str(tag) for tag in auto_review.get("autoBadTags", []) if isinstance(tag, str)]
+        auto_good_tags = [str(tag) for tag in auto_review.get("autoGoodTags", []) if isinstance(tag, str)]
+        auto_metrics = auto_review.get("metrics") if isinstance(auto_review.get("metrics"), dict) else {}
+        similarity_score = _safe_float(auto_metrics.get("similarityScore"))
+        white_ratio = _safe_float(auto_metrics.get("whiteBackgroundRatio"))
+        if 0.0 <= similarity_score <= 1.0:
+            similarity_score_sum += similarity_score
+            similarity_score_count += 1
+        if 0.0 <= white_ratio <= 1.0:
+            white_background_ratio_sum += white_ratio
+            white_background_ratio_count += 1
+        for tag in auto_bad_tags:
+            stats["_autoBadCounter"][tag] += 1
+            global_auto_bad_counter[tag] += 1
+        for tag in auto_good_tags:
+            stats["_autoGoodCounter"][tag] += 1
+            global_auto_good_counter[tag] += 1
+
+        staff_rating = _get_staff_rating(item)
+        if staff_rating is not None:
             stats["ratedCount"] += 1
-            stats["_ratingSum"] += rating
+            stats["_ratingSum"] += staff_rating
             tags = [str(tag) for tag in item.get("feedbackTags", []) if isinstance(tag, str)]
             for tag in tags:
                 if tag in BAD_FEEDBACK_TAGS:
                     stats["_badCounter"][tag] += 1
                     global_bad_counter[tag] += 1
+                    bad_by_preset_counter[preset][tag] += 1
+                    bad_by_generation_mode_counter[generation_mode][tag] += 1
+                    bad_by_style_id_counter[style_id][tag] += 1
                 if tag in GOOD_FEEDBACK_TAGS:
                     stats["_goodCounter"][tag] += 1
                     global_good_counter[tag] += 1
+                    good_by_preset_counter[preset][tag] += 1
 
-            if rating <= 2:
+            if staff_rating <= 2:
                 low_rated_items.append(
                     {
                         "jobId": item.get("jobId"),
                         "visitorName": item.get("visitorName"),
                         "preset": item.get("preset"),
-                        "rating": rating,
+                        "rating": staff_rating,
+                        "staffRating": staff_rating,
+                        "autoRating": auto_rating,
+                        "autoReview": auto_review,
+                        "generationMode": generation_mode,
+                        "styleId": style_id,
                         "feedbackTags": item.get("feedbackTags", []),
                         "feedbackNote": item.get("feedbackNote", ""),
+                        "comparisonScores": _normalize_comparison_scores(item.get("comparisonScores")),
                         "inputUrl": item.get("inputUrl"),
                         "outputUrl": item.get("outputUrl"),
                         "detection": item.get("detection", {}),
@@ -1016,32 +1417,89 @@ def _build_tuning_summary(items: List[Dict[str, Any]]) -> Dict[str, Any]:
                     }
                 )
 
+        if (
+            staff_rating is not None
+            and auto_rating is not None
+            and 1 <= auto_rating <= 5
+            and 1 <= staff_rating <= 5
+            and auto_rating != staff_rating
+        ):
+            delta = abs(staff_rating - auto_rating)
+            mismatch_total_delta += float(delta)
+            mismatch_examples.append(
+                {
+                    "jobId": item.get("jobId"),
+                    "preset": preset,
+                    "generationMode": generation_mode,
+                    "styleId": style_id,
+                    "staffRating": staff_rating,
+                    "autoRating": auto_rating,
+                    "ratingDelta": delta,
+                }
+            )
+
     recommendations: List[str] = []
+
+    def _counter_to_dict(counter: Counter) -> Dict[str, int]:
+        return {tag: int(count) for tag, count in counter.most_common()}
+
+    def _counter_to_ranked_list(counter: Counter, limit: int = 10) -> List[Dict[str, Any]]:
+        return [{"tag": tag, "count": int(count)} for tag, count in counter.most_common(limit)]
+
+    def _counter_map_to_ranked(counter_map: Dict[str, Counter], limit: int = 10) -> Dict[str, List[Dict[str, Any]]]:
+        output: Dict[str, List[Dict[str, Any]]] = {}
+        for key in sorted(counter_map.keys()):
+            output[key] = _counter_to_ranked_list(counter_map[key], limit)
+        return output
+
     for preset, stats in by_preset.items():
         count = stats["count"]
         rated_for_preset = stats["ratedCount"]
+        auto_rated_for_preset = stats["autoRatedCount"]
         stats["averageControlWeight"] = round(stats["_controlWeightSum"] / count, 4) if count > 0 else 0
         stats["averageDenoisingStrength"] = round(stats["_denoiseSum"] / count, 4) if count > 0 else 0
-        stats["averageRating"] = (
+        stats["averageStaffRating"] = (
             round(stats["_ratingSum"] / rated_for_preset, 3) if rated_for_preset > 0 else 0
+        )
+        stats["averageRating"] = stats["averageStaffRating"]
+        stats["averageAutoRating"] = (
+            round(stats["_autoRatingSum"] / auto_rated_for_preset, 3) if auto_rated_for_preset > 0 else 0
         )
         stats["commonBadTags"] = [tag for tag, _ in stats["_badCounter"].most_common(5)]
         stats["commonGoodTags"] = [tag for tag, _ in stats["_goodCounter"].most_common(5)]
+        stats["commonAutoBadTags"] = [tag for tag, _ in stats["_autoBadCounter"].most_common(5)]
+        stats["commonAutoGoodTags"] = [tag for tag, _ in stats["_autoGoodCounter"].most_common(5)]
+        stats["badTagCounts"] = _counter_to_dict(stats["_badCounter"])
+        stats["goodTagCounts"] = _counter_to_dict(stats["_goodCounter"])
+        stats["autoBadTagCounts"] = _counter_to_dict(stats["_autoBadCounter"])
+        stats["autoGoodTagCounts"] = _counter_to_dict(stats["_autoGoodCounter"])
 
-        recommendations.extend(_generate_recommendations(stats["_badCounter"], rated_for_preset, preset))
+        recommendations.extend(
+            _generate_recommendations(
+                stats["_badCounter"],
+                rated_for_preset,
+                f"Preset {preset}",
+            )
+        )
 
         del stats["_ratingSum"]
+        del stats["_autoRatingSum"]
         del stats["_controlWeightSum"]
         del stats["_denoiseSum"]
         del stats["_badCounter"]
         del stats["_goodCounter"]
+        del stats["_autoBadCounter"]
+        del stats["_autoGoodCounter"]
 
-    if not recommendations and rated_count > 0:
-        recommendations.append(
+    recommendations.extend(_generate_recommendations(global_bad_counter, staff_rated_count, "Global"))
+    dedup_recommendations = list(dict.fromkeys(recommendations))
+
+    if not recommendations and staff_rated_count > 0:
+        dedup_recommendations.append(
             "No strong failure trend detected yet. Continue rating more samples to improve tuning confidence."
         )
-    if rated_count == 0:
-        recommendations.append("No rated images yet. Add ratings first to generate tuning recommendations.")
+    if staff_rated_count == 0:
+        dedup_recommendations.append("No rated images yet. Add ratings first to generate tuning recommendations.")
 
     low_rated_items.sort(
         key=lambda item: (
@@ -1049,14 +1507,63 @@ def _build_tuning_summary(items: List[Dict[str, Any]]) -> Dict[str, Any]:
             str(item.get("jobId") or ""),
         )
     )
+    mismatch_examples.sort(
+        key=lambda row: (
+            -_safe_float(row.get("ratingDelta")),
+            str(row.get("jobId") or ""),
+        )
+    )
+
+    mismatch_count = len(mismatch_examples)
+    average_mismatch_delta = (
+        round(mismatch_total_delta / mismatch_count, 3) if mismatch_count > 0 else 0
+    )
+    average_similarity_score = (
+        round(similarity_score_sum / similarity_score_count, 4)
+        if similarity_score_count > 0
+        else 0
+    )
+    average_white_background_ratio = (
+        round(white_background_ratio_sum / white_background_ratio_count, 4)
+        if white_background_ratio_count > 0
+        else 0
+    )
+    wrong_generation_count = int(
+        sum(global_bad_counter.get(tag, 0) for tag in WRONG_SUBJECT_TAGS)
+    )
+    person_main_object_missing_count = int(
+        sum(global_bad_counter.get(tag, 0) for tag in MISSING_SUBJECT_TAGS)
+    )
 
     return {
         "totalImages": total_images,
-        "ratedImages": rated_count,
-        "averageRating": average_rating,
+        "ratedImages": staff_rated_count,
+        "averageRating": average_staff_rating,
+        "staffRatedImages": staff_rated_count,
+        "autoRatedImages": auto_rated_count,
+        "averageStaffRating": average_staff_rating,
+        "averageAutoRating": average_auto_rating,
+        "autoStaffMismatch": {
+            "count": mismatch_count,
+            "averageDelta": average_mismatch_delta,
+            "examples": mismatch_examples[:10],
+        },
+        "mostCommonBadTags": _counter_to_ranked_list(global_bad_counter, 20),
+        "mostCommonGoodTags": _counter_to_ranked_list(global_good_counter, 20),
+        "mostCommonAutoBadTags": _counter_to_ranked_list(global_auto_bad_counter, 20),
+        "mostCommonAutoGoodTags": _counter_to_ranked_list(global_auto_good_counter, 20),
+        "mostCommonStaffBadTags": _counter_to_ranked_list(global_bad_counter, 20),
+        "badTagsByPreset": _counter_map_to_ranked(bad_by_preset_counter, 15),
+        "goodTagsByPreset": _counter_map_to_ranked(good_by_preset_counter, 15),
+        "badTagsByGenerationMode": _counter_map_to_ranked(bad_by_generation_mode_counter, 15),
+        "badTagsByStyleId": _counter_map_to_ranked(bad_by_style_id_counter, 15),
+        "wrongGenerationCount": wrong_generation_count,
+        "personMainObjectMissingCount": person_main_object_missing_count,
+        "averageBeforeAfterSimilarityScore": average_similarity_score,
+        "averageWhiteBackgroundRatio": average_white_background_ratio,
         "byPreset": by_preset,
         "lowRatedItems": low_rated_items,
-        "recommendations": recommendations,
+        "recommendations": dedup_recommendations,
         "_globalBadTags": global_bad_counter,
         "_globalGoodTags": global_good_counter,
     }
@@ -1101,21 +1608,114 @@ def _build_tuning_text_report(summary: Dict[str, Any]) -> str:
     lines.append(f"Generated At: {datetime.now(timezone.utc).isoformat()}")
     lines.append("")
     lines.append(f"Total generated images: {summary['totalImages']}")
-    lines.append(f"Total rated images: {summary['ratedImages']}")
-    lines.append(f"Average rating: {summary['averageRating']}")
+    lines.append(f"Total staff-rated images: {summary.get('staffRatedImages', summary['ratedImages'])}")
+    lines.append(f"Total auto-rated images: {summary.get('autoRatedImages', 0)}")
+    lines.append(f"Average staff rating: {summary.get('averageStaffRating', summary['averageRating'])}")
+    lines.append(f"Average auto rating: {summary.get('averageAutoRating', 0)}")
+    mismatch = summary.get("autoStaffMismatch", {})
+    lines.append(
+        f"Auto/staff mismatch count: {mismatch.get('count', 0)} "
+        f"(avg delta: {mismatch.get('averageDelta', 0)})"
+    )
     lines.append("")
     lines.append("Average rating by preset:")
     for preset_name, stats in summary["byPreset"].items():
         lines.append(
-            f"- {preset_name}: avgRating={stats['averageRating']} rated={stats['ratedCount']}/{stats['count']} "
+            f"- {preset_name}: avgStaff={stats.get('averageStaffRating', stats['averageRating'])} "
+            f"avgAuto={stats.get('averageAutoRating', 0)} "
+            f"rated={stats['ratedCount']}/{stats['count']} "
+            f"autoRated={stats.get('autoRatedCount', 0)}/{stats['count']} "
             f"avgControlWeight={stats['averageControlWeight']} avgDenoising={stats['averageDenoisingStrength']}"
         )
 
-    global_bad_counter: Counter = summary.get("_globalBadTags", Counter())
-    global_good_counter: Counter = summary.get("_globalGoodTags", Counter())
     lines.append("")
-    lines.append(f"Most common bad feedback tags: {[tag for tag, _ in global_bad_counter.most_common(10)]}")
-    lines.append(f"Most common good feedback tags: {[tag for tag, _ in global_good_counter.most_common(10)]}")
+    lines.append("Most common bad feedback tags:")
+    most_common_bad = summary.get("mostCommonBadTags", [])
+    if not most_common_bad:
+        lines.append("- None")
+    else:
+        for entry in most_common_bad:
+            lines.append(f"- {entry.get('tag')}: {entry.get('count')}")
+
+    lines.append("")
+    lines.append("Most common good feedback tags:")
+    most_common_good = summary.get("mostCommonGoodTags", [])
+    if not most_common_good:
+        lines.append("- None")
+    else:
+        for entry in most_common_good:
+            lines.append(f"- {entry.get('tag')}: {entry.get('count')}")
+
+    lines.append("")
+    lines.append("Most common auto bad tags:")
+    most_common_auto_bad = summary.get("mostCommonAutoBadTags", [])
+    if not most_common_auto_bad:
+        lines.append("- None")
+    else:
+        for entry in most_common_auto_bad:
+            lines.append(f"- {entry.get('tag')}: {entry.get('count')}")
+
+    lines.append("")
+    lines.append("Most common staff bad tags:")
+    most_common_staff_bad = summary.get("mostCommonStaffBadTags", [])
+    if not most_common_staff_bad:
+        lines.append("- None")
+    else:
+        for entry in most_common_staff_bad:
+            lines.append(f"- {entry.get('tag')}: {entry.get('count')}")
+
+    lines.append("")
+    lines.append("Bad tags by preset:")
+    bad_by_preset = summary.get("badTagsByPreset", {})
+    if not bad_by_preset:
+        lines.append("- None")
+    else:
+        for preset_name, rows in bad_by_preset.items():
+            pairs = [f"{entry.get('tag')}({entry.get('count')})" for entry in rows]
+            lines.append(f"- {preset_name}: {pairs}")
+
+    lines.append("")
+    lines.append("Good tags by preset:")
+    good_by_preset = summary.get("goodTagsByPreset", {})
+    if not good_by_preset:
+        lines.append("- None")
+    else:
+        for preset_name, rows in good_by_preset.items():
+            pairs = [f"{entry.get('tag')}({entry.get('count')})" for entry in rows]
+            lines.append(f"- {preset_name}: {pairs}")
+
+    lines.append("")
+    lines.append("Bad tags by generationMode:")
+    bad_by_mode = summary.get("badTagsByGenerationMode", {})
+    if not bad_by_mode:
+        lines.append("- None")
+    else:
+        for mode_name, rows in bad_by_mode.items():
+            pairs = [f"{entry.get('tag')}({entry.get('count')})" for entry in rows]
+            lines.append(f"- {mode_name}: {pairs}")
+
+    lines.append("")
+    lines.append("Bad tags by styleId:")
+    bad_by_style = summary.get("badTagsByStyleId", {})
+    if not bad_by_style:
+        lines.append("- None")
+    else:
+        for style_name, rows in bad_by_style.items():
+            pairs = [f"{entry.get('tag')}({entry.get('count')})" for entry in rows]
+            lines.append(f"- {style_name}: {pairs}")
+
+    lines.append("")
+    lines.append("Key issue counts:")
+    lines.append(f"- wrong generation count: {summary.get('wrongGenerationCount', 0)}")
+    lines.append(
+        f"- person/main object missing count: {summary.get('personMainObjectMissingCount', 0)}"
+    )
+    lines.append(
+        f"- average before/after similarity score: {summary.get('averageBeforeAfterSimilarityScore', 0)}"
+    )
+    lines.append(
+        f"- average white background ratio: {summary.get('averageWhiteBackgroundRatio', 0)}"
+    )
 
     lines.append("")
     lines.append("Recommendations:")
@@ -1123,11 +1723,29 @@ def _build_tuning_text_report(summary: Dict[str, Any]) -> str:
         lines.append(f"- {recommendation}")
 
     lines.append("")
+    lines.append("Recommendation for next tuning cycle:")
+    next_cycle = summary["recommendations"][0] if summary.get("recommendations") else "Continue collecting ratings."
+    lines.append(f"- {next_cycle}")
+
+    lines.append("")
     lines.append("Generation settings by preset:")
     for preset_name, stats in summary["byPreset"].items():
         lines.append(
             f"- {preset_name}: avgControlWeight={stats['averageControlWeight']} avgDenoising={stats['averageDenoisingStrength']}"
         )
+
+    lines.append("")
+    lines.append("Auto/staff mismatch examples:")
+    mismatch_examples = (summary.get("autoStaffMismatch") or {}).get("examples", [])
+    if not mismatch_examples:
+        lines.append("- None")
+    else:
+        for row in mismatch_examples[:10]:
+            lines.append(
+                f"- jobId={row.get('jobId')} preset={row.get('preset')} generationMode={row.get('generationMode')} "
+                f"styleId={row.get('styleId')} auto={row.get('autoRating')} staff={row.get('staffRating')} "
+                f"delta={row.get('ratingDelta')}"
+            )
 
     lines.append("")
     lines.append("Prompts used (from low-rated examples):")
@@ -1153,13 +1771,18 @@ def _build_tuning_text_report(summary: Dict[str, Any]) -> str:
         lines.append("")
         lines.append(f"jobId: {item.get('jobId')}")
         lines.append(f"preset: {item.get('preset')}")
-        lines.append(f"rating: {item.get('rating')}")
+        lines.append(f"generationMode: {item.get('generationMode')}")
+        lines.append(f"styleId: {item.get('styleId')}")
+        lines.append(f"staffRating: {item.get('staffRating', item.get('rating'))}")
+        lines.append(f"autoRating: {item.get('autoRating')}")
+        lines.append(f"autoReview: {item.get('autoReview', {})}")
         lines.append(f"feedbackTags: {item.get('feedbackTags', [])}")
         lines.append(f"feedbackNote: {item.get('feedbackNote', '')}")
+        lines.append(f"comparisonScores: {item.get('comparisonScores', {})}")
         lines.append(f"detection: {item.get('detection', {})}")
-        lines.append(f"generationSettings: {item.get('generationSettings', {})}")
-        lines.append(f"prompt: {item.get('prompt', '')}")
-        lines.append(f"negativePrompt: {item.get('negativePrompt', '')}")
+        lines.append(f"exactGenerationSettings: {item.get('generationSettings', {})}")
+        lines.append(f"promptUsed: {item.get('prompt', '')}")
+        lines.append(f"negativePromptUsed: {item.get('negativePrompt', '')}")
         lines.append(f"inputUrl: {item.get('inputUrl', '')}")
         lines.append(f"outputUrl: {item.get('outputUrl', '')}")
         lines.append(f"inputPath: {_url_to_local_path(item.get('inputUrl'))}")
@@ -1199,9 +1822,21 @@ def _job_to_public_payload(job: Dict[str, Any]) -> Dict[str, Any]:
         "regenerationOf",
         "version",
         "problemTags",
+        "rating",
+        "staffRating",
+        "autoRating",
+        "autoReview",
+        "feedbackTags",
+        "feedbackNote",
+        "comparisonScores",
+        "ratedAt",
     )
     payload = {key: job.get(key) for key in keys}
     payload["source"] = _normalize_source(payload.get("source"))
+    payload["autoReview"] = _normalize_auto_review_payload(payload.get("autoReview"))
+    payload["autoRating"] = int(_safe_int(payload.get("autoRating")) or payload["autoReview"].get("autoRating") or 0)
+    payload["staffRating"] = _get_staff_rating(payload) if isinstance(payload, dict) else None
+    payload["comparisonScores"] = payload.get("comparisonScores") if isinstance(payload.get("comparisonScores"), dict) else {}
     return payload
 
 
@@ -1219,6 +1854,14 @@ def _gallery_item_to_job_payload(item: Dict[str, Any]) -> Dict[str, Any]:
         "startedAt": item.get("startedAt"),
         "completedAt": item.get("completedAt"),
         "durationSeconds": item.get("durationSeconds"),
+        "rating": item.get("rating"),
+        "staffRating": item.get("staffRating"),
+        "autoRating": item.get("autoRating"),
+        "autoReview": _normalize_auto_review_payload(item.get("autoReview")),
+        "feedbackTags": item.get("feedbackTags", []),
+        "feedbackNote": item.get("feedbackNote", ""),
+        "comparisonScores": item.get("comparisonScores", {}) if isinstance(item.get("comparisonScores"), dict) else {},
+        "ratedAt": item.get("ratedAt"),
         "error": None,
     }
 
@@ -1238,6 +1881,14 @@ def _build_api_job_payload(job: Dict[str, Any], request: Request, absolute: bool
         "completedAt": job.get("completedAt"),
         "durationSeconds": float(_safe_float(job.get("durationSeconds"))),
         "error": job.get("error"),
+        "rating": job.get("rating"),
+        "staffRating": _get_staff_rating(job),
+        "autoRating": int(_safe_int(job.get("autoRating")) or 0),
+        "autoReview": _normalize_auto_review_payload(job.get("autoReview")),
+        "feedbackTags": job.get("feedbackTags", []),
+        "feedbackNote": job.get("feedbackNote", ""),
+        "comparisonScores": job.get("comparisonScores", {}) if isinstance(job.get("comparisonScores"), dict) else {},
+        "ratedAt": job.get("ratedAt"),
     }
     return _with_absolute_image_urls(request, payload, absolute)
 
@@ -1250,6 +1901,10 @@ def _build_api_gallery_item(item: Dict[str, Any], request: Request, absolute: bo
     payload["status"] = str(payload.get("status") or "completed")
     payload["inputUrl"] = str(payload.get("inputUrl") or "")
     payload["outputUrl"] = str(payload.get("outputUrl") or "")
+    payload["staffRating"] = _get_staff_rating(payload)
+    payload["autoReview"] = _normalize_auto_review_payload(payload.get("autoReview"))
+    payload["autoRating"] = int(_safe_int(payload.get("autoRating")) or payload["autoReview"].get("autoRating") or 0)
+    payload["comparisonScores"] = payload.get("comparisonScores") if isinstance(payload.get("comparisonScores"), dict) else {}
     return _with_absolute_image_urls(request, payload, absolute)
 
 
@@ -1270,6 +1925,9 @@ async def _update_job_with_completed_result(job: Dict[str, Any], result_item: Di
         "negativePrompt": result_item.get("negativePrompt"),
         "generationSettings": result_item.get("generationSettings"),
         "detection": result_item.get("detection"),
+        "autoRating": result_item.get("autoRating"),
+        "autoReview": _normalize_auto_review_payload(result_item.get("autoReview")),
+        "comparisonScores": _normalize_comparison_scores(result_item.get("comparisonScores")),
         "createdAt": result_item.get("createdAt"),
         "generationMode": result_item.get("generationMode"),
         "styleId": result_item.get("styleId"),
@@ -1342,42 +2000,75 @@ def _apply_regenerate_adjustments(
     *,
     base_preset: PresetSettings,
     problem_tags: List[str],
+    generation_mode: str,
+    style_id: str,
 ) -> PresetSettings:
     control_weight = float(base_preset.control_weight)
     denoising = float(base_preset.denoising_strength)
-    prompt = str(base_preset.prompt)
+    cfg_scale = float(base_preset.cfg_scale)
+    prompt = _apply_mode_style_prompt(str(base_preset.prompt), generation_mode, style_id)
     negative_prompt = str(base_preset.negative_prompt)
 
     for tag in problem_tags:
-        if tag == "not_lively_enough":
+        if tag in {"wrong_generation", "wrong_subject"}:
+            prompt = _append_prompt_sentence(prompt, REGENERATE_WRONG_GENERATION_PROMPT)
+            prompt = _apply_mode_style_prompt(prompt, generation_mode, style_id)
+        elif tag in {"same_as_input", "too_close_to_drawing"}:
             denoising += 0.08
-            control_weight -= 0.08
-        elif tag == "changed_too_much":
+            control_weight -= 0.05
+        elif tag in {"person_missing", "person_changed", "face_changed"}:
+            denoising -= 0.08
+            prompt = _append_prompt_sentence(prompt, REGENERATE_PRESERVE_PERSON_PROMPT)
+        elif tag in {"artwork_missing", "artwork_changed", "main_object_missing"}:
+            denoising -= 0.08
+            control_weight += 0.08
+            prompt = _append_prompt_sentence(prompt, REGENERATE_PRESERVE_ARTWORK_PROMPT)
+        elif tag in {"object_missing", "object_changed"}:
+            denoising -= 0.05
+            control_weight += 0.08
+        elif tag in {"not_lively_enough", "too_empty"}:
+            denoising += 0.08
+            cfg_scale += 0.5
+            prompt = _append_prompt_sentence(prompt, REGENERATE_RICH_BACKGROUND_PROMPT)
+        elif tag == "too_messy":
+            denoising -= 0.05
+            control_weight += 0.05
+        elif tag in {"changed_too_much", "over_changed"}:
             denoising -= 0.08
             control_weight += 0.08
         elif tag == "bad_face":
             denoising -= 0.05
-            negative_prompt = f"{negative_prompt}, {REGENERATE_FACE_NEGATIVE}"
+            negative_prompt = _append_prompt_sentence(negative_prompt, REGENERATE_FACE_NEGATIVE)
         elif tag == "bad_hands":
             denoising -= 0.05
-            negative_prompt = f"{negative_prompt}, {REGENERATE_HAND_NEGATIVE}"
-        elif tag == "too_dark":
-            prompt = f"{prompt}. {REGENERATE_BRIGHT_PROMPT}."
-        elif tag == "artwork_changed":
-            denoising -= 0.08
-            control_weight += 0.1
-        elif tag == "person_changed":
-            denoising -= 0.1
+            negative_prompt = _append_prompt_sentence(negative_prompt, REGENERATE_HAND_NEGATIVE)
+        elif tag in {"too_dark", "bad_colors", "background_wrong"}:
+            cfg_scale += 0.5
+            prompt = _append_prompt_sentence(prompt, REGENERATE_BRIGHT_PROMPT)
+        elif tag == "style_wrong":
+            prompt = _apply_mode_style_prompt(prompt, generation_mode, style_id)
+            prompt = _append_prompt_sentence(prompt, "strictly follow selected styleId style prompt")
+        elif tag in {"composition_wrong", "wrong_composition"}:
+            denoising -= 0.05
+            control_weight += 0.05
+            prompt = _append_prompt_sentence(prompt, "preserve exact composition and object positions")
+        elif tag in {"blurry", "low_quality"}:
+            cfg_scale += 0.3
+        elif tag == "text_or_watermark":
+            negative_prompt = _append_prompt_sentence(negative_prompt, "text, watermark, logo")
+        elif tag in {"creepy", "scary_or_creepy"}:
+            negative_prompt = _append_prompt_sentence(negative_prompt, "creepy, scary, horror")
 
-    denoising = max(0.25, min(0.75, denoising))
-    control_weight = max(0.45, min(1.0, control_weight))
+    denoising = max(0.2, min(0.9, denoising))
+    control_weight = max(0.35, min(1.0, control_weight))
+    cfg_scale = max(5.0, min(12.0, cfg_scale))
 
     return PresetSettings(
         name=base_preset.name,
         control_weight=control_weight,
         denoising_strength=denoising,
         control_mode=base_preset.control_mode,
-        cfg_scale=base_preset.cfg_scale,
+        cfg_scale=cfg_scale,
         steps=base_preset.steps,
         sampler_name=base_preset.sampler_name,
         prompt=prompt,
@@ -1577,6 +2268,18 @@ async def gallery_items(includeHidden: bool = False) -> Dict[str, Any]:
     for item in items:
         updated_item = dict(item)
         updated_item["source"] = _normalize_source(updated_item.get("source"))
+        updated_item["staffRating"] = _get_staff_rating(updated_item)
+        updated_item["autoReview"] = _normalize_auto_review_payload(updated_item.get("autoReview"))
+        updated_item["autoRating"] = int(
+            _safe_int(updated_item.get("autoRating"))
+            or updated_item["autoReview"].get("autoRating")
+            or 0
+        )
+        updated_item["comparisonScores"] = (
+            updated_item.get("comparisonScores")
+            if isinstance(updated_item.get("comparisonScores"), dict)
+            else {}
+        )
         normalized_items.append(updated_item)
     return {"items": normalized_items}
 
@@ -1598,11 +2301,18 @@ async def rate_gallery_item(jobId: str, payload: RatingRequest) -> Dict[str, Any
             int(payload.rating),
             payload.feedbackTags,
             payload.feedbackNote,
+            payload.comparisonScores.to_payload() if payload.comparisonScores else {},
         )
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Gallery item not found: {jobId}") from exc
 
-    logger.info("Rating saved for jobId=%s rating=%s tags=%s", jobId, payload.rating, payload.feedbackTags)
+    logger.info(
+        "Rating saved for jobId=%s rating=%s tags=%s comparison=%s",
+        jobId,
+        payload.rating,
+        payload.feedbackTags,
+        payload.comparisonScores.to_payload() if payload.comparisonScores else {},
+    )
     await ws_manager.broadcast({"type": "gallery_item_updated", "item": updated_item})
     return updated_item
 
@@ -2193,18 +2903,20 @@ async def regenerate_job(jobId: str, payload: RegenerateRequest) -> Dict[str, An
     if base_preset is None:
         raise HTTPException(status_code=400, detail="Original generation settings are missing.")
 
+    target_generation_mode = _normalize_generation_mode(
+        payload.generationMode if payload.generationMode is not None else source_job.get("generationMode")
+    )
+    target_style_id = _normalize_style_id(
+        payload.styleId if payload.styleId is not None else source_job.get("styleId")
+    )
+
     adjusted_preset = _apply_regenerate_adjustments(
         base_preset=base_preset,
         problem_tags=payload.problemTags,
+        generation_mode=target_generation_mode,
+        style_id=target_style_id,
     )
     adjusted_settings = _build_generation_settings(adjusted_preset)
-
-    cfg_scale = float(source_job.get("generationSettings", {}).get("cfgScale", GENERATION_DEFAULTS.cfg_scale))
-    for tag in payload.problemTags:
-        if tag in {"bad_colors", "too_dark"}:
-            cfg_scale += 0.8
-    cfg_scale = max(5.0, min(9.0, cfg_scale))
-    adjusted_settings["cfgScale"] = cfg_scale
 
     new_job_id = uuid.uuid4().hex
     new_input_path, _ = _job_paths(new_job_id)
@@ -2227,8 +2939,8 @@ async def regenerate_job(jobId: str, payload: RegenerateRequest) -> Dict[str, An
         input_path=new_input_path,
         source="regenerate",
         estimate_payload=estimate_payload,
-        generation_mode=_normalize_generation_mode(source_job.get("generationMode")),
-        style_id=_normalize_style_id(source_job.get("styleId")),
+        generation_mode=target_generation_mode,
+        style_id=target_style_id,
         original_job_id=original_job_id,
         regeneration_of=jobId,
         version=version,
@@ -2393,7 +3105,9 @@ async def maintenance_cleanup(payload: CleanupRequest = CleanupRequest()) -> Dic
 async def tuning_report_json() -> Dict[str, Any]:
     items = await run_in_threadpool(gallery_store.list_items)
     summary = _build_tuning_summary(items)
-    if int(summary.get("ratedImages") or 0) == 0:
+    staff_count = int(summary.get("staffRatedImages") or summary.get("ratedImages") or 0)
+    auto_count = int(summary.get("autoRatedImages") or 0)
+    if staff_count == 0 and auto_count == 0:
         summary.pop("_globalBadTags", None)
         summary.pop("_globalGoodTags", None)
         summary["message"] = "No rated images yet."
@@ -2407,7 +3121,9 @@ async def tuning_report_json() -> Dict[str, Any]:
 async def tuning_report_text() -> PlainTextResponse:
     items = await run_in_threadpool(gallery_store.list_items)
     summary = _build_tuning_summary(items)
-    if int(summary.get("ratedImages") or 0) == 0:
+    staff_count = int(summary.get("staffRatedImages") or summary.get("ratedImages") or 0)
+    auto_count = int(summary.get("autoRatedImages") or 0)
+    if staff_count == 0 and auto_count == 0:
         return PlainTextResponse("No rated images yet.")
     report = _build_tuning_text_report(summary)
     return PlainTextResponse(report)

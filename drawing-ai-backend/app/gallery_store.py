@@ -4,6 +4,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from app.quality_reviewer import default_auto_review
+
 
 class GalleryStore:
     def __init__(self, json_path: Path) -> None:
@@ -23,13 +25,127 @@ class GalleryStore:
                 return []
             parsed = json.loads(raw)
             if isinstance(parsed, list):
-                return parsed
+                return [self._normalize_item(item) for item in parsed if isinstance(item, dict)]
         except (OSError, json.JSONDecodeError):
             pass
         return []
 
+    @staticmethod
+    def _safe_int(value: Any) -> Optional[int]:
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return None
+
+    @staticmethod
+    def _safe_float(value: Any) -> float:
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return 0.0
+
+    @staticmethod
+    def _normalize_auto_review(value: Any) -> Dict[str, Any]:
+        base = dict(default_auto_review())
+        if not isinstance(value, dict):
+            return base
+
+        auto_rating = GalleryStore._safe_int(value.get("autoRating"))
+        if auto_rating is not None and 1 <= auto_rating <= 5:
+            base["autoRating"] = auto_rating
+        else:
+            base["autoRating"] = 0
+
+        bad_tags = [str(tag) for tag in value.get("autoBadTags", []) if isinstance(tag, str)]
+        good_tags = [str(tag) for tag in value.get("autoGoodTags", []) if isinstance(tag, str)]
+        base["autoBadTags"] = list(dict.fromkeys(bad_tags))
+        base["autoGoodTags"] = list(dict.fromkeys(good_tags))
+        base["autoNotes"] = str(value.get("autoNotes") or "").strip()
+        try:
+            confidence = float(value.get("confidence"))
+        except (TypeError, ValueError):
+            confidence = 0.0
+        base["confidence"] = round(max(0.0, min(1.0, confidence)), 3)
+        metrics = value.get("metrics")
+        metric_payload = base.get("metrics")
+        if not isinstance(metric_payload, dict):
+            metric_payload = {}
+        if isinstance(metrics, dict):
+            metric_payload["similarityScore"] = round(
+                max(0.0, min(1.0, GalleryStore._safe_float(metrics.get("similarityScore")))),
+                4,
+            )
+            metric_payload["whiteBackgroundRatio"] = round(
+                max(0.0, min(1.0, GalleryStore._safe_float(metrics.get("whiteBackgroundRatio")))),
+                4,
+            )
+            metric_payload["colorRatio"] = round(
+                max(0.0, min(1.0, GalleryStore._safe_float(metrics.get("colorRatio")))),
+                4,
+            )
+            metric_payload["edgeRatio"] = round(
+                max(0.0, min(1.0, GalleryStore._safe_float(metrics.get("edgeRatio")))),
+                4,
+            )
+            metric_payload["colorGain"] = round(
+                max(-1.0, min(1.0, GalleryStore._safe_float(metrics.get("colorGain")))),
+                4,
+            )
+        base["metrics"] = metric_payload
+        return base
+
+    @staticmethod
+    def _normalize_comparison_scores(value: Any) -> Dict[str, int]:
+        if not isinstance(value, dict):
+            return {}
+        keys = (
+            "subjectPreserved",
+            "colorImprovement",
+            "backgroundFullness",
+            "styleQuality",
+            "childFriendlyResult",
+        )
+        output: Dict[str, int] = {}
+        for key in keys:
+            numeric = GalleryStore._safe_int(value.get(key))
+            if numeric is None:
+                continue
+            if 1 <= numeric <= 5:
+                output[key] = int(numeric)
+        return output
+
+    @staticmethod
+    def _normalize_item(item: Dict[str, Any]) -> Dict[str, Any]:
+        normalized = dict(item)
+
+        staff_rating = GalleryStore._safe_int(normalized.get("staffRating"))
+        legacy_rating = GalleryStore._safe_int(normalized.get("rating"))
+        if staff_rating is None and legacy_rating is not None and 1 <= legacy_rating <= 5:
+            staff_rating = legacy_rating
+        if staff_rating is not None and not (1 <= staff_rating <= 5):
+            staff_rating = None
+
+        normalized["staffRating"] = staff_rating
+        normalized["rating"] = staff_rating
+
+        auto_review = GalleryStore._normalize_auto_review(normalized.get("autoReview"))
+        fallback_auto = GalleryStore._safe_int(normalized.get("autoRating"))
+        if auto_review.get("autoRating", 0) <= 0 and fallback_auto is not None and 1 <= fallback_auto <= 5:
+            auto_review["autoRating"] = fallback_auto
+        normalized["autoReview"] = auto_review
+        normalized["autoRating"] = int(auto_review.get("autoRating") or 0)
+
+        tags = [str(tag) for tag in normalized.get("feedbackTags", []) if isinstance(tag, str)]
+        normalized["feedbackTags"] = list(dict.fromkeys(tags))
+        normalized["feedbackNote"] = str(normalized.get("feedbackNote") or "").strip()
+        normalized["comparisonScores"] = GalleryStore._normalize_comparison_scores(
+            normalized.get("comparisonScores")
+        )
+        return normalized
+
     def _save_items_unlocked(self, items: List[Dict[str, Any]]) -> None:
-        sorted_items = sorted(items, key=lambda item: item.get("createdAt", ""), reverse=True)
+        normalized_items = [self._normalize_item(item) for item in items]
+        sorted_items = sorted(normalized_items, key=lambda item: item.get("createdAt", ""), reverse=True)
         self._json_path.write_text(
             json.dumps(sorted_items, indent=2, ensure_ascii=True),
             encoding="utf-8",
@@ -43,11 +159,12 @@ class GalleryStore:
         return sorted(items, key=lambda item: item.get("createdAt", ""), reverse=True)
 
     def add_item(self, item: Dict[str, Any]) -> Dict[str, Any]:
+        normalized_item = self._normalize_item(item)
         with self._lock:
             items = self._load_items_unlocked()
-            items.append(item)
+            items.append(normalized_item)
             self._save_items_unlocked(items)
-        return item
+        return normalized_item
 
     @staticmethod
     def _extract_duration_seconds(item: Dict[str, Any]) -> Optional[float]:
@@ -109,6 +226,7 @@ class GalleryStore:
         rating: int,
         feedback_tags: List[str],
         feedback_note: str,
+        comparison_scores: Optional[Dict[str, int]] = None,
     ) -> Dict[str, Any]:
         with self._lock:
             items = self._load_items_unlocked()
@@ -118,12 +236,15 @@ class GalleryStore:
                 raise KeyError(job_id)
 
             target["rating"] = rating
+            target["staffRating"] = rating
             target["feedbackTags"] = feedback_tags
             target["feedbackNote"] = feedback_note
+            target["comparisonScores"] = self._normalize_comparison_scores(comparison_scores)
             target["ratedAt"] = datetime.now(timezone.utc).isoformat()
+            target["updatedAt"] = target["ratedAt"]
 
             self._save_items_unlocked(items)
-            return target
+            return self._normalize_item(target)
 
     def rename_item(self, job_id: str, visitor_name: str) -> Dict[str, Any]:
         with self._lock:
@@ -135,7 +256,7 @@ class GalleryStore:
             target["visitorName"] = visitor_name
             target["updatedAt"] = datetime.now(timezone.utc).isoformat()
             self._save_items_unlocked(items)
-            return target
+            return self._normalize_item(target)
 
     def set_hidden(self, job_id: str, hidden: bool) -> Dict[str, Any]:
         with self._lock:
@@ -149,7 +270,7 @@ class GalleryStore:
             target["hiddenAt"] = datetime.now(timezone.utc).isoformat() if hidden_value else None
             target["updatedAt"] = datetime.now(timezone.utc).isoformat()
             self._save_items_unlocked(items)
-            return target
+            return self._normalize_item(target)
 
     def delete_item(self, job_id: str) -> Dict[str, Any]:
         with self._lock:
@@ -167,4 +288,4 @@ class GalleryStore:
                 raise KeyError(job_id)
 
             self._save_items_unlocked(remaining_items)
-            return removed_item
+            return self._normalize_item(removed_item)
