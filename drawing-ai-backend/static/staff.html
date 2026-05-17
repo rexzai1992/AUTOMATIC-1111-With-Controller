@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Drawing AI Staff Control</title>
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/style.css?v=20260517b">
 </head>
 <body class="staff-body">
   <main class="staff-dashboard">
@@ -12,6 +12,10 @@
       <div>
         <h1>Drawing AI Staff Control</h1>
         <p>Scan, upload, or capture drawings and generate gallery-ready artwork.</p>
+        <div class="lan-helper">
+          <p>Staff URL: <a id="staffLanUrl" href="#" target="_blank" rel="noopener noreferrer">-</a></p>
+          <p>Gallery URL: <a id="galleryLanUrl" href="#" target="_blank" rel="noopener noreferrer">-</a></p>
+        </div>
       </div>
       <nav class="quick-links" aria-label="Quick links">
         <a href="/gallery" target="_blank" rel="noopener noreferrer">Open Gallery Wall</a>
@@ -45,6 +49,8 @@
 
         <div class="method-panel" data-panel="webcam" hidden>
           <p class="panel-hint">Use the backend webcam index 0 to capture and generate in one step.</p>
+          <p id="webcamPermissionStatus" class="panel-hint">Camera permission: not requested.</p>
+          <button id="requestWebcamPermissionBtn" class="small-action-btn" type="button">Request Camera Permission</button>
         </div>
 
         <div class="method-panel" data-panel="scanner" hidden>
@@ -159,6 +165,6 @@
     </section>
   </main>
 
-  <script src="/static/staff.js"></script>
+  <script src="/static/staff.js?v=20260517a"></script>
 </body>
 </html>

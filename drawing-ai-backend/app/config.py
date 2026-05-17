@@ -10,6 +10,7 @@ OUTPUT_DIR = BASE_DIR / "outputs"
 DATA_DIR = BASE_DIR / "data"
 STATIC_DIR = BASE_DIR / "static"
 GALLERY_JSON_PATH = DATA_DIR / "gallery.json"
+QUEUE_JSON_PATH = DATA_DIR / "queue.json"
 TEMP_DIR = BASE_DIR / "temp"
 
 for directory in (SCANNER_INPUT_DIR, INPUT_DIR, OUTPUT_DIR, DATA_DIR, STATIC_DIR, TEMP_DIR):
@@ -17,10 +18,20 @@ for directory in (SCANNER_INPUT_DIR, INPUT_DIR, OUTPUT_DIR, DATA_DIR, STATIC_DIR
 
 if not GALLERY_JSON_PATH.exists():
     GALLERY_JSON_PATH.write_text("[]", encoding="utf-8")
+if not QUEUE_JSON_PATH.exists():
+    QUEUE_JSON_PATH.write_text("[]", encoding="utf-8")
 
 ENABLE_FOLDER_WATCHER = True
 ALLOWED_UPLOAD_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".bmp"}
 SCANNER_ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg"}
+API_KEY = ""
+
+# CORS settings for local/LAN app integrations.
+# Keep permissive defaults for offline kiosk usage; tighten as needed.
+CORS_ALLOWED_ORIGINS = ["*"]
+CORS_ALLOW_CREDENTIALS = False
+CORS_ALLOW_METHODS = ["*"]
+CORS_ALLOW_HEADERS = ["*"]
 
 
 @dataclass(frozen=True)

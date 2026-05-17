@@ -3,6 +3,7 @@ setlocal EnableExtensions
 
 REM ==================================================
 REM Restart launcher services
+REM (Stable Diffusion + backend + Cloudflare Tunnel)
 REM ==================================================
 
 echo ==================================================

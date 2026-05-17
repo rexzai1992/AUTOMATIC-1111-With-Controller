@@ -4,6 +4,8 @@ const drawingFileInput = document.getElementById("drawingFile");
 const generateBtn = document.getElementById("generateBtn");
 const clearBtn = document.getElementById("clearBtn");
 const controlHint = document.getElementById("controlHint");
+const staffLanUrl = document.getElementById("staffLanUrl");
+const galleryLanUrl = document.getElementById("galleryLanUrl");
 
 const statusText = document.getElementById("statusText");
 const jobIdText = document.getElementById("jobIdText");
@@ -32,6 +34,8 @@ const refreshGalleryControlBtn = document.getElementById("refreshGalleryControlB
 const eventLog = document.getElementById("eventLog");
 const methodTabs = Array.from(document.querySelectorAll(".method-tab"));
 const methodPanels = Array.from(document.querySelectorAll(".method-panel"));
+const webcamPermissionStatus = document.getElementById("webcamPermissionStatus");
+const requestWebcamPermissionBtn = document.getElementById("requestWebcamPermissionBtn");
 
 const FEEDBACK_TAGS = [
   { id: "too_close_to_drawing", label: "Too close to drawing" },
@@ -66,6 +70,9 @@ let elapsedTimerId = null;
 let elapsedStartMs = null;
 let localInputPreviewUrl = null;
 let galleryControlItems = [];
+let latestQueueStatus = null;
+let webcamPermissionState = "unknown";
+let webcamPermissionPending = null;
 
 function appendEvent(text, isError = false) {
   const item = document.createElement("li");
@@ -77,6 +84,27 @@ function appendEvent(text, isError = false) {
   while (eventLog.children.length > 30) {
     eventLog.removeChild(eventLog.lastChild);
   }
+}
+
+function setupLanHelper() {
+  if (!staffLanUrl || !galleryLanUrl) {
+    return;
+  }
+  const base = `${window.location.protocol}//${window.location.host}`;
+  const staffUrl = `${base}/staff`;
+  const galleryUrl = `${base}/gallery`;
+  staffLanUrl.href = staffUrl;
+  staffLanUrl.textContent = staffUrl;
+  galleryLanUrl.href = galleryUrl;
+  galleryLanUrl.textContent = galleryUrl;
+}
+
+function formatWaitSeconds(seconds) {
+  const numeric = Number(seconds);
+  if (!Number.isFinite(numeric) || numeric <= 0) {
+    return "0 sec";
+  }
+  return `${Math.round(numeric)} sec`;
 }
 
 function formatClock(totalSeconds) {
@@ -100,6 +128,10 @@ function formatDateTime(isoString) {
     return isoString;
   }
   return parsed.toLocaleString();
+}
+
+function formatSourceLabel(sourceValue) {
+  return String(sourceValue || "").trim().toLowerCase() === "api" ? "API" : "Staff";
 }
 
 function formatEstimateRange(estimate) {
@@ -223,6 +255,41 @@ function applyEstimate(estimate) {
   estimatedTimeText.textContent = formatEstimateRange(activeEstimate);
 }
 
+function applyQueueStatus(statusPayload, { silent = false } = {}) {
+  if (!statusPayload || typeof statusPayload !== "object") {
+    return;
+  }
+  latestQueueStatus = statusPayload;
+  const queueLength = Number(statusPayload.queueLength || 0);
+  const currentJob = statusPayload.currentJob || "-";
+  const waitText = formatWaitSeconds(statusPayload.estimatedWaitSeconds || 0);
+
+  if (!loading && !currentJobId) {
+    setStatus(queueLength > 0 ? "Queued" : "Idle");
+  }
+  if (queueLength > 0 || currentJob !== "-") {
+    estimatedTimeText.textContent = waitText;
+  }
+  if (!silent) {
+    appendEvent(`Queue: ${queueLength} waiting, current job: ${currentJob}.`);
+  }
+}
+
+async function fetchQueueStatus({ silent = false } = {}) {
+  try {
+    const response = await fetch("/queue/status");
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.detail || "Failed to load queue status.");
+    }
+    applyQueueStatus(data, { silent });
+  } catch (error) {
+    if (!silent) {
+      appendEvent(error.message || "Failed to load queue status.", true);
+    }
+  }
+}
+
 async function fetchGenerationEstimate() {
   try {
     const response = await fetch("/generation/estimate");
@@ -281,6 +348,99 @@ function setSelectedFeedbackTags(tags) {
   });
 }
 
+function setWebcamPermissionState(state, message) {
+  webcamPermissionState = state;
+  if (webcamPermissionStatus) {
+    webcamPermissionStatus.textContent = message;
+  }
+  if (requestWebcamPermissionBtn) {
+    requestWebcamPermissionBtn.disabled = state === "checking";
+  }
+}
+
+function canRequestBrowserCameraPermission() {
+  return Boolean(
+    window.navigator &&
+      window.navigator.mediaDevices &&
+      typeof window.navigator.mediaDevices.getUserMedia === "function"
+  );
+}
+
+function stopMediaStream(stream) {
+  if (!stream || typeof stream.getTracks !== "function") {
+    return;
+  }
+  stream.getTracks().forEach((track) => {
+    try {
+      track.stop();
+    } catch (error) {
+      // Ignore track stop errors.
+    }
+  });
+}
+
+function buildCameraPermissionErrorMessage(error) {
+  const errorName = String((error && error.name) || "").trim();
+  if (errorName === "NotAllowedError" || errorName === "PermissionDeniedError") {
+    return "Camera permission denied. Allow camera access in browser settings.";
+  }
+  if (errorName === "NotFoundError" || errorName === "DevicesNotFoundError") {
+    return "No camera device found on this browser device.";
+  }
+  if (errorName === "NotReadableError" || errorName === "TrackStartError") {
+    return "Camera is busy or unavailable. Close other camera apps and try again.";
+  }
+  if (errorName === "SecurityError") {
+    return "Camera access is blocked by browser security policy.";
+  }
+  if (!window.isSecureContext) {
+    return "Camera permission requires HTTPS or localhost.";
+  }
+  return "Unable to request camera permission from browser.";
+}
+
+async function requestWebcamPermission({ silent = false } = {}) {
+  if (!canRequestBrowserCameraPermission()) {
+    setWebcamPermissionState(
+      "unsupported",
+      "Camera permission API not supported in this browser."
+    );
+    if (!silent) {
+      appendEvent("Browser does not support camera permission request.", true);
+    }
+    return false;
+  }
+
+  if (webcamPermissionPending) {
+    return webcamPermissionPending;
+  }
+
+  setWebcamPermissionState("checking", "Requesting camera permission...");
+  webcamPermissionPending = window.navigator.mediaDevices
+    .getUserMedia({ video: true })
+    .then((stream) => {
+      stopMediaStream(stream);
+      setWebcamPermissionState("granted", "Camera permission granted.");
+      if (!silent) {
+        appendEvent("Camera permission granted.");
+      }
+      return true;
+    })
+    .catch((error) => {
+      const message = buildCameraPermissionErrorMessage(error);
+      setWebcamPermissionState("denied", message);
+      if (!silent) {
+        appendEvent(message, true);
+      }
+      return false;
+    })
+    .finally(() => {
+      webcamPermissionPending = null;
+    });
+
+  return webcamPermissionPending;
+}
+
 function updateControlText() {
   if (currentMethod === "upload") {
     generateBtn.textContent = "Generate Artwork";
@@ -311,6 +471,9 @@ function setActiveMethod(methodName) {
 
   updateControlText();
   setLoading(loading);
+  if (methodName === "webcam") {
+    requestWebcamPermission({ silent: false });
+  }
 }
 
 function resetStatusCards() {
@@ -439,6 +602,13 @@ async function submitGeneration() {
     localInputPreviewUrl = URL.createObjectURL(selectedFile);
     setPreview(inputPreviewLink, inputPreviewImage, localInputPreviewUrl);
   }
+  if (currentMethod === "webcam") {
+    const hasPermission = await requestWebcamPermission({ silent: false });
+    if (!hasPermission) {
+      setStatus("Camera permission required");
+      return;
+    }
+  }
 
   const estimate = await fetchGenerationEstimate();
   applyEstimate(estimate);
@@ -452,7 +622,8 @@ async function submitGeneration() {
   ratingSection.hidden = true;
 
   setPreviewLoading(outputPreviewLink, true);
-  startElapsedTimer();
+  stopElapsedTimer();
+  elapsedTimeText.textContent = "00:00";
   setLoading(true);
 
   if (visitorNotes) {
@@ -480,7 +651,20 @@ async function submitGeneration() {
       throw new Error(payload.detail || "Generation failed.");
     }
 
-    updateStatusFromResult({ status: "Completed", ...payload }, "response");
+    if (payload.status === "queued" && payload.job) {
+      currentJobId = payload.job.jobId || currentJobId;
+      setStatus("Queued");
+      jobIdText.textContent = payload.job.jobId || "pending";
+      visitorText.textContent = payload.job.visitorName || visitorName;
+      presetText.textContent = "-";
+      promptModeText.textContent = "-";
+      finalDurationText.textContent = "-";
+      setPreviewLoading(outputPreviewLink, false);
+      applyQueueStatus(payload, { silent: true });
+      appendEvent(`Queued job ${payload.job.jobId}.`);
+    } else {
+      updateStatusFromResult({ status: "Completed", ...payload }, "response");
+    }
   } catch (error) {
     setStatus("Error");
     stopElapsedTimer();
@@ -697,6 +881,11 @@ function createGalleryControlCard(item) {
   jobLine.textContent = `Job ${item.jobId || "-"} | ${formatDateTime(item.createdAt)} | ${visibilityText}`;
   meta.appendChild(jobLine);
 
+  const sourceLine = document.createElement("div");
+  sourceLine.className = "gallery-control-source";
+  sourceLine.textContent = `Source: ${formatSourceLabel(item.source)}`;
+  meta.appendChild(sourceLine);
+
   const actionRow = document.createElement("div");
   actionRow.className = "gallery-control-actions";
 
@@ -715,9 +904,67 @@ function createGalleryControlCard(item) {
   deleteBtn.className = "small-action-btn danger";
   deleteBtn.textContent = "Delete";
 
+  const previewWrap = document.createElement("div");
+  previewWrap.className = "gallery-control-preview-wrap";
+
+  const previewBtn = document.createElement("button");
+  previewBtn.type = "button";
+  previewBtn.className = "small-action-btn gallery-control-preview-btn";
+  previewBtn.textContent = "Before/After";
+  previewWrap.appendChild(previewBtn);
+
+  const previewPanel = document.createElement("div");
+  previewPanel.className = "gallery-control-preview-popover";
+  previewPanel.hidden = true;
+
+  const previewGrid = document.createElement("div");
+  previewGrid.className = "gallery-control-preview-grid";
+
+  const beforeBox = document.createElement("div");
+  beforeBox.className = "gallery-control-preview-box";
+  const beforeLabel = document.createElement("p");
+  beforeLabel.className = "gallery-control-preview-label";
+  beforeLabel.textContent = "Before";
+  beforeBox.appendChild(beforeLabel);
+  if (item.inputUrl) {
+    const beforeImg = document.createElement("img");
+    beforeImg.src = `${item.inputUrl}${item.inputUrl.includes("?") ? "&" : "?"}t=${Date.now()}`;
+    beforeImg.alt = `Before image for ${item.visitorName || "Guest"}`;
+    beforeBox.appendChild(beforeImg);
+  } else {
+    const beforeEmpty = document.createElement("p");
+    beforeEmpty.className = "gallery-control-preview-empty";
+    beforeEmpty.textContent = "Before image not available";
+    beforeBox.appendChild(beforeEmpty);
+  }
+  previewGrid.appendChild(beforeBox);
+
+  const afterBox = document.createElement("div");
+  afterBox.className = "gallery-control-preview-box";
+  const afterLabel = document.createElement("p");
+  afterLabel.className = "gallery-control-preview-label";
+  afterLabel.textContent = "After";
+  afterBox.appendChild(afterLabel);
+  if (item.outputUrl) {
+    const afterImg = document.createElement("img");
+    afterImg.src = `${item.outputUrl}${item.outputUrl.includes("?") ? "&" : "?"}t=${Date.now()}`;
+    afterImg.alt = `After image for ${item.visitorName || "Guest"}`;
+    afterBox.appendChild(afterImg);
+  } else {
+    const afterEmpty = document.createElement("p");
+    afterEmpty.className = "gallery-control-preview-empty";
+    afterEmpty.textContent = "After image not available";
+    afterBox.appendChild(afterEmpty);
+  }
+  previewGrid.appendChild(afterBox);
+
+  previewPanel.appendChild(previewGrid);
+  previewWrap.appendChild(previewPanel);
+
   actionRow.appendChild(renameBtn);
   actionRow.appendChild(visibilityBtn);
   actionRow.appendChild(deleteBtn);
+  actionRow.appendChild(previewWrap);
   meta.appendChild(actionRow);
 
   const status = document.createElement("p");
@@ -746,6 +993,26 @@ function createGalleryControlCard(item) {
     }
     await deleteGalleryItem(item.jobId, status, actionButtons);
   });
+
+  let hidePreviewTimer = null;
+  const showPreview = () => {
+    if (hidePreviewTimer) {
+      window.clearTimeout(hidePreviewTimer);
+      hidePreviewTimer = null;
+    }
+    previewPanel.hidden = false;
+  };
+
+  const hidePreview = () => {
+    hidePreviewTimer = window.setTimeout(() => {
+      previewPanel.hidden = true;
+    }, 90);
+  };
+
+  previewWrap.addEventListener("mouseenter", showPreview);
+  previewWrap.addEventListener("mouseleave", hidePreview);
+  previewBtn.addEventListener("focus", showPreview);
+  previewBtn.addEventListener("blur", hidePreview);
 
   return wrapper;
 }
@@ -805,11 +1072,12 @@ function connectWebSocket() {
 
   socket.onopen = () => {
     appendEvent("Live updates connected.");
+    fetchQueueStatus({ silent: true });
   };
 
   socket.onclose = () => {
     appendEvent("Live updates disconnected. Reconnecting...", true);
-    window.setTimeout(connectWebSocket, 1500);
+    window.setTimeout(connectWebSocket, 3000);
   };
 
   socket.onmessage = (event) => {
@@ -824,6 +1092,36 @@ function connectWebSocket() {
         stopElapsedTimer();
         setPreviewLoading(outputPreviewLink, false);
         appendEvent(`Error on ${payload.jobId || "unknown"}: ${payload.error || "Unknown error"}`, true);
+      } else if (payload.type === "queue_updated") {
+        applyQueueStatus(payload, { silent: true });
+      } else if (payload.type === "job_started" && payload.job) {
+        const startedJob = payload.job;
+        if (currentJobId && startedJob.jobId === currentJobId) {
+          setStatus("Processing");
+          jobIdText.textContent = startedJob.jobId || "-";
+          visitorText.textContent = startedJob.visitorName || visitorText.textContent;
+          startElapsedTimer(startedJob.startedAt || null);
+        }
+        appendEvent(`Job started: ${startedJob.jobId}.`);
+      } else if (payload.type === "job_failed" && payload.job) {
+        const failedJob = payload.job;
+        if (currentJobId && failedJob.jobId === currentJobId) {
+          setStatus("Error");
+          stopElapsedTimer();
+          setPreviewLoading(outputPreviewLink, false);
+        }
+        appendEvent(`Job failed: ${failedJob.jobId} (${failedJob.error || "Unknown error"})`, true);
+      } else if (payload.type === "job_cancelled" && payload.job) {
+        const cancelledJob = payload.job;
+        if (currentJobId && cancelledJob.jobId === currentJobId) {
+          setStatus("Cancelled");
+          stopElapsedTimer();
+          setPreviewLoading(outputPreviewLink, false);
+          finalDurationText.textContent = "-";
+        }
+        appendEvent(`Job cancelled: ${cancelledJob.jobId}.`, true);
+      } else if (payload.type === "job_completed" && payload.job) {
+        appendEvent(`Job completed: ${payload.job.jobId}.`);
       } else if (payload.type === "gallery_item_updated" && payload.item) {
         mergeGalleryControlItem(payload.item);
       } else if (payload.type === "gallery_item_deleted" && payload.jobId) {
@@ -895,11 +1193,18 @@ if (refreshGalleryControlBtn) {
   });
 }
 
+if (requestWebcamPermissionBtn) {
+  requestWebcamPermissionBtn.addEventListener("click", () => {
+    requestWebcamPermission({ silent: false });
+  });
+}
+
 generateBtn.addEventListener("click", submitGeneration);
 clearBtn.addEventListener("click", clearDashboard);
 saveRatingBtn.addEventListener("click", saveRating);
 
 renderTagCheckboxes();
+setupLanHelper();
 setActiveMethod("upload");
 setStatus("Idle");
 ratingSection.hidden = true;
@@ -907,6 +1212,7 @@ setPreview(inputPreviewLink, inputPreviewImage, null);
 setPreview(outputPreviewLink, outputPreviewImage, null);
 wirePreviewLinkSafety(inputPreviewLink);
 wirePreviewLinkSafety(outputPreviewLink);
+setWebcamPermissionState("unknown", "Camera permission: not requested.");
 
 fetchGenerationEstimate().then((estimate) => {
   applyEstimate(estimate);
@@ -914,4 +1220,5 @@ fetchGenerationEstimate().then((estimate) => {
 });
 
 loadGalleryControlItems({ silent: true });
+fetchQueueStatus({ silent: true });
 connectWebSocket();

@@ -5,6 +5,7 @@ REM ==================================================
 REM Stop launcher services by port
 REM - Stable Diffusion API (7860)
 REM - Drawing AI Backend (8000)
+REM - Cloudflare Tunnel process (cloudflared.exe)
 REM ==================================================
 
 echo ==================================================
@@ -42,6 +43,22 @@ for /f "tokens=5" %%P in ('netstat -ano ^| findstr /R /C:":8000 .*LISTENING"') d
     )
 )
 if "%FOUND_8000%"=="0" echo [INFO] Controller Backend not running on port 8000.
+
+echo.
+echo [INFO] Checking Cloudflare Tunnel process...
+tasklist /FI "IMAGENAME eq cloudflared.exe" 2>nul | find /I "cloudflared.exe" >nul
+if errorlevel 1 (
+    echo [INFO] Cloudflare Tunnel is not running.
+) else (
+    echo [INFO] Stopping cloudflared.exe...
+    taskkill /IM cloudflared.exe /T >nul 2>&1
+    if errorlevel 1 taskkill /IM cloudflared.exe /T /F >nul 2>&1
+    if errorlevel 1 (
+        echo [ERROR] Could not stop cloudflared.exe.
+    ) else (
+        echo [OK] Stopped Cloudflare Tunnel.
+    )
+)
 
 echo.
 echo Stop sequence completed.

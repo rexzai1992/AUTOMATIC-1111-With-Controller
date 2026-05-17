@@ -79,22 +79,33 @@ class StableDiffusionGenerator:
         input_image_path: Path,
         output_image_path: Path,
         preset: PresetSettings,
+        generation_settings: Dict[str, object] | None = None,
     ) -> Path:
         self.fetch_models()
         self.set_checkpoint()
 
         preset_data: Dict[str, object] = asdict(preset)
+        settings = generation_settings or {}
+        steps = int(settings.get("steps", preset_data.get("steps", GENERATION_DEFAULTS.steps)))
+        cfg_scale = float(settings.get("cfgScale", preset_data.get("cfg_scale", GENERATION_DEFAULTS.cfg_scale)))
+        width = int(settings.get("width", GENERATION_DEFAULTS.width))
+        height = int(settings.get("height", GENERATION_DEFAULTS.height))
+        sampler_name = str(settings.get("samplerName", preset_data.get("sampler_name", GENERATION_DEFAULTS.sampler_name)))
+        control_weight = float(settings.get("controlWeight", preset_data["control_weight"]))
+        denoising_strength = float(settings.get("denoisingStrength", preset_data["denoising_strength"]))
+        control_mode = str(settings.get("controlMode", preset_data["control_mode"]))
+
         base64_image = self._encode_image_base64(input_image_path)
         payload = {
             "init_images": [base64_image],
             "prompt": preset_data["prompt"],
             "negative_prompt": preset_data["negative_prompt"],
-            "steps": GENERATION_DEFAULTS.steps,
-            "cfg_scale": GENERATION_DEFAULTS.cfg_scale,
-            "denoising_strength": preset_data["denoising_strength"],
-            "width": GENERATION_DEFAULTS.width,
-            "height": GENERATION_DEFAULTS.height,
-            "sampler_name": GENERATION_DEFAULTS.sampler_name,
+            "steps": steps,
+            "cfg_scale": cfg_scale,
+            "denoising_strength": denoising_strength,
+            "width": width,
+            "height": height,
+            "sampler_name": sampler_name,
             "alwayson_scripts": {
                 "controlnet": {
                     "args": [
@@ -103,9 +114,9 @@ class StableDiffusionGenerator:
                             "image": base64_image,
                             "module": SD_CONFIG.controlnet_module,
                             "model": SD_CONFIG.controlnet_model,
-                            "weight": preset_data["control_weight"],
+                            "weight": control_weight,
                             "resize_mode": GENERATION_DEFAULTS.resize_mode,
-                            "control_mode": preset_data["control_mode"],
+                            "control_mode": control_mode,
                             "guidance_start": GENERATION_DEFAULTS.guidance_start,
                             "guidance_end": GENERATION_DEFAULTS.guidance_end,
                             "pixel_perfect": GENERATION_DEFAULTS.pixel_perfect,

@@ -57,9 +57,13 @@ if errorlevel 1 (
   echo.
 )
 
-echo [Run] Starting backend on http://127.0.0.1:8000
+echo [Run] Starting backend on http://0.0.0.0:8000
+echo [Info] Local pages:
+echo        http://127.0.0.1:8000/staff
+echo        http://127.0.0.1:8000/gallery
 start "" "http://127.0.0.1:8000/staff"
-".venv\Scripts\python.exe" -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --ws websockets
+start "" "http://127.0.0.1:8000/gallery"
+".venv\Scripts\python.exe" -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --ws websockets
 
 set "EXIT_CODE=%errorlevel%"
 echo.

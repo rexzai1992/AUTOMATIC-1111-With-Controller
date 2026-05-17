@@ -1,4 +1,5 @@
 const galleryGrid = document.getElementById("galleryGrid");
+const wsStatusBadge = document.getElementById("wsStatusBadge");
 
 const FEEDBACK_TAGS = [
   "too_close_to_drawing",
@@ -34,6 +35,21 @@ function renderEmptyState() {
   empty.className = "empty-state";
   empty.textContent = "Waiting for the first generated artwork...";
   galleryGrid.appendChild(empty);
+}
+
+function setWsStatus(connected) {
+  if (!wsStatusBadge) {
+    return;
+  }
+  if (connected) {
+    wsStatusBadge.textContent = "Connected";
+    wsStatusBadge.classList.remove("reconnecting");
+    wsStatusBadge.classList.add("connected");
+  } else {
+    wsStatusBadge.textContent = "Reconnecting";
+    wsStatusBadge.classList.remove("connected");
+    wsStatusBadge.classList.add("reconnecting");
+  }
 }
 
 function createTagCheckboxes(container, selectedTags) {
@@ -102,6 +118,64 @@ function createCard(item) {
   rateButton.className = "rate-btn";
   rateButton.textContent = "Rate";
   actionsRow.appendChild(rateButton);
+
+  const previewWrap = document.createElement("div");
+  previewWrap.className = "before-after-wrap";
+
+  const previewButton = document.createElement("button");
+  previewButton.type = "button";
+  previewButton.className = "before-after-btn";
+  previewButton.textContent = "Before/After";
+  previewWrap.appendChild(previewButton);
+
+  const previewPanel = document.createElement("div");
+  previewPanel.className = "before-after-popover";
+  previewPanel.hidden = true;
+
+  const previewGrid = document.createElement("div");
+  previewGrid.className = "before-after-grid";
+
+  const beforeCard = document.createElement("div");
+  beforeCard.className = "before-after-card";
+  const beforeLabel = document.createElement("p");
+  beforeLabel.className = "before-after-label";
+  beforeLabel.textContent = "Before";
+  beforeCard.appendChild(beforeLabel);
+  if (item.inputUrl) {
+    const beforeImage = document.createElement("img");
+    beforeImage.src = `${item.inputUrl}?t=${Date.now()}`;
+    beforeImage.alt = `Before drawing by ${item.visitorName || "Guest"}`;
+    beforeCard.appendChild(beforeImage);
+  } else {
+    const beforeEmpty = document.createElement("p");
+    beforeEmpty.className = "before-after-empty";
+    beforeEmpty.textContent = "Before image not available";
+    beforeCard.appendChild(beforeEmpty);
+  }
+  previewGrid.appendChild(beforeCard);
+
+  const afterCard = document.createElement("div");
+  afterCard.className = "before-after-card";
+  const afterLabel = document.createElement("p");
+  afterLabel.className = "before-after-label";
+  afterLabel.textContent = "After";
+  afterCard.appendChild(afterLabel);
+  if (item.outputUrl) {
+    const afterImage = document.createElement("img");
+    afterImage.src = `${item.outputUrl}?t=${Date.now()}`;
+    afterImage.alt = `Generated artwork by ${item.visitorName || "Guest"}`;
+    afterCard.appendChild(afterImage);
+  } else {
+    const afterEmpty = document.createElement("p");
+    afterEmpty.className = "before-after-empty";
+    afterEmpty.textContent = "After image not available";
+    afterCard.appendChild(afterEmpty);
+  }
+  previewGrid.appendChild(afterCard);
+
+  previewPanel.appendChild(previewGrid);
+  previewWrap.appendChild(previewPanel);
+  actionsRow.appendChild(previewWrap);
   meta.appendChild(actionsRow);
 
   const panel = document.createElement("div");
@@ -150,6 +224,28 @@ function createCard(item) {
   rateButton.addEventListener("click", () => {
     panel.hidden = !panel.hidden;
   });
+
+  let hidePreviewTimer = null;
+  const showPreview = () => {
+    if (hidePreviewTimer) {
+      clearTimeout(hidePreviewTimer);
+      hidePreviewTimer = null;
+    }
+    previewPanel.hidden = false;
+    previewWrap.classList.add("is-open");
+  };
+
+  const hidePreview = () => {
+    hidePreviewTimer = setTimeout(() => {
+      previewPanel.hidden = true;
+      previewWrap.classList.remove("is-open");
+    }, 90);
+  };
+
+  previewWrap.addEventListener("mouseenter", showPreview);
+  previewWrap.addEventListener("mouseleave", hidePreview);
+  previewButton.addEventListener("focus", showPreview);
+  previewButton.addEventListener("blur", hidePreview);
 
   saveBtn.addEventListener("click", async () => {
     const numericRating = Number(ratingSelect.value);
@@ -239,7 +335,20 @@ function connectWebSocket() {
   const protocol = window.location.protocol === "https:" ? "wss" : "ws";
   const ws = new WebSocket(`${protocol}://${window.location.host}/ws`);
 
-  ws.onclose = () => setTimeout(connectWebSocket, 1500);
+  ws.onopen = async () => {
+    setWsStatus(true);
+    await loadGallery();
+  };
+
+  ws.onclose = () => {
+    setWsStatus(false);
+    setTimeout(connectWebSocket, 3000);
+  };
+
+  ws.onerror = () => {
+    setWsStatus(false);
+  };
+
   ws.onmessage = (event) => {
     try {
       const payload = JSON.parse(event.data);
@@ -262,5 +371,6 @@ function connectWebSocket() {
   };
 }
 
+setWsStatus(false);
 loadGallery();
 connectWebSocket();

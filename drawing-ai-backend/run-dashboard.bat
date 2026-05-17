@@ -2,18 +2,15 @@
 setlocal EnableExtensions EnableDelayedExpansion
 
 REM ==================================================
-REM Drawing AI full launcher
-REM - Starts Stable Diffusion locally on 127.0.0.1:7860
-REM - Starts FastAPI backend on 0.0.0.0:8000
-REM - Starts Cloudflare Tunnel that points ONLY to 127.0.0.1:8000
+REM Dashboard launcher (backend + Cloudflare Tunnel)
+REM - Starts backend if not already running
+REM - Starts Cloudflare Tunnel (named tunnel if available, else quick tunnel)
+REM - Opens public dashboard pages
 REM ==================================================
 
 set "SCRIPT_DIR=%~dp0"
 for %%I in ("%SCRIPT_DIR%.") do set "BACKEND_DIR=%%~fI"
-for %%I in ("%BACKEND_DIR%\..\stable-diffusion-webui") do set "SD_DIR=%%~fI"
 
-set "SD_LAUNCHER=%SD_DIR%\webui-user.bat"
-set "SD_API_URL=http://127.0.0.1:7860/sdapi/v1/sd-models"
 set "BACKEND_HEALTH_URL=http://127.0.0.1:8000/health"
 set "TUNNEL_LOCAL_URL=http://127.0.0.1:8000"
 set "TUNNEL_PUBLIC_HOST=Image-generator-wonderpark.izzul.xyz"
@@ -22,12 +19,6 @@ set "TUNNEL_NAME=image-generator-wonderpark"
 REM Optional overrides from environment variables.
 if defined CLOUDFLARE_TUNNEL_NAME set "TUNNEL_NAME=%CLOUDFLARE_TUNNEL_NAME%"
 if defined CLOUDFLARE_PUBLIC_HOST set "TUNNEL_PUBLIC_HOST=%CLOUDFLARE_PUBLIC_HOST%"
-
-if not exist "%SD_LAUNCHER%" (
-  echo [ERROR] Stable Diffusion launcher not found:
-  echo         %SD_LAUNCHER%
-  exit /b 1
-)
 
 if not exist "%BACKEND_DIR%\app\main.py" (
   echo [ERROR] Backend path is invalid:
@@ -39,24 +30,12 @@ call :resolve_python_cmd
 if errorlevel 1 exit /b 1
 
 echo ==================================================
-echo Starting Stable Diffusion...
-echo ==================================================
-call :is_url_ready "%SD_API_URL%"
-if errorlevel 1 (
-  start "Stable Diffusion WebUI" cmd /k "cd /d ""%SD_DIR%"" && set ""COMMANDLINE_ARGS=--api --opt-sdp-attention"" && call ""%SD_LAUNCHER%"""
-  echo [WAIT] Waiting for Stable Diffusion API...
-  call :wait_for_url "%SD_API_URL%" 3 240 "Stable Diffusion API"
-  if errorlevel 1 exit /b 1
-) else (
-  echo [INFO] Stable Diffusion API is already running.
-)
-
-echo ==================================================
-echo Starting Backend...
+echo Checking backend...
 echo ==================================================
 call :is_url_ready "%BACKEND_HEALTH_URL%"
 if errorlevel 1 (
-  start "Drawing AI Backend" cmd /k "cd /d ""%BACKEND_DIR%"" && %PY_CMD% -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --ws websockets"
+  echo [INFO] Backend is not running. Starting backend...
+  start "Drawing AI Backend" cmd /k "cd /d ""%BACKEND_DIR%"" && %PY_LAUNCH% -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --ws websockets"
   echo [WAIT] Waiting for backend health...
   call :wait_for_url "%BACKEND_HEALTH_URL%" 2 120 "Backend /health"
   if errorlevel 1 exit /b 1
@@ -66,17 +45,16 @@ if errorlevel 1 (
 
 call :start_cloudflare_tunnel
 
-start "" "http://localhost:8000/staff"
 start "" "https://%TUNNEL_PUBLIC_HOST%/staff"
+start "" "https://%TUNNEL_PUBLIC_HOST%/gallery"
 
 echo.
-echo [OK] System ready.
-echo Local staff:  http://localhost:8000/staff
-echo Public staff: https://%TUNNEL_PUBLIC_HOST%/staff
-echo Public API:   https://%TUNNEL_PUBLIC_HOST%/api/gallery
+echo [OK] Dashboard ready.
+echo Staff:   https://%TUNNEL_PUBLIC_HOST%/staff
+echo Gallery: https://%TUNNEL_PUBLIC_HOST%/gallery
 echo.
-echo [SECURITY] Stable Diffusion stays private/local at http://127.0.0.1:7860
-echo            Only backend port 8000 is exposed via Cloudflare Tunnel.
+echo [SECURITY] Stable Diffusion remains local-only at http://127.0.0.1:7860
+echo            Only backend port 8000 is tunnelled.
 exit /b 0
 
 :wait_for_url
@@ -125,16 +103,22 @@ if errorlevel 1 exit /b 1
 exit /b 0
 
 :resolve_python_cmd
-set "PY_CMD=python"
-%PY_CMD% -c "import sys" >nul 2>&1
+if exist "%BACKEND_DIR%\.venv\Scripts\python.exe" (
+  set "PY_LAUNCH=""%BACKEND_DIR%\.venv\Scripts\python.exe"""
+  exit /b 0
+)
+
+python -c "import sys" >nul 2>&1
 if errorlevel 1 (
-  set "PY_CMD=py -3"
-  %PY_CMD% -c "import sys" >nul 2>&1
+  py -3 -c "import sys" >nul 2>&1
   if errorlevel 1 (
     echo [ERROR] Python 3 was not found in PATH.
     exit /b 1
   )
+  set "PY_LAUNCH=py -3"
+  exit /b 0
 )
+set "PY_LAUNCH=python"
 exit /b 0
 
 :cloudflared_installed
@@ -187,7 +171,6 @@ if not errorlevel 1 (
 echo ==================================================
 echo Starting Cloudflare Tunnel...
 echo ==================================================
-
 call :can_use_named_tunnel
 if not errorlevel 1 (
   echo [INFO] Using named tunnel: %TUNNEL_NAME%
