@@ -1,8 +1,0 @@
-DOWNLOAD TEST IMAGE REPORT
-Generated At: 2026-05-17T09:30:49.473028+00:00
-Total requested: 36
-Total downloaded: 1
-Total failed: 449
-Manifest: C:\AI ofline\drawing-ai-backend\tests\sample_manifest.json
-Reporter TXT: C:\AI ofline\drawing-ai-backend\tests\results\download_test_20260517_093049.txt
-Reporter JSON: C:\AI ofline\drawing-ai-backend\tests\results\download_test_20260517_093049.json

@@ -1,6 +1,0 @@
-INFO:     Started server process [7284]
-INFO:     Waiting for application startup.
-2026-05-19 14:38:15,688 | INFO | app.scanner_service | Scanner watcher started for folder: C:\AI ofline\drawing-ai-backend\scanner_inputs
-2026-05-19 14:38:15,750 | INFO | drawing-ai-backend | Application startup complete.
-INFO:     Application startup complete.
-INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
