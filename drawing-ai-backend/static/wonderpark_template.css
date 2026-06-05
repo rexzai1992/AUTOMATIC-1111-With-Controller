@@ -1,0 +1,129 @@
+﻿@page {
+  size: A5 portrait;
+  margin: 8mm;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: "Arial", "Helvetica", sans-serif;
+  color: #000;
+  background: #fff;
+}
+
+.template-page {
+  width: 100%;
+  height: 100%;
+  border: 1px solid #000;
+  padding: 8mm 8mm 6mm;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 7mm;
+}
+
+.header-block h1 {
+  margin: 0;
+  font-size: 15pt;
+  text-align: center;
+  letter-spacing: 0.2px;
+}
+
+.header-block p {
+  margin: 2mm 0 0;
+  text-align: center;
+  font-size: 10pt;
+}
+
+.meta-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8mm;
+  font-size: 11pt;
+}
+
+.meta-row label {
+  display: flex;
+  align-items: center;
+  gap: 3mm;
+}
+
+.line {
+  flex: 1;
+  border-bottom: 1px solid #000;
+  height: 0;
+}
+
+.artwork-zone {
+  border: 2px solid #000;
+  padding: 10mm;
+  display: flex;
+  min-height: 0;
+}
+
+.artwork-inner {
+  flex: 1;
+  border: 1px dashed #000;
+  min-height: 0;
+}
+
+.footer-block {
+  display: grid;
+  grid-template-columns: 34mm 1fr;
+  gap: 7mm;
+  align-items: center;
+}
+
+.qr-wrap {
+  width: 34mm;
+  height: 34mm;
+  border: 1px solid #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-placeholder {
+  width: 28mm;
+  height: 28mm;
+  border: 1px dashed #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11pt;
+  font-weight: 700;
+}
+
+.qr-text-wrap {
+  min-width: 0;
+}
+
+.qr-title {
+  margin: 0;
+  font-size: 10.5pt;
+  font-weight: 700;
+}
+
+.qr-url {
+  margin: 1.5mm 0;
+  font-size: 9pt;
+  word-break: break-all;
+}
+
+.instruction {
+  margin: 0;
+  font-size: 9.5pt;
+}
+
+@media print {
+  .template-page {
+    border-width: 1px;
+    box-shadow: none;
+  }
+}

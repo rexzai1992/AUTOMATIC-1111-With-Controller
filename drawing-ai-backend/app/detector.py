@@ -55,123 +55,95 @@ class DetectionResult:
         }
 
 
+DRAWING_TO_ARTWORK_BASE_PROMPT = (
+    "Transform the submitted child drawing into a lively, colorful, polished children's storybook illustration "
+    "while preserving the original creative idea, main subject, composition, and childlike charm. Repaint the "
+    "drawing with vibrant colors, warm cheerful lighting, soft shadows, richer details, clean shapes, expressive "
+    "simple cartoon features, playful environmental details, and a full imaginative background. Make it feel alive, "
+    "magical, joyful, and high quality, while still clearly inspired by the original child's drawing."
+)
+DRAWING_TO_ARTWORK_WHITE_BG_APPEND = (
+    "Fill the empty white paper area with a rich playful background, colorful scenery, soft sky, grass, flowers, "
+    "magical details, and storybook atmosphere. No empty white background."
+)
+DRAWING_TO_ARTWORK_NEGATIVE_PROMPT = (
+    "same as input, unchanged drawing, too close to sketch, empty white background, plain background, unfinished "
+    "sketch, monochrome, dull colors, low detail, boring, flat colors, messy artifacts, scary, horror, "
+    "photorealistic, realistic human face, adult anatomy, bad hands, extra fingers, malformed hands, distorted "
+    "face, ugly face, blurry, low quality, text, watermark, logo"
+)
+
+
 SKETCH_LINEART = PresetSettings(
     name="sketch_lineart",
-    control_weight=0.6,
+    control_weight=0.62,
     denoising_strength=0.7,
     control_mode="My prompt is more important",
-    cfg_scale=7.0,
-    steps=30,
+    cfg_scale=8.2,
+    steps=34,
     sampler_name="DPM++ 2M Karras",
-    prompt=(
-        "Transform the submitted pencil or line drawing into a fully colored lively illustration. "
-        "Keep the original composition, subject, and main shapes, but add vibrant colors, soft lighting, "
-        "polished storybook details, cheerful mood, expressive characters, rich background, clean painted "
-        "shapes, high quality digital artwork, animated movie style."
-    ),
-    negative_prompt=(
-        "black and white, monochrome, pencil sketch, plain lineart, unfinished, empty background, low detail, "
-        "dull colors, rough lines, ugly, deformed, distorted, bad anatomy, extra limbs, text, watermark, logo, "
-        "photorealistic"
-    ),
+    prompt=DRAWING_TO_ARTWORK_BASE_PROMPT,
+    negative_prompt=DRAWING_TO_ARTWORK_NEGATIVE_PROMPT,
     prompt_mode="lively_storybook",
 )
 KID_CRAYON = PresetSettings(
     name="kid_crayon",
-    control_weight=0.78,
-    denoising_strength=0.48,
-    control_mode="Balanced",
-    cfg_scale=7.2,
-    steps=30,
+    control_weight=0.68,
+    denoising_strength=0.62,
+    control_mode="My prompt is more important",
+    cfg_scale=8.0,
+    steps=32,
     sampler_name="DPM++ 2M Karras",
-    prompt=(
-        "Transform the submitted child drawing into a lively colorful children's storybook illustration. Keep the "
-        "main objects, layout, pose, and creative idea, then repaint with bold playful colors, warm sunlight, soft "
-        "shadows, expressive cartoon faces, cleaner hands, detailed scenery, and rich environment depth. Keep the "
-        "result clearly stylized and non-photorealistic, fully colored, cheerful, magical, polished, and high "
-        "quality animated movie style."
-    ),
-    negative_prompt=(
-        "photorealistic, realistic skin, realistic face, realistic hands, 3d render, adult proportions, scary, "
-        "horror, crayon texture, pencil texture, rough sketch, unfinished drawing, monochrome, black and white, "
-        "flat colors, empty background, low detail, dull colors, messy lines, bad face, bad eyes, bad hands, extra "
-        "fingers, missing fingers, fused fingers, bad anatomy, deformed, distorted, extra limbs, text, watermark, "
-        "logo"
-    ),
+    prompt=DRAWING_TO_ARTWORK_BASE_PROMPT,
+    negative_prompt=DRAWING_TO_ARTWORK_NEGATIVE_PROMPT,
     prompt_mode="lively_storybook",
 )
 COLORED_DRAWING = PresetSettings(
     name="colored_drawing",
     control_weight=0.7,
-    denoising_strength=0.55,
+    denoising_strength=0.58,
     control_mode="Balanced",
-    cfg_scale=7.0,
-    steps=30,
+    cfg_scale=7.8,
+    steps=32,
     sampler_name="DPM++ 2M Karras",
-    prompt=(
-        "Enhance the submitted colored drawing into a polished vibrant illustration while preserving the original "
-        "design, colors, layout, and childlike charm. Improve lighting, shading, cleanliness, depth, color "
-        "richness, and details. Keep the artwork cheerful, friendly, fully colored, storybook style, high quality."
-    ),
-    negative_prompt=(
-        "overchanged composition, different subject, monochrome, black and white, dull colors, messy, blurry, "
-        "low quality, ugly, deformed, distorted, text, watermark, logo, photorealistic"
-    ),
+    prompt=DRAWING_TO_ARTWORK_BASE_PROMPT,
+    negative_prompt=DRAWING_TO_ARTWORK_NEGATIVE_PROMPT,
     prompt_mode="enhance_colored",
 )
 DEFAULT = PresetSettings(
     name="default",
-    control_weight=0.45,
-    denoising_strength=0.78,
+    control_weight=0.60,
+    denoising_strength=0.68,
     control_mode="My prompt is more important",
-    cfg_scale=8.8,
-    steps=35,
+    cfg_scale=8.2,
+    steps=32,
     sampler_name="DPM++ 2M Karras",
-    prompt=(
-        "Transform the submitted child drawing into a complete colorful storybook illustration. Preserve the main "
-        "subject, original idea, rough shape, and childlike creativity, but repaint it into a finished cheerful "
-        "artwork. Add a full colorful background, playful environment, warm lighting, soft shadows, vibrant colors, "
-        "clean bold shapes, expressive cute details, and animated movie style. Fill the whole image with color and "
-        "scenery. Avoid empty white space. Make it look like a polished children's book illustration while still "
-        "respecting the original drawing."
-    ),
-    negative_prompt=(
-        "empty white background, blank space, same as input, unchanged sketch, unfinished, monochrome, black and "
-        "white, dull colors, low detail, weak color, messy output, blurry, distorted, ugly, deformed, bad anatomy, "
-        "extra limbs, text, watermark, logo, photorealistic"
-    ),
+    prompt=DRAWING_TO_ARTWORK_BASE_PROMPT,
+    negative_prompt=DRAWING_TO_ARTWORK_NEGATIVE_PROMPT,
     prompt_mode="lively_storybook",
 )
 TODDLER_ABSTRACT_PEOPLE = PresetSettings(
     name="toddler_abstract_people",
-    control_weight=0.82,
-    denoising_strength=0.42,
+    control_weight=0.74,
+    denoising_strength=0.55,
     control_mode="Balanced",
-    cfg_scale=7.5,
-    steps=28,
+    cfg_scale=7.8,
+    steps=32,
     sampler_name="DPM++ 2M Karras",
-    prompt=(
-        "Transform the submitted toddler drawing into a beautiful children's picture-book illustration while "
-        "preserving the original childlike identity, proportions, object positions, face placement, pose, and "
-        "playful imperfections from the drawing. Do not redesign the composition. Keep the character simple, "
-        "innocent, and charming like a real young child's imagination. Preserve the large face shape, simple facial "
-        "placement, simple limbs, floating decorative objects, and unusual childlike proportions exactly as "
-        "interpreted from the original drawing. Convert rough lines into clean soft illustrated outlines while "
-        "keeping the original playful structure. Add cheerful colorful storybook styling, soft pastel colors, warm "
-        "sunlight, gentle soft shadows, magical playful atmosphere, child-safe environment, cute simple flowers, "
-        "sparkles, whimsical decorative elements, rich but not overcrowded background, soft grass or playful dreamy "
-        "environment. Use simple cartoon facial features, friendly eyes, soft smile, natural child-safe expression, "
-        "soft rounded features, simple cute hands, simple cute fingers, soft body proportions, charming children's "
-        "illustration style. Highly detailed children's storybook illustration, polished digital art, soft lighting, "
-        "warm colors, magical innocence, picture book quality, family friendly, visually rich, emotionally warm."
-    ),
-    negative_prompt=(
-        "photorealistic, realistic human face, adult face, mature face, creepy face, horror, scary, monster, "
-        "zombie, sharp jawline, realistic skin, cinematic portrait, hyper realistic eyes, muscular anatomy, sexy, "
-        "violent, dark scene, extra fingers, extra hands, malformed hands, mutated limbs, broken anatomy, deformed "
-        "face, ugly face, distorted face, duplicated body, duplicated limbs, missing limbs, empty white background, "
-        "unfinished sketch, rough pencil texture, grayscale, monochrome, blurry, low quality, watermark, logo, text"
-    ),
+    prompt=DRAWING_TO_ARTWORK_BASE_PROMPT,
+    negative_prompt=DRAWING_TO_ARTWORK_NEGATIVE_PROMPT,
+    prompt_mode="lively_storybook",
+)
+ROUGH_LOW_COLOR_DRAWING = PresetSettings(
+    name="rough_low_color_drawing",
+    control_weight=0.58,
+    denoising_strength=0.74,
+    control_mode="My prompt is more important",
+    cfg_scale=8.5,
+    steps=34,
+    sampler_name="DPM++ 2M Karras",
+    prompt=DRAWING_TO_ARTWORK_BASE_PROMPT,
+    negative_prompt=DRAWING_TO_ARTWORK_NEGATIVE_PROMPT,
     prompt_mode="lively_storybook",
 )
 
@@ -206,6 +178,8 @@ def _compute_roughness(image_bgr) -> float:
 def _select_preset(metrics: DetectionMetrics) -> PresetSettings:
     if metrics.whiteBackgroundRatio > 0.75 and metrics.roughness > 0.85 and metrics.edgeRatio < 0.08:
         return TODDLER_ABSTRACT_PEOPLE
+    if metrics.whiteBackgroundRatio > 0.80 and metrics.edgeRatio < 0.03:
+        return ROUGH_LOW_COLOR_DRAWING
     if metrics.colorRatio < 0.08 and metrics.edgeRatio > 0.12:
         return SKETCH_LINEART
     if metrics.colorRatio > 0.18 and metrics.roughness > 0.4:
@@ -237,7 +211,7 @@ def analyze_image(image_path: Path) -> DetectionResult:
             cfg_scale=preset.cfg_scale,
             steps=preset.steps,
             sampler_name=preset.sampler_name,
-            prompt=f"{preset.prompt} rich environment, full background, playful scene, no empty white areas",
+            prompt=f"{preset.prompt} {DRAWING_TO_ARTWORK_WHITE_BG_APPEND}".strip(),
             negative_prompt=preset.negative_prompt,
             prompt_mode=preset.prompt_mode,
         )

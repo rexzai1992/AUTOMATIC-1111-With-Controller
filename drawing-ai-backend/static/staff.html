@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Drawing AI Staff Control</title>
-  <link rel="stylesheet" href="/static/style.css?v=20260517f">
+  <link rel="stylesheet" href="/static/style.css?v=20260519a">
 </head>
 <body class="staff-body">
   <main class="staff-dashboard">
@@ -15,6 +15,10 @@
         <div class="lan-helper">
           <p>Staff URL: <a id="staffLanUrl" href="#" target="_blank" rel="noopener noreferrer">-</a></p>
           <p>Gallery URL: <a id="galleryLanUrl" href="#" target="_blank" rel="noopener noreferrer">-</a></p>
+          <p>Comfy Staff URL: <a id="comfyStaffLanUrl" href="#" target="_blank" rel="noopener noreferrer">-</a></p>
+          <p>Showcase URL: <a id="showcaseLanUrl" href="#" target="_blank" rel="noopener noreferrer">-</a></p>
+          <p>Public Wonderpark URL: <a id="wonderparkLanUrl" href="#" target="_blank" rel="noopener noreferrer">-</a></p>
+          <p>Public Gallery URL: <a id="publicGalleryLanUrl" href="#" target="_blank" rel="noopener noreferrer">-</a></p>
         </div>
       </div>
       <nav class="quick-links" aria-label="Quick links">
@@ -60,6 +64,73 @@
 
       <section class="staff-card">
         <h2>Generation Control</h2>
+        <label class="field-toggle" for="aiArtVentureEnabledToggle">
+          <input id="aiArtVentureEnabledToggle" type="checkbox">
+          <span>AI Art Venture</span>
+        </label>
+        <p class="panel-hint">OFF = normal generation mode. ON = AI Art Venture image-to-image mode.</p>
+
+        <label class="field-label" for="generationModeSelect">Generation Mode</label>
+        <select id="generationModeSelect">
+          <option value="drawing_to_artwork">Drawing to Artwork</option>
+          <option value="person_holding_artwork">Person Holding Artwork</option>
+          <option value="ai_art_venture">AI Art Venture</option>
+        </select>
+
+        <div id="styleSelectWrap" class="mode-style-wrap" hidden>
+          <label class="field-label" for="styleIdSelect">AI Art Venture Style</label>
+          <select id="styleIdSelect"></select>
+        </div>
+
+        <div id="modePresetInfoBox" class="mode-preset-info" hidden>
+          <p><strong>Preset Info:</strong> <span id="modePresetInfoText">-</span></p>
+          <p><strong>ControlNet:</strong> <span id="modeControlNetInfoText">-</span></p>
+          <p><strong>Model:</strong> <span id="modeModelNameText">-</span></p>
+          <p><strong>Settings:</strong> <span id="modeGenerationSettingsText">-</span></p>
+          <p><strong>Warning:</strong> <span id="modeWarningText">-</span></p>
+        </div>
+
+        <div id="aiArtVenturePanel" class="ai-art-venture-panel" hidden>
+          <h3>AI Art Venture Settings</h3>
+
+          <label class="field-toggle compact" for="randomStyleEnabledToggle">
+            <input id="randomStyleEnabledToggle" type="checkbox">
+            <span>Random Style</span>
+          </label>
+          <p id="randomStyleNote" class="panel-hint" hidden>A random style will be picked for every generation.</p>
+
+          <label class="field-label" for="aiArtVentureStyleSelect">Style Preset</label>
+          <select id="aiArtVentureStyleSelect"></select>
+          <p class="panel-hint">Current selected style: <strong id="currentSelectedStyleName">-</strong></p>
+
+          <label class="field-toggle compact" for="randomThemeEnabledToggle">
+            <input id="randomThemeEnabledToggle" type="checkbox">
+            <span>Random Theme</span>
+          </label>
+          <p id="randomThemeNote" class="panel-hint" hidden>A random theme will be picked for every generation.</p>
+
+          <label class="field-label" for="aiArtVentureThemeSelect">Theme Preset</label>
+          <select id="aiArtVentureThemeSelect"></select>
+          <p class="panel-hint">Current selected theme: <strong id="currentSelectedThemeName">-</strong></p>
+          <p class="panel-hint" id="selectedThemePromptText">-</p>
+
+          <label class="field-label" for="aiArtVentureCustomTheme">Custom Theme</label>
+          <textarea
+            id="aiArtVentureCustomTheme"
+            rows="3"
+            placeholder="Optional custom background theme prompt"
+          ></textarea>
+          <p id="customThemeNote" class="panel-hint" hidden>Custom theme overrides theme preset.</p>
+          <button id="resetCustomThemeBtn" class="small-action-btn" type="button">Reset to preset</button>
+
+          <div class="ai-art-venture-debug">
+            <p><strong>Last generated style:</strong> <span id="lastGeneratedStyleName">-</span></p>
+            <p><strong>Last generated theme:</strong> <span id="lastGeneratedThemeName">-</span></p>
+            <p><strong>Final prompt preview:</strong></p>
+            <pre id="aiArtVenturePromptPreview">-</pre>
+          </div>
+        </div>
+
         <button id="generateBtn" class="action-btn primary-btn" type="button">Generate Artwork</button>
         <button id="clearBtn" class="action-btn ghost-btn" type="button">Clear / Reset</button>
         <p id="controlHint" class="panel-hint">Upload a drawing or choose webcam capture to start.</p>
@@ -73,6 +144,11 @@
           <article class="status-card">
             <span>Status</span>
             <strong id="statusText">Idle</strong>
+          </article>
+          <article class="status-card">
+            <span>Generation Backend</span>
+            <strong id="generationEngineText">-</strong>
+            <small id="generationWorkflowText" class="status-subtext">-</small>
           </article>
           <article class="status-card">
             <span>Job ID</span>
@@ -126,11 +202,14 @@
             </a>
           </article>
         </div>
+        <div class="preview-actions">
+          <a id="photoPrintLink" class="small-action-btn photo-print-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Photo 4x6</a>
+        </div>
       </section>
 
       <section id="ratingSection" class="staff-card rating-card" hidden>
-        <h2>Rating</h2>
-        <p class="panel-hint">Rate quality to improve tuning over time.</p>
+        <h2>Auto Rating</h2>
+        <p class="panel-hint">Quality rating is now generated automatically by the backend.</p>
 
         <div id="autoReviewBox" class="auto-review-box">
           <div class="auto-review-head">
@@ -142,7 +221,7 @@
           <p><strong>Auto bad tags:</strong> <span id="autoBadTagsText">-</span></p>
           <p><strong>Auto good tags:</strong> <span id="autoGoodTagsText">-</span></p>
           <p><strong>Auto notes:</strong> <span id="autoNotesText">-</span></p>
-          <p class="panel-hint">Staff rating is final. You can accept or override auto review before saving.</p>
+          <p class="panel-hint">Manual staff rating is disabled. Auto review is used as final rating.</p>
         </div>
 
         <div class="comparison-review-box">
@@ -222,13 +301,16 @@
         <textarea id="feedbackNote" rows="3" placeholder="Optional quality notes"></textarea>
 
         <button id="saveRatingBtn" class="action-btn primary-btn" type="button">Save Rating</button>
-        <p id="ratingStatus" class="rating-status">No rating saved yet.</p>
+        <p id="ratingStatus" class="rating-status">Auto rating not available yet.</p>
       </section>
 
       <section class="staff-card">
         <div class="subheader-row">
           <h2>Gallery Control</h2>
-          <button id="refreshGalleryControlBtn" class="small-action-btn" type="button">Refresh</button>
+          <div class="subheader-actions">
+            <button id="refreshGalleryControlBtn" class="small-action-btn" type="button">Refresh</button>
+            <button id="clearGalleryControlBtn" class="small-action-btn danger" type="button">Clear Gallery Photos</button>
+          </div>
         </div>
         <p class="panel-hint">Manage gallery items here: rename visitor, hide from public wall, or delete permanently.</p>
         <div id="galleryControlList" class="gallery-control-list" aria-live="polite"></div>
@@ -241,6 +323,7 @@
     </section>
   </main>
 
-  <script src="/static/staff.js?v=20260517e"></script>
+  <script src="/static/ai_art_venture_presets.js?v=20260520c"></script>
+  <script src="/static/staff.js?v=20260522d"></script>
 </body>
 </html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Genius Photo 4x6</title>
+  <link rel="stylesheet" href="/static/photo.css?v=20260604a">
+</head>
+<body>
+  <main class="photo-shell">
+    <header class="photo-header">
+      <div>
+        <p class="eyebrow">Wonderpark</p>
+        <h1>AI Genius Photo</h1>
+      </div>
+      <a class="back-link" href="/gallery">Gallery</a>
+    </header>
+
+    <section id="messageBox" class="message-box" hidden></section>
+
+    <section class="photo-workspace" aria-label="4x6 photo print creator">
+      <article class="preview-panel">
+        <div class="panel-title-row">
+          <h2>Generated Image</h2>
+          <span id="jobIdBadge" class="job-badge">-</span>
+        </div>
+        <div class="image-stage source-stage">
+          <img id="sourceImage" alt="Generated AI artwork" hidden>
+          <p id="sourceEmpty" class="empty-note">Loading generated image...</p>
+        </div>
+        <p id="visitorNameText" class="visitor-name">Wonderpark Guest</p>
+      </article>
+
+      <article class="preview-panel">
+        <div class="panel-title-row">
+          <h2>4x6 Photo Print</h2>
+          <span class="size-badge">1200 x 1800 PNG</span>
+        </div>
+        <div class="image-stage print-stage">
+          <img id="photoPrintImage" alt="4x6 photo print preview" hidden>
+          <p id="photoEmpty" class="empty-note">Create the 4x6 photo to preview it here.</p>
+        </div>
+        <div class="action-row">
+          <button id="createPhotoBtn" type="button" class="primary-btn">Create 4x6 Photo</button>
+          <a id="downloadPhotoLink" class="secondary-btn is-disabled" href="#" download>Download 4x6 Photo</a>
+          <button id="recreatePhotoBtn" type="button" class="secondary-btn" disabled>Recreate Photo</button>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="/static/photo.js?v=20260604a"></script>
+</body>
+</html>

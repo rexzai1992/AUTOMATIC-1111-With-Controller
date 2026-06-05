@@ -1,0 +1,5 @@
+DRAWING TEST 5-EACH REPORT (POST-RESTART)
+generatedAt: 2026-05-19T14:38:30.307605
+kid_crayon: total=5 summary={'kid_crayon': 5}
+rough_low_color_drawing: total=5 summary={'rough_low_color_drawing': 5}
+toddler_abstract_people: total=5 summary={'toddler_abstract_people': 5}

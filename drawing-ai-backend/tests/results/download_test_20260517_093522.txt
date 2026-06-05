@@ -1,0 +1,34 @@
+TEST REPORT: download_test_images
+Generated At: 2026-05-17T09:35:22.110575+00:00
+Base URL: N/A
+Status: ok
+
+Summary:
+PASS: 10
+WARNING: 0
+FAIL: 0
+DANGER: 0
+
+Checks:
+[PASS] Category simple_crayon_house: Downloaded 4 image(s).
+[PASS] Category toddler_abstract_people: Downloaded 4 image(s).
+[PASS] Category rough_low_color_drawing: Downloaded 4 image(s).
+[PASS] Category colored_kids_drawing: Downloaded 4 image(s).
+[PASS] Category pencil_lineart_drawing: Downloaded 4 image(s).
+[PASS] Category almost_blank_drawing: Downloaded 4 image(s).
+[PASS] Category large_resolution_drawing: Downloaded 4 image(s).
+[PASS] Category weird_aspect_ratio_drawing: Downloaded 4 image(s).
+[PASS] Category noisy_low_quality_drawing: Downloaded 4 image(s).
+[PASS] Total download target: Downloaded 36 images (>=30 target).
+
+Metrics:
+{
+  "requestedTotal": 36,
+  "downloadedTotal": 36,
+  "failedTotal": 0,
+  "manifestPath": "C:\\AI ofline\\drawing-ai-backend\\tests\\sample_manifest.json",
+  "sampleImageFolder": "C:\\AI ofline\\drawing-ai-backend\\tests\\sample_images"
+}
+
+Artifacts:
+{}

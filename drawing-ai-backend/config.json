@@ -1,0 +1,27 @@
+﻿{
+  "generation_engine": "comfyui",
+  "stable_diffusion": {
+    "base_url": "http://127.0.0.1:7860",
+    "output_dir": "outputs/stable_diffusion"
+  },
+  "comfyui": {
+    "base_url": "http://127.0.0.1:8188",
+    "workflow_path": "workflows/Ai Genius.json",
+    "output_dir": "outputs/comfyui",
+    "node_ids": {
+      "load_image": "78",
+      "positive_prompt": "115:111",
+      "negative_prompt": "115:110",
+      "ksampler": "115:3",
+      "save_image": "60",
+      "image_scale": "115:93"
+    },
+    "defaults": {
+      "steps": 4,
+      "cfg": 1,
+      "denoise": 1,
+      "seed": -1,
+      "megapixels": 1
+    }
+  }
+}

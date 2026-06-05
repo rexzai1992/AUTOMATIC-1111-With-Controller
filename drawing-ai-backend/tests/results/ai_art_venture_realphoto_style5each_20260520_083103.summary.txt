@@ -1,0 +1,29 @@
+AI Art Venture real-photo style sweep
+generatedAtUtc: 2026-05-20T08:37:57.118511+00:00
+baseUrl: http://127.0.0.1:8000
+sourceImageDir: C:/AI ofline/drawing-ai-backend/tests/real_people_holding_creation_wikimedia_20260520_set2
+styles: 20 | imagesPerStyle: 5 | expectedJobs: 100
+submittedJobs: 100 | submitErrors: 0
+statusCounts: {'completed': 100}
+
+Per-style:
+- storybook (Storybook): submitted=5 completed=5 failed=0 cancelled=0 avgRating=2.6 avgDuration=3.612 nullRating=0
+- watercolor (Watercolor): submitted=5 completed=5 failed=0 cancelled=0 avgRating=3.2 avgDuration=3.496 nullRating=0
+- comic_book (Comic Book): submitted=5 completed=5 failed=0 cancelled=0 avgRating=2.8 avgDuration=3.454 nullRating=0
+- paper_cut (Paper Cut): submitted=5 completed=5 failed=0 cancelled=0 avgRating=2.4 avgDuration=3.46 nullRating=0
+- doodle (Doodle): submitted=5 completed=5 failed=0 cancelled=0 avgRating=2.4 avgDuration=3.519 nullRating=0
+- clay_toy (Clay Toy): submitted=5 completed=5 failed=0 cancelled=0 avgRating=3.2 avgDuration=3.499 nullRating=0
+- manga (Manga): submitted=5 completed=5 failed=0 cancelled=0 avgRating=2.4 avgDuration=3.45 nullRating=0
+- anime_movie (Anime Movie): submitted=5 completed=5 failed=0 cancelled=0 avgRating=2.8 avgDuration=3.442 nullRating=0
+- fantasy_epic (Fantasy Epic): submitted=5 completed=5 failed=0 cancelled=0 avgRating=2.8 avgDuration=3.443 nullRating=0
+- steampunk (Steampunk): submitted=5 completed=5 failed=0 cancelled=0 avgRating=2.8 avgDuration=3.45 nullRating=0
+- oil_painting (Oil Painting): submitted=5 completed=5 failed=0 cancelled=0 avgRating=2.8 avgDuration=3.581 nullRating=0
+- renaissance (Renaissance): submitted=5 completed=5 failed=0 cancelled=0 avgRating=2.8 avgDuration=3.654 nullRating=0
+- da_vinci (Da Vinci): submitted=5 completed=5 failed=0 cancelled=0 avgRating=3.2 avgDuration=3.577 nullRating=0
+- cyberpunk (Cyberpunk): submitted=5 completed=5 failed=0 cancelled=0 avgRating=2.8 avgDuration=3.393 nullRating=0
+- plush_toy (Plush Toy): submitted=5 completed=5 failed=0 cancelled=0 avgRating=3.4 avgDuration=3.462 nullRating=0
+- pixar_3d (Pixar 3D): submitted=5 completed=5 failed=0 cancelled=0 avgRating=2.2 avgDuration=3.565 nullRating=0
+- disney_3d (Disney 3D): submitted=5 completed=5 failed=0 cancelled=0 avgRating=2.2 avgDuration=3.57 nullRating=0
+- lego_3d (LEGO 3D): submitted=5 completed=5 failed=0 cancelled=0 avgRating=2.4 avgDuration=3.58 nullRating=0
+- minecraft (Minecraft): submitted=5 completed=5 failed=0 cancelled=0 avgRating=2.6 avgDuration=3.557 nullRating=0
+- low_poly (Low Poly): submitted=5 completed=5 failed=0 cancelled=0 avgRating=3.0 avgDuration=3.551 nullRating=0

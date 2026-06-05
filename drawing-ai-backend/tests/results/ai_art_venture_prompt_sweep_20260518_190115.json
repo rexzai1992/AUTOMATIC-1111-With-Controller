@@ -1,0 +1,238 @@
+{
+  "script": "ai_art_venture_prompt_sweep",
+  "generatedAt": "2026-05-18T11:01:15.397573Z",
+  "baseUrl": "http://127.0.0.1:8000",
+  "imagePath": "c:\\Users\\User\\Downloads\\ChatGPT Image May 18, 2026, 06_41_32 PM.png",
+  "generationMode": "ai_art_venture",
+  "stylesCount": 20,
+  "elapsedSeconds": 101.22,
+  "summary": {
+    "completed": 20,
+    "failed": 0,
+    "cancelled": 0,
+    "timeout": 0,
+    "submitFailed": 0
+  },
+  "rows": [
+    {
+      "styleId": "pixar_3d",
+      "visitorName": "TEST_AIV_PROMPT_01_pixar_3d",
+      "submitOk": true,
+      "submitStatusCode": 200,
+      "jobId": "4fd690a2fcbb41ea93cf6bf69d5227fb",
+      "finalStatus": "completed",
+      "outputUrl": "/outputs/4fd690a2fcbb41ea93cf6bf69d5227fb.png",
+      "error": null,
+      "durationSeconds": 5.45
+    },
+    {
+      "styleId": "disney_3d",
+      "visitorName": "TEST_AIV_PROMPT_02_disney_3d",
+      "submitOk": true,
+      "submitStatusCode": 200,
+      "jobId": "55dffcedbdd84d96a56b326cd38c2308",
+      "finalStatus": "completed",
+      "outputUrl": "/outputs/55dffcedbdd84d96a56b326cd38c2308.png",
+      "error": null,
+      "durationSeconds": 4.05
+    },
+    {
+      "styleId": "anime_movie",
+      "visitorName": "TEST_AIV_PROMPT_03_anime_movie",
+      "submitOk": true,
+      "submitStatusCode": 200,
+      "jobId": "112d72170a0140ac905b4834124f3c36",
+      "finalStatus": "completed",
+      "outputUrl": "/outputs/112d72170a0140ac905b4834124f3c36.png",
+      "error": null,
+      "durationSeconds": 3.821
+    },
+    {
+      "styleId": "watercolor",
+      "visitorName": "TEST_AIV_PROMPT_04_watercolor",
+      "submitOk": true,
+      "submitStatusCode": 200,
+      "jobId": "2166b088ea3940bab5dc80a20f06e13a",
+      "finalStatus": "completed",
+      "outputUrl": "/outputs/2166b088ea3940bab5dc80a20f06e13a.png",
+      "error": null,
+      "durationSeconds": 5.956
+    },
+    {
+      "styleId": "oil_painting",
+      "visitorName": "TEST_AIV_PROMPT_05_oil_painting",
+      "submitOk": true,
+      "submitStatusCode": 200,
+      "jobId": "c2bcc1ca1a4e4858b57135900526b1c6",
+      "finalStatus": "completed",
+      "outputUrl": "/outputs/c2bcc1ca1a4e4858b57135900526b1c6.png",
+      "error": null,
+      "durationSeconds": 5.949
+    },
+    {
+      "styleId": "renaissance",
+      "visitorName": "TEST_AIV_PROMPT_06_renaissance",
+      "submitOk": true,
+      "submitStatusCode": 200,
+      "jobId": "892d948503cc44a392e72d853fae252b",
+      "finalStatus": "completed",
+      "outputUrl": "/outputs/892d948503cc44a392e72d853fae252b.png",
+      "error": null,
+      "durationSeconds": 5.924
+    },
+    {
+      "styleId": "da_vinci",
+      "visitorName": "TEST_AIV_PROMPT_07_da_vinci",
+      "submitOk": true,
+      "submitStatusCode": 200,
+      "jobId": "f75aaca3b1aa4dc6be3fbb558e0664dc",
+      "finalStatus": "completed",
+      "outputUrl": "/outputs/f75aaca3b1aa4dc6be3fbb558e0664dc.png",
+      "error": null,
+      "durationSeconds": 5.928
+    },
+    {
+      "styleId": "comic_book",
+      "visitorName": "TEST_AIV_PROMPT_08_comic_book",
+      "submitOk": true,
+      "submitStatusCode": 200,
+      "jobId": "bba5a70cc5174fdd942411a33e85af8c",
+      "finalStatus": "completed",
+      "outputUrl": "/outputs/bba5a70cc5174fdd942411a33e85af8c.png",
+      "error": null,
+      "durationSeconds": 4.539
+    },
+    {
+      "styleId": "manga",
+      "visitorName": "TEST_AIV_PROMPT_09_manga",
+      "submitOk": true,
+      "submitStatusCode": 200,
+      "jobId": "017e11671394499d954fef34db3ca235",
+      "finalStatus": "completed",
+      "outputUrl": "/outputs/017e11671394499d954fef34db3ca235.png",
+      "error": null,
+      "durationSeconds": 4.526
+    },
+    {
+      "styleId": "doodle",
+      "visitorName": "TEST_AIV_PROMPT_10_doodle",
+      "submitOk": true,
+      "submitStatusCode": 200,
+      "jobId": "a72e205915ca460ab2b73328baa77336",
+      "finalStatus": "completed",
+      "outputUrl": "/outputs/a72e205915ca460ab2b73328baa77336.png",
+      "error": null,
+      "durationSeconds": 4.54
+    },
+    {
+      "styleId": "lego_3d",
+      "visitorName": "TEST_AIV_PROMPT_11_lego_3d",
+      "submitOk": true,
+      "submitStatusCode": 200,
+      "jobId": "f384b398e048416581f859ed08f89901",
+      "finalStatus": "completed",
+      "outputUrl": "/outputs/f384b398e048416581f859ed08f89901.png",
+      "error": null,
+      "durationSeconds": 5.235
+    },
+    {
+      "styleId": "clay_toy",
+      "visitorName": "TEST_AIV_PROMPT_12_clay_toy",
+      "submitOk": true,
+      "submitStatusCode": 200,
+      "jobId": "d7a13146b0fd4dcba92cc4284a0ece16",
+      "finalStatus": "completed",
+      "outputUrl": "/outputs/d7a13146b0fd4dcba92cc4284a0ece16.png",
+      "error": null,
+      "durationSeconds": 5.218
+    },
+    {
+      "styleId": "plush_toy",
+      "visitorName": "TEST_AIV_PROMPT_13_plush_toy",
+      "submitOk": true,
+      "submitStatusCode": 200,
+      "jobId": "ae23f5591274404e90835aba4fad1411",
+      "finalStatus": "completed",
+      "outputUrl": "/outputs/ae23f5591274404e90835aba4fad1411.png",
+      "error": null,
+      "durationSeconds": 4.319
+    },
+    {
+      "styleId": "fantasy_epic",
+      "visitorName": "TEST_AIV_PROMPT_14_fantasy_epic",
+      "submitOk": true,
+      "submitStatusCode": 200,
+      "jobId": "87d3dd3f68c44307b4157f73cf5be9c8",
+      "finalStatus": "completed",
+      "outputUrl": "/outputs/87d3dd3f68c44307b4157f73cf5be9c8.png",
+      "error": null,
+      "durationSeconds": 5.225
+    },
+    {
+      "styleId": "cyberpunk",
+      "visitorName": "TEST_AIV_PROMPT_15_cyberpunk",
+      "submitOk": true,
+      "submitStatusCode": 200,
+      "jobId": "5383876e94f047359da09071dfad0cd8",
+      "finalStatus": "completed",
+      "outputUrl": "/outputs/5383876e94f047359da09071dfad0cd8.png",
+      "error": null,
+      "durationSeconds": 4.326
+    },
+    {
+      "styleId": "steampunk",
+      "visitorName": "TEST_AIV_PROMPT_16_steampunk",
+      "submitOk": true,
+      "submitStatusCode": 200,
+      "jobId": "8dfabdff345a4eb1b5c67d6b59ce4e51",
+      "finalStatus": "completed",
+      "outputUrl": "/outputs/8dfabdff345a4eb1b5c67d6b59ce4e51.png",
+      "error": null,
+      "durationSeconds": 4.308
+    },
+    {
+      "styleId": "minecraft",
+      "visitorName": "TEST_AIV_PROMPT_17_minecraft",
+      "submitOk": true,
+      "submitStatusCode": 200,
+      "jobId": "090e43d18389456da106bb6e01b97022",
+      "finalStatus": "completed",
+      "outputUrl": "/outputs/090e43d18389456da106bb6e01b97022.png",
+      "error": null,
+      "durationSeconds": 5.243
+    },
+    {
+      "styleId": "low_poly",
+      "visitorName": "TEST_AIV_PROMPT_18_low_poly",
+      "submitOk": true,
+      "submitStatusCode": 200,
+      "jobId": "180904026d4148819506ff13d07a6795",
+      "finalStatus": "completed",
+      "outputUrl": "/outputs/180904026d4148819506ff13d07a6795.png",
+      "error": null,
+      "durationSeconds": 4.527
+    },
+    {
+      "styleId": "storybook",
+      "visitorName": "TEST_AIV_PROMPT_19_storybook",
+      "submitOk": true,
+      "submitStatusCode": 200,
+      "jobId": "0785fcf82a3a4a61afce803d75a28af2",
+      "finalStatus": "completed",
+      "outputUrl": "/outputs/0785fcf82a3a4a61afce803d75a28af2.png",
+      "error": null,
+      "durationSeconds": 5.007
+    },
+    {
+      "styleId": "paper_cut",
+      "visitorName": "TEST_AIV_PROMPT_20_paper_cut",
+      "submitOk": true,
+      "submitStatusCode": 200,
+      "jobId": "1cecfd3a4eed4acc8c8e0092075c2bfe",
+      "finalStatus": "completed",
+      "outputUrl": "/outputs/1cecfd3a4eed4acc8c8e0092075c2bfe.png",
+      "error": null,
+      "durationSeconds": 5.014
+    }
+  ]
+}

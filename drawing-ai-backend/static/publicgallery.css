@@ -1,0 +1,217 @@
+﻿:root {
+  color-scheme: only light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.public-gallery-body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Trebuchet MS", "Avenir Next", "Segoe UI", sans-serif;
+  color: #0f2342;
+  background:
+    radial-gradient(circle at 18% 8%, rgba(145, 229, 255, 0.32), transparent 34%),
+    radial-gradient(circle at 82% 12%, rgba(115, 196, 245, 0.26), transparent 30%),
+    linear-gradient(180deg, #e8f8ff 0%, #d8f2ff 46%, #cbe9ff 100%);
+}
+
+.gallery-shell {
+  width: min(1180px, 100% - 32px);
+  margin: 0 auto;
+  padding: clamp(16px, 3vw, 30px) 0 clamp(26px, 4vw, 48px);
+}
+
+.gallery-header {
+  text-align: center;
+  margin-bottom: clamp(16px, 2.5vw, 28px);
+}
+
+.gallery-header h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 3.2vw, 2.7rem);
+  color: #0a2c52;
+}
+
+.gallery-header p {
+  margin: 0.35rem 0 0;
+  color: #27608a;
+  font-size: clamp(0.98rem, 1.6vw, 1.2rem);
+}
+
+.gallery-main {
+  position: relative;
+}
+
+.public-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: clamp(12px, 2vw, 22px);
+}
+
+.public-gallery-card {
+  border: 1px solid rgba(155, 208, 235, 0.6);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 16px 34px rgba(25, 71, 113, 0.14);
+  overflow: hidden;
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.public-gallery-card:hover,
+.public-gallery-card:focus-within {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 38px rgba(18, 63, 102, 0.22);
+}
+
+.public-gallery-btn {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.public-gallery-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  background: linear-gradient(180deg, rgba(219, 244, 255, 0.92), rgba(233, 248, 255, 0.95));
+}
+
+.public-gallery-meta {
+  padding: 0.65rem 0.75rem 0.8rem;
+}
+
+.public-gallery-name {
+  margin: 0;
+  font-weight: 700;
+  color: #163f69;
+  font-size: clamp(0.88rem, 1.2vw, 1rem);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.public-gallery-date {
+  margin: 0.3rem 0 0;
+  color: #436f95;
+  font-size: clamp(0.76rem, 1vw, 0.86rem);
+}
+
+.public-gallery-print-btn {
+  width: calc(100% - 1.5rem);
+  min-height: 36px;
+  margin: 0 0.75rem 0.8rem;
+  border: 1px solid #90c9ef;
+  border-radius: 8px;
+  background: #e9f7ff;
+  color: #0a4f86;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.public-gallery-print-btn:disabled {
+  opacity: 0.58;
+  cursor: wait;
+}
+
+.public-gallery-empty {
+  margin: 2.4rem auto;
+  width: min(560px, 92%);
+  text-align: center;
+  font-size: clamp(0.98rem, 1.6vw, 1.2rem);
+  color: #26567e;
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid rgba(151, 206, 235, 0.68);
+  border-radius: 16px;
+  padding: 1rem 1.2rem;
+}
+
+.preview-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+}
+
+.preview-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(7, 25, 46, 0.68);
+  backdrop-filter: blur(2px);
+}
+
+.preview-dialog {
+  position: relative;
+  width: min(860px, calc(100vw - 24px));
+  max-height: min(92vh, 920px);
+  overflow: auto;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 30px 56px rgba(5, 17, 32, 0.42);
+  padding: clamp(12px, 2vw, 18px);
+  z-index: 1;
+}
+
+.preview-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 10px;
+  background: #d6edff;
+  color: #0a2f56;
+  font-weight: 700;
+  padding: 0.38rem 0.78rem;
+  cursor: pointer;
+}
+
+.preview-image {
+  width: 100%;
+  max-height: min(68vh, 680px);
+  object-fit: contain;
+  border-radius: 14px;
+  margin-top: 0.65rem;
+  background: #edf8ff;
+}
+
+.preview-title {
+  margin: 0.75rem 0 0;
+  color: #0a2f56;
+  font-size: clamp(1.05rem, 1.8vw, 1.4rem);
+}
+
+.preview-meta {
+  margin: 0.3rem 0 0;
+  color: #436f95;
+  font-size: clamp(0.88rem, 1.2vw, 1rem);
+}
+
+@media (max-width: 700px) {
+  .gallery-shell {
+    width: min(100%, calc(100% - 20px));
+    padding-top: 14px;
+  }
+
+  .public-gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .preview-dialog {
+    padding: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-gallery-card {
+    transition: none;
+  }
+}

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Drawing Showcase</title>
+  <link rel="stylesheet" href="/static/showcase.css?v=20260522n">
+</head>
+<body class="showcase-body">
+    <div id="showcaseShell" class="showcase-shell" data-display-mode="single">
+    <div class="ocean-backdrop" aria-hidden="true">
+      <div id="craftpixBgA" class="craftpix-bg is-active"></div>
+      <div id="craftpixBgB" class="craftpix-bg"></div>
+      <div class="light-rays"></div>
+      <div id="bubbleLayer" class="bubble-layer"></div>
+      <div id="bgFishLayer" class="bg-fish-layer"></div>
+      <div class="seafloor"></div>
+    </div>
+
+    <header class="showcase-header">
+      <p class="connection-line">Live status: <span id="wsStatusBadge" class="ws-badge reconnecting">Reconnecting</span></p>
+    </header>
+
+    <main class="showcase-main" aria-live="polite">
+      <section id="centerPresentation" class="center-presentation is-hidden">
+        <div id="fishCourier" class="fish-courier" data-direction="left" aria-hidden="true">
+          <svg viewBox="0 0 220 120" role="img" aria-label="fish">
+            <defs>
+              <linearGradient id="fishBodyGradient" x1="0%" x2="100%" y1="0%" y2="100%">
+                <stop offset="0%" stop-color="#ffd56b"></stop>
+                <stop offset="100%" stop-color="#ff8f49"></stop>
+              </linearGradient>
+            </defs>
+            <ellipse cx="120" cy="60" rx="74" ry="38" fill="url(#fishBodyGradient)"></ellipse>
+            <polygon points="42,60 10,34 10,86" fill="#ff8f49"></polygon>
+            <circle cx="152" cy="53" r="8" fill="#ffffff"></circle>
+            <circle cx="153" cy="54" r="4" fill="#1f2a5c"></circle>
+            <path d="M94 78 Q120 90 145 78" stroke="#ff7043" stroke-width="6" fill="none" stroke-linecap="round"></path>
+          </svg>
+        </div>
+
+        <article id="centerCard" class="center-card stage-arrive">
+          <div class="center-glow"></div>
+          <div class="sparkle spark-1" aria-hidden="true"></div>
+          <div class="sparkle spark-2" aria-hidden="true"></div>
+          <div class="sparkle spark-3" aria-hidden="true"></div>
+          <div class="center-card-media">
+            <img id="centerOriginalImage" class="center-image original" alt="Customer Drawing">
+            <img id="centerGeneratedImage" class="center-image generated" alt="Generated Drawing">
+          </div>
+          <div class="center-card-meta">
+            <p id="centerLabel" class="center-label">Customer Drawing</p>
+            <h2 id="centerName" class="center-name">Customer</h2>
+            <p id="centerStatus" class="center-status">Transforming drawing...</p>
+          </div>
+        </article>
+      </section>
+
+      <section id="roamingLayer" class="roaming-layer"></section>
+    </main>
+  </div>
+
+  <script src="/static/showcase.js?v=20260522o"></script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wonderpark A5 Template</title>
+  <link rel="stylesheet" href="/static/wonderpark_template.css?v=20260521a">
+</head>
+<body>
+  <main class="template-page">
+    <header class="header-block">
+      <h1>Draw / Color Inside This Box</h1>
+      <p>Please do not draw outside the box.</p>
+    </header>
+
+    <section class="meta-row" aria-label="Paper metadata">
+      <label>Name: <span class="line"></span></label>
+      <label>Page ID: <span class="line"></span></label>
+    </section>
+
+    <section class="artwork-zone" aria-label="Artwork area">
+      <div class="artwork-inner"></div>
+    </section>
+
+    <footer class="footer-block">
+      <div class="qr-wrap" aria-label="QR area">
+        <!-- QR generation hook: replace this placeholder with actual QR rendering pointing to /public/wonderpark -->
+        <div id="qrPlaceholder" class="qr-placeholder">QR</div>
+      </div>
+      <div class="qr-text-wrap">
+        <p class="qr-title">Scan QR to upload your artwork</p>
+        <p class="qr-url" id="qrUrlText">/public/wonderpark</p>
+        <p class="instruction">Enter your name, upload your scanned artwork, then submit.</p>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    (function () {
+      var target = document.getElementById("qrUrlText");
+      if (!target) return;
+      var params = new URLSearchParams(window.location.search || "");
+      var animal = String(params.get("animal") || "").trim().toLowerCase();
+      var templateId = String(params.get("paperTemplateId") || params.get("templateId") || "").trim();
+      var allowed = { lion: true, zebra: true, elephant: true, tiger: true, unknown: true };
+      var route = "/public/wonderpark";
+      if (allowed[animal] && animal !== "unknown") {
+        route = "/public/wonderpark/" + animal;
+      } else if (allowed[animal] && animal === "unknown") {
+        route = "/public/wonderpark?animal=unknown";
+      }
+      if (templateId) {
+        var glue = route.indexOf("?") >= 0 ? "&" : "?";
+        route = route + glue + "paperTemplateId=" + encodeURIComponent(templateId);
+      }
+      var url = window.location.origin + route;
+      target.textContent = url;
+      var placeholder = document.getElementById("qrPlaceholder");
+      if (placeholder) {
+        placeholder.setAttribute("aria-label", "QR placeholder for " + url);
+      }
+    })();
+  </script>
+</body>
+</html>

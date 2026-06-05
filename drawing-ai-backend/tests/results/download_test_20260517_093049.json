@@ -1,0 +1,86 @@
+{
+  "script": "download_test_images",
+  "baseUrl": "N/A",
+  "startedAt": "2026-05-17T09:16:45.939879+00:00",
+  "finishedAt": "2026-05-17T09:30:49.471525+00:00",
+  "status": "failed",
+  "summary": {
+    "PASS": 0,
+    "WARNING": 2,
+    "FAIL": 8,
+    "DANGER": 0,
+    "TOTAL": 10
+  },
+  "checks": [
+    {
+      "level": "WARNING",
+      "name": "Category simple_crayon_house",
+      "detail": "Only downloaded 1 image(s); target is 3 to 5.",
+      "createdAt": "2026-05-17T09:18:20.760558+00:00"
+    },
+    {
+      "level": "FAIL",
+      "name": "Category toddler_abstract_people",
+      "detail": "No image downloaded for this category.",
+      "createdAt": "2026-05-17T09:19:54.244377+00:00"
+    },
+    {
+      "level": "FAIL",
+      "name": "Category rough_low_color_drawing",
+      "detail": "No image downloaded for this category.",
+      "createdAt": "2026-05-17T09:21:29.797072+00:00"
+    },
+    {
+      "level": "FAIL",
+      "name": "Category colored_kids_drawing",
+      "detail": "No image downloaded for this category.",
+      "createdAt": "2026-05-17T09:23:03.400727+00:00"
+    },
+    {
+      "level": "FAIL",
+      "name": "Category pencil_lineart_drawing",
+      "detail": "No image downloaded for this category.",
+      "createdAt": "2026-05-17T09:24:38.243314+00:00"
+    },
+    {
+      "level": "FAIL",
+      "name": "Category almost_blank_drawing",
+      "detail": "No image downloaded for this category.",
+      "createdAt": "2026-05-17T09:26:11.554903+00:00"
+    },
+    {
+      "level": "FAIL",
+      "name": "Category large_resolution_drawing",
+      "detail": "No image downloaded for this category.",
+      "createdAt": "2026-05-17T09:27:44.298161+00:00"
+    },
+    {
+      "level": "FAIL",
+      "name": "Category weird_aspect_ratio_drawing",
+      "detail": "No image downloaded for this category.",
+      "createdAt": "2026-05-17T09:29:17.566184+00:00"
+    },
+    {
+      "level": "FAIL",
+      "name": "Category noisy_low_quality_drawing",
+      "detail": "No image downloaded for this category.",
+      "createdAt": "2026-05-17T09:30:49.471525+00:00"
+    },
+    {
+      "level": "WARNING",
+      "name": "Total download target",
+      "detail": "Downloaded 1 images (<30 target).",
+      "createdAt": "2026-05-17T09:30:49.471525+00:00"
+    }
+  ],
+  "metrics": {
+    "requestedTotal": 36,
+    "downloadedTotal": 1,
+    "failedTotal": 449,
+    "sampleImageFolder": "C:\\AI ofline\\drawing-ai-backend\\tests\\sample_images",
+    "manifestPath": "C:\\AI ofline\\drawing-ai-backend\\tests\\sample_manifest.json"
+  },
+  "artifacts": {
+    "sampleImageCount": 1
+  }
+}

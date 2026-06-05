@@ -18,10 +18,14 @@ set "BACKEND_HEALTH_URL=http://127.0.0.1:8000/health"
 set "TUNNEL_LOCAL_URL=http://127.0.0.1:8000"
 set "TUNNEL_PUBLIC_HOST=Image-generator-wonderpark.izzul.xyz"
 set "TUNNEL_NAME=image-generator-wonderpark"
+set "LAN_IP="
 
 REM Optional overrides from environment variables.
 if defined CLOUDFLARE_TUNNEL_NAME set "TUNNEL_NAME=%CLOUDFLARE_TUNNEL_NAME%"
 if defined CLOUDFLARE_PUBLIC_HOST set "TUNNEL_PUBLIC_HOST=%CLOUDFLARE_PUBLIC_HOST%"
+for /f "delims=" %%I in ('powershell -NoProfile -Command "$ips=[System.Net.Dns]::GetHostAddresses([System.Net.Dns]::GetHostName()) ^| Where-Object { $_.AddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetwork -and $_.ToString() -notlike '127.*' -and $_.ToString() -notlike '169.254.*' }; if ($ips) { $ips[0].ToString() }"') do (
+  if not defined LAN_IP set "LAN_IP=%%I"
+)
 
 if not exist "%SD_LAUNCHER%" (
   echo [ERROR] Stable Diffusion launcher not found:
@@ -71,9 +75,24 @@ start "" "https://%TUNNEL_PUBLIC_HOST%/staff"
 
 echo.
 echo [OK] System ready.
-echo Local staff:  http://localhost:8000/staff
-echo Public staff: https://%TUNNEL_PUBLIC_HOST%/staff
-echo Public API:   https://%TUNNEL_PUBLIC_HOST%/api/gallery
+echo Local staff:        http://localhost:8000/staff
+echo Local gallery:      http://localhost:8000/gallery
+echo Local comfy staff:  http://localhost:8000/comfy/staff
+echo Local showcase:     http://localhost:8000/showcase
+echo Local wonderpark:   http://localhost:8000/public/wonderpark
+if defined LAN_IP (
+echo LAN staff:          http://%LAN_IP%:8000/staff
+echo LAN gallery:        http://%LAN_IP%:8000/gallery
+echo LAN comfy staff:    http://%LAN_IP%:8000/comfy/staff
+echo LAN showcase:       http://%LAN_IP%:8000/showcase
+echo LAN wonderpark:     http://%LAN_IP%:8000/public/wonderpark
+)
+echo Public staff:       https://%TUNNEL_PUBLIC_HOST%/staff
+echo Public gallery:     https://%TUNNEL_PUBLIC_HOST%/gallery
+echo Public comfy staff: https://%TUNNEL_PUBLIC_HOST%/comfy/staff
+echo Public showcase:    https://%TUNNEL_PUBLIC_HOST%/showcase
+echo Public wonderpark:  https://%TUNNEL_PUBLIC_HOST%/public/wonderpark
+echo Public gallery api: https://%TUNNEL_PUBLIC_HOST%/api/gallery
 echo.
 echo [SECURITY] Stable Diffusion stays private/local at http://127.0.0.1:7860
 echo            Only backend port 8000 is exposed via Cloudflare Tunnel.
@@ -155,6 +174,15 @@ if "%TUNNEL_NAME%"=="" exit /b 1
 if errorlevel 1 exit /b 1
 exit /b 0
 
+:named_tunnel_active
+if "%TUNNEL_NAME%"=="" exit /b 1
+for /f "delims=" %%I in ('"%CF_EXE%" tunnel info "%TUNNEL_NAME%" 2^>nul ^| find /I "does not have any active connection."') do (
+  exit /b 1
+)
+"%CF_EXE%" tunnel info "%TUNNEL_NAME%" 2>nul | find /I "CONNECTOR ID" >nul
+if errorlevel 1 exit /b 1
+exit /b 0
+
 :resolve_cloudflared_cmd
 if defined CF_EXE (
   if exist "%CF_EXE%" exit /b 0
@@ -178,10 +206,20 @@ if errorlevel 1 (
   exit /b 1
 )
 
+call :can_use_named_tunnel
+if not errorlevel 1 (
+  call :named_tunnel_active
+  if not errorlevel 1 (
+    echo [INFO] Named tunnel "%TUNNEL_NAME%" already has active connection.
+    exit /b 0
+  )
+)
+
 call :cloudflared_running
 if not errorlevel 1 (
-  echo [INFO] cloudflared is already running. Skipping tunnel launch.
-  exit /b 0
+  echo [INFO] cloudflared process is running but tunnel is not active. Restarting cloudflared...
+  taskkill /IM cloudflared.exe /T /F >nul 2>&1
+  timeout /t 1 /nobreak >nul
 )
 
 echo ==================================================
@@ -191,9 +229,20 @@ echo ==================================================
 call :can_use_named_tunnel
 if not errorlevel 1 (
   echo [INFO] Using named tunnel: %TUNNEL_NAME%
-  start "Cloudflare Tunnel" cmd /k ""%CF_EXE%" tunnel --url %TUNNEL_LOCAL_URL% run "%TUNNEL_NAME%""
+  powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process -FilePath '%CF_EXE%' -ArgumentList @('tunnel','--url','%TUNNEL_LOCAL_URL%','run','%TUNNEL_NAME%') -WindowStyle Hidden"
 ) else (
   echo [INFO] Named tunnel not available. Using quick tunnel to %TUNNEL_LOCAL_URL%
-  start "Cloudflare Tunnel" cmd /k ""%CF_EXE%" tunnel --url %TUNNEL_LOCAL_URL%"
+  powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process -FilePath '%CF_EXE%' -ArgumentList @('tunnel','--url','%TUNNEL_LOCAL_URL%') -WindowStyle Hidden"
+)
+
+timeout /t 4 /nobreak >nul
+call :can_use_named_tunnel
+if not errorlevel 1 (
+  call :named_tunnel_active
+  if not errorlevel 1 (
+    echo [OK] Named tunnel is connected.
+    exit /b 0
+  )
+  echo [WARN] Tunnel process started, but named tunnel has no active connector yet.
 )
 exit /b 0

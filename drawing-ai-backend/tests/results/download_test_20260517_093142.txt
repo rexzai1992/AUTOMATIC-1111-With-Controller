@@ -1,0 +1,36 @@
+TEST REPORT: download_test_images
+Generated At: 2026-05-17T09:31:42.980156+00:00
+Base URL: N/A
+Status: failed
+
+Summary:
+PASS: 0
+WARNING: 1
+FAIL: 9
+DANGER: 0
+
+Checks:
+[FAIL] Category simple_crayon_house: No image downloaded for this category.
+[FAIL] Category toddler_abstract_people: No image downloaded for this category.
+[FAIL] Category rough_low_color_drawing: No image downloaded for this category.
+[FAIL] Category colored_kids_drawing: No image downloaded for this category.
+[FAIL] Category pencil_lineart_drawing: No image downloaded for this category.
+[FAIL] Category almost_blank_drawing: No image downloaded for this category.
+[FAIL] Category large_resolution_drawing: No image downloaded for this category.
+[FAIL] Category weird_aspect_ratio_drawing: No image downloaded for this category.
+[FAIL] Category noisy_low_quality_drawing: No image downloaded for this category.
+[WARNING] Total download target: Downloaded 0 images (<30 target).
+
+Metrics:
+{
+  "requestedTotal": 36,
+  "downloadedTotal": 0,
+  "failedTotal": 0,
+  "sampleImageFolder": "C:\\AI ofline\\drawing-ai-backend\\tests\\sample_images",
+  "manifestPath": "C:\\AI ofline\\drawing-ai-backend\\tests\\sample_manifest.json"
+}
+
+Artifacts:
+{
+  "sampleImageCount": 1
+}

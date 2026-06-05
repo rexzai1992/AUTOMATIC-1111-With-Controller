@@ -272,6 +272,19 @@ class GalleryStore:
             self._save_items_unlocked(items)
             return self._normalize_item(target)
 
+    def update_item_fields(self, job_id: str, updates: Dict[str, Any]) -> Dict[str, Any]:
+        with self._lock:
+            items = self._load_items_unlocked()
+            target = self._find_item_by_job_id_unlocked(items, job_id)
+            if target is None:
+                raise KeyError(job_id)
+
+            for key, value in dict(updates or {}).items():
+                target[key] = value
+            target["updatedAt"] = datetime.now(timezone.utc).isoformat()
+            self._save_items_unlocked(items)
+            return self._normalize_item(target)
+
     def delete_item(self, job_id: str) -> Dict[str, Any]:
         with self._lock:
             items = self._load_items_unlocked()

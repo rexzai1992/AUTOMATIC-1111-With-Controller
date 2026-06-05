@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Drawing Gallery</title>
+  <link rel="stylesheet" href="/static/publicgallery.css?v=20260604photo1">
+</head>
+<body class="public-gallery-body">
+  <div class="gallery-shell">
+    <header class="gallery-header">
+      <h1>Drawing Gallery</h1>
+      <p>See the latest transformed drawings</p>
+    </header>
+
+    <main class="gallery-main">
+      <section id="publicGalleryGrid" class="public-gallery-grid" aria-live="polite"></section>
+      <p id="publicGalleryEmpty" class="public-gallery-empty" hidden>No generated drawings are ready yet.</p>
+    </main>
+  </div>
+
+  <div id="previewModal" class="preview-modal" hidden>
+    <div class="preview-backdrop" data-close-modal="true"></div>
+    <article class="preview-dialog" role="dialog" aria-modal="true" aria-labelledby="previewTitle">
+      <button type="button" class="preview-close" data-close-modal="true" aria-label="Close preview">Close</button>
+      <img id="previewImage" class="preview-image" alt="Generated Drawing preview">
+      <h2 id="previewTitle" class="preview-title">Generated Drawing</h2>
+      <p id="previewMeta" class="preview-meta"></p>
+    </article>
+  </div>
+
+  <script src="/static/publicgallery.js?v=20260604photo1"></script>
+</body>
+</html>

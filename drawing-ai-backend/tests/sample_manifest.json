@@ -1,0 +1,366 @@
+{
+  "generatedAt": "2026-05-17T09:35:22.109252+00:00",
+  "totalItems": 36,
+  "items": [
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/house.ndjson",
+      "category": "simple_crayon_house",
+      "filePath": "tests\\sample_images\\simple_crayon_house_01_20260517_093354.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 8413,
+      "quickdrawClass": "house",
+      "quickdrawKeyId": "6113351065141248"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/house.ndjson",
+      "category": "simple_crayon_house",
+      "filePath": "tests\\sample_images\\simple_crayon_house_02_20260517_093354.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 13788,
+      "quickdrawClass": "house",
+      "quickdrawKeyId": "5402745097945088"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/house.ndjson",
+      "category": "simple_crayon_house",
+      "filePath": "tests\\sample_images\\simple_crayon_house_03_20260517_093354.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 6378,
+      "quickdrawClass": "house",
+      "quickdrawKeyId": "5643181897023488"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/house.ndjson",
+      "category": "simple_crayon_house",
+      "filePath": "tests\\sample_images\\simple_crayon_house_04_20260517_093354.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 7163,
+      "quickdrawClass": "house",
+      "quickdrawKeyId": "6283487973736448"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/face.ndjson",
+      "category": "toddler_abstract_people",
+      "filePath": "tests\\sample_images\\toddler_abstract_people_01_20260517_093408.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 9091,
+      "quickdrawClass": "face",
+      "quickdrawKeyId": "5908735161532416"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/face.ndjson",
+      "category": "toddler_abstract_people",
+      "filePath": "tests\\sample_images\\toddler_abstract_people_02_20260517_093408.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 11984,
+      "quickdrawClass": "face",
+      "quickdrawKeyId": "6134924480348160"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/face.ndjson",
+      "category": "toddler_abstract_people",
+      "filePath": "tests\\sample_images\\toddler_abstract_people_03_20260517_093408.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 9429,
+      "quickdrawClass": "face",
+      "quickdrawKeyId": "5104385346502656"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/face.ndjson",
+      "category": "toddler_abstract_people",
+      "filePath": "tests\\sample_images\\toddler_abstract_people_04_20260517_093408.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 7750,
+      "quickdrawClass": "face",
+      "quickdrawKeyId": "4733787097268224"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/line.ndjson",
+      "category": "rough_low_color_drawing",
+      "filePath": "tests\\sample_images\\rough_low_color_drawing_01_20260517_093421.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 4596,
+      "quickdrawClass": "line",
+      "quickdrawKeyId": "6432517601099776"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/zigzag.ndjson",
+      "category": "rough_low_color_drawing",
+      "filePath": "tests\\sample_images\\rough_low_color_drawing_02_20260517_093421.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 7695,
+      "quickdrawClass": "zigzag",
+      "quickdrawKeyId": "6537199874998272"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/line.ndjson",
+      "category": "rough_low_color_drawing",
+      "filePath": "tests\\sample_images\\rough_low_color_drawing_03_20260517_093421.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 4633,
+      "quickdrawClass": "line",
+      "quickdrawKeyId": "6149755845476352"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/line.ndjson",
+      "category": "rough_low_color_drawing",
+      "filePath": "tests\\sample_images\\rough_low_color_drawing_04_20260517_093421.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 4454,
+      "quickdrawClass": "line",
+      "quickdrawKeyId": "5574518909173760"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/sun.ndjson",
+      "category": "colored_kids_drawing",
+      "filePath": "tests\\sample_images\\colored_kids_drawing_01_20260517_093445.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 7751,
+      "quickdrawClass": "sun",
+      "quickdrawKeyId": "5864391587135488"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/flower.ndjson",
+      "category": "colored_kids_drawing",
+      "filePath": "tests\\sample_images\\colored_kids_drawing_02_20260517_093445.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 8037,
+      "quickdrawClass": "flower",
+      "quickdrawKeyId": "4774266543276032"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/flower.ndjson",
+      "category": "colored_kids_drawing",
+      "filePath": "tests\\sample_images\\colored_kids_drawing_03_20260517_093445.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 8175,
+      "quickdrawClass": "flower",
+      "quickdrawKeyId": "5592126651891712"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/flower.ndjson",
+      "category": "colored_kids_drawing",
+      "filePath": "tests\\sample_images\\colored_kids_drawing_04_20260517_093445.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 9275,
+      "quickdrawClass": "flower",
+      "quickdrawKeyId": "5802977803632640"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/tree.ndjson",
+      "category": "pencil_lineart_drawing",
+      "filePath": "tests\\sample_images\\pencil_lineart_drawing_01_20260517_093512.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 7196,
+      "quickdrawClass": "tree",
+      "quickdrawKeyId": "4823549447503872"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/cat.ndjson",
+      "category": "pencil_lineart_drawing",
+      "filePath": "tests\\sample_images\\pencil_lineart_drawing_02_20260517_093512.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 8642,
+      "quickdrawClass": "cat",
+      "quickdrawKeyId": "5695583689900032"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/cat.ndjson",
+      "category": "pencil_lineart_drawing",
+      "filePath": "tests\\sample_images\\pencil_lineart_drawing_03_20260517_093512.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 8435,
+      "quickdrawClass": "cat",
+      "quickdrawKeyId": "6573893978423296"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/cat.ndjson",
+      "category": "pencil_lineart_drawing",
+      "filePath": "tests\\sample_images\\pencil_lineart_drawing_04_20260517_093513.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 10187,
+      "quickdrawClass": "cat",
+      "quickdrawKeyId": "6200875045355520"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/square.ndjson",
+      "category": "almost_blank_drawing",
+      "filePath": "tests\\sample_images\\almost_blank_drawing_01_20260517_093519.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 5106,
+      "quickdrawClass": "square",
+      "quickdrawKeyId": "6668359154270208"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/square.ndjson",
+      "category": "almost_blank_drawing",
+      "filePath": "tests\\sample_images\\almost_blank_drawing_02_20260517_093519.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 6524,
+      "quickdrawClass": "square",
+      "quickdrawKeyId": "6303141957992448"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/line.ndjson",
+      "category": "almost_blank_drawing",
+      "filePath": "tests\\sample_images\\almost_blank_drawing_03_20260517_093519.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 4567,
+      "quickdrawClass": "line",
+      "quickdrawKeyId": "6433304586747904"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/line.ndjson",
+      "category": "almost_blank_drawing",
+      "filePath": "tests\\sample_images\\almost_blank_drawing_04_20260517_093520.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 4523,
+      "quickdrawClass": "line",
+      "quickdrawKeyId": "5461254732775424"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/house.ndjson",
+      "category": "large_resolution_drawing",
+      "filePath": "tests\\sample_images\\large_resolution_drawing_01_20260517_093520.png",
+      "width": 3000,
+      "height": 2118,
+      "fileSize": 157768,
+      "quickdrawClass": "house",
+      "quickdrawKeyId": "4542479762194432"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/house.ndjson",
+      "category": "large_resolution_drawing",
+      "filePath": "tests\\sample_images\\large_resolution_drawing_02_20260517_093520.png",
+      "width": 3000,
+      "height": 2118,
+      "fileSize": 148966,
+      "quickdrawClass": "house",
+      "quickdrawKeyId": "5623966565662720"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/house.ndjson",
+      "category": "large_resolution_drawing",
+      "filePath": "tests\\sample_images\\large_resolution_drawing_03_20260517_093521.png",
+      "width": 3000,
+      "height": 2118,
+      "fileSize": 156456,
+      "quickdrawClass": "house",
+      "quickdrawKeyId": "5479307658919936"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/house.ndjson",
+      "category": "large_resolution_drawing",
+      "filePath": "tests\\sample_images\\large_resolution_drawing_04_20260517_093521.png",
+      "width": 3000,
+      "height": 2118,
+      "fileSize": 169018,
+      "quickdrawClass": "house",
+      "quickdrawKeyId": "6658989548896256"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/tree.ndjson",
+      "category": "weird_aspect_ratio_drawing",
+      "filePath": "tests\\sample_images\\weird_aspect_ratio_drawing_01_20260517_093521.png",
+      "width": 2200,
+      "height": 700,
+      "fileSize": 12242,
+      "quickdrawClass": "tree",
+      "quickdrawKeyId": "5208659254575104"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/house.ndjson",
+      "category": "weird_aspect_ratio_drawing",
+      "filePath": "tests\\sample_images\\weird_aspect_ratio_drawing_02_20260517_093521.png",
+      "width": 2800,
+      "height": 900,
+      "fileSize": 15153,
+      "quickdrawClass": "house",
+      "quickdrawKeyId": "5769909743124480"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/house.ndjson",
+      "category": "weird_aspect_ratio_drawing",
+      "filePath": "tests\\sample_images\\weird_aspect_ratio_drawing_03_20260517_093521.png",
+      "width": 700,
+      "height": 2200,
+      "fileSize": 13266,
+      "quickdrawClass": "house",
+      "quickdrawKeyId": "4720804115775488"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/house.ndjson",
+      "category": "weird_aspect_ratio_drawing",
+      "filePath": "tests\\sample_images\\weird_aspect_ratio_drawing_04_20260517_093521.png",
+      "width": 2200,
+      "height": 700,
+      "fileSize": 10701,
+      "quickdrawClass": "house",
+      "quickdrawKeyId": "5403854076116992"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/house.ndjson",
+      "category": "noisy_low_quality_drawing",
+      "filePath": "tests\\sample_images\\noisy_low_quality_drawing_01_20260517_093521.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 25925,
+      "quickdrawClass": "house",
+      "quickdrawKeyId": "6136814114963456"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/flower.ndjson",
+      "category": "noisy_low_quality_drawing",
+      "filePath": "tests\\sample_images\\noisy_low_quality_drawing_02_20260517_093521.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 30079,
+      "quickdrawClass": "flower",
+      "quickdrawKeyId": "6528663577165824"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/house.ndjson",
+      "category": "noisy_low_quality_drawing",
+      "filePath": "tests\\sample_images\\noisy_low_quality_drawing_03_20260517_093522.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 13824,
+      "quickdrawClass": "house",
+      "quickdrawKeyId": "5069138697388032"
+    },
+    {
+      "sourceUrl": "https://storage.googleapis.com/quickdraw_dataset/full/simplified/flower.ndjson",
+      "category": "noisy_low_quality_drawing",
+      "filePath": "tests\\sample_images\\noisy_low_quality_drawing_04_20260517_093522.png",
+      "width": 900,
+      "height": 900,
+      "fileSize": 21858,
+      "quickdrawClass": "flower",
+      "quickdrawKeyId": "5043898101530624"
+    }
+  ]
+}

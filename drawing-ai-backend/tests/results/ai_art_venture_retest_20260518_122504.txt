@@ -1,0 +1,123 @@
+AI Art Venture Retest (Live)
+generatedAtUtc=2026-05-18T12:27:33.209037
+count=20
+
+style=pixar_3d status=completed denoise=0.44 weight=0.8 mode=Balanced cfg=7.4 bg=plain white=0.0062
+identitySafetyMode=True experimentalMode=False
+autoRating=1 autoBadTags=['wrong_subject', 'background_not_changed', 'background_wrong', 'face_identity_changed']
+autoGoodTags=['good_preserve_clothing']
+outputUrl=/outputs/64903c754ff1400983385c1de6fd1dae.png
+
+style=disney_3d status=completed denoise=0.44 weight=0.8 mode=Balanced cfg=7.4 bg=plain white=0.0062
+identitySafetyMode=True experimentalMode=False
+autoRating=1 autoBadTags=['wrong_subject', 'background_not_changed', 'background_wrong', 'face_identity_changed']
+autoGoodTags=['good_preserve_clothing']
+outputUrl=/outputs/ce7a9de646654a6aaeb61f1d8d957676.png
+
+style=anime_movie status=completed denoise=0.42 weight=0.82 mode=Balanced cfg=7.2 bg=plain white=0.0062
+identitySafetyMode=True experimentalMode=False
+autoRating=2 autoBadTags=['background_not_changed', 'background_wrong', 'face_identity_changed']
+autoGoodTags=['good_preserve_person', 'good_preserve_clothing']
+outputUrl=/outputs/eb15201d4bb948f7b6057c69749f4805.png
+
+style=watercolor status=completed denoise=0.44 weight=0.8 mode=Balanced cfg=7.4 bg=plain white=0.0062
+identitySafetyMode=True experimentalMode=False
+autoRating=1 autoBadTags=['wrong_subject', 'background_not_changed', 'background_wrong', 'face_identity_changed']
+autoGoodTags=['good_preserve_clothing']
+outputUrl=/outputs/07d35688811842cb9f7f2ef97aad22b7.png
+
+style=oil_painting status=completed denoise=0.45 weight=0.8 mode=Balanced cfg=7.5 bg=plain white=0.0062
+identitySafetyMode=True experimentalMode=False
+autoRating=1 autoBadTags=['wrong_subject', 'background_not_changed', 'background_wrong', 'face_identity_changed']
+autoGoodTags=['good_preserve_clothing']
+outputUrl=/outputs/d8fd84a3d0ed40e08cc8f723858f32c5.png
+
+style=renaissance status=completed denoise=0.45 weight=0.8 mode=Balanced cfg=7.5 bg=plain white=0.0062
+identitySafetyMode=True experimentalMode=False
+autoRating=1 autoBadTags=['wrong_subject', 'background_not_changed', 'background_wrong', 'face_identity_changed']
+autoGoodTags=['good_preserve_clothing']
+outputUrl=/outputs/7d90d57167864c609b972fff7a5a732d.png
+
+style=da_vinci status=completed denoise=0.45 weight=0.8 mode=Balanced cfg=7.5 bg=plain white=0.0062
+identitySafetyMode=True experimentalMode=False
+autoRating=1 autoBadTags=['wrong_subject', 'background_not_changed', 'background_wrong', 'face_identity_changed']
+autoGoodTags=['good_preserve_clothing']
+outputUrl=/outputs/2ba11998b0014993a5559cc3568564e3.png
+
+style=comic_book status=completed denoise=0.38 weight=0.86 mode=Balanced cfg=7.0 bg=plain white=0.0062
+identitySafetyMode=True experimentalMode=False
+autoRating=3 autoBadTags=['background_not_changed', 'background_wrong']
+autoGoodTags=['good_preserve_person', 'good_preserve_shape', 'good_preserve_identity', 'good_preserve_clothing']
+outputUrl=/outputs/f70ddfebf3b44597b1a83300956376fb.png
+
+style=manga status=completed denoise=0.38 weight=0.86 mode=Balanced cfg=7.0 bg=plain white=0.0062
+identitySafetyMode=True experimentalMode=False
+autoRating=3 autoBadTags=['background_not_changed', 'background_wrong']
+autoGoodTags=['good_preserve_person', 'good_preserve_shape', 'good_preserve_identity', 'good_preserve_clothing']
+outputUrl=/outputs/f7e737e9e90244c49535a55663ec0007.png
+
+style=doodle status=completed denoise=0.35 weight=0.88 mode=Balanced cfg=6.8 bg=plain white=0.0062
+identitySafetyMode=True experimentalMode=False
+autoRating=3 autoBadTags=['background_not_changed', 'background_wrong']
+autoGoodTags=['good_preserve_person', 'good_preserve_shape', 'good_preserve_identity', 'good_preserve_clothing']
+outputUrl=/outputs/507bd36ffa804cb1b6fd959c34c21c44.png
+
+style=lego_3d status=completed denoise=0.45 weight=0.8 mode=Balanced cfg=7.5 bg=plain white=0.0062
+identitySafetyMode=True experimentalMode=False
+autoRating=1 autoBadTags=['wrong_subject', 'background_not_changed', 'background_wrong', 'face_identity_changed']
+autoGoodTags=['good_preserve_clothing']
+outputUrl=/outputs/da510e8333d84847a6653959de14ccaa.png
+
+style=clay_toy status=completed denoise=0.44 weight=0.8 mode=Balanced cfg=7.4 bg=plain white=0.0062
+identitySafetyMode=True experimentalMode=False
+autoRating=1 autoBadTags=['wrong_subject', 'background_not_changed', 'background_wrong', 'face_identity_changed']
+autoGoodTags=['good_preserve_clothing']
+outputUrl=/outputs/197e96213dd449ad88f9f115db1be2c6.png
+
+style=plush_toy status=completed denoise=0.44 weight=0.8 mode=Balanced cfg=7.4 bg=plain white=0.0062
+identitySafetyMode=True experimentalMode=False
+autoRating=1 autoBadTags=['wrong_subject', 'background_not_changed', 'background_wrong', 'face_identity_changed']
+autoGoodTags=['good_preserve_clothing']
+outputUrl=/outputs/04568e8fcb2e47cb8308219257ab7451.png
+
+style=fantasy_epic status=completed denoise=0.45 weight=0.8 mode=Balanced cfg=7.6 bg=plain white=0.0062
+identitySafetyMode=True experimentalMode=False
+autoRating=1 autoBadTags=['wrong_subject', 'background_not_changed', 'background_wrong', 'face_identity_changed']
+autoGoodTags=['good_preserve_clothing']
+outputUrl=/outputs/eb7213c9266147528e88423060c3d899.png
+
+style=cyberpunk status=completed denoise=0.44 weight=0.8 mode=Balanced cfg=7.6 bg=plain white=0.0062
+identitySafetyMode=True experimentalMode=False
+autoRating=1 autoBadTags=['wrong_subject', 'background_not_changed', 'background_wrong', 'face_identity_changed']
+autoGoodTags=['good_preserve_clothing']
+outputUrl=/outputs/476e849bd8294c4e985e35c8f78ccbd5.png
+
+style=steampunk status=completed denoise=0.44 weight=0.8 mode=Balanced cfg=7.5 bg=plain white=0.0062
+identitySafetyMode=True experimentalMode=False
+autoRating=1 autoBadTags=['wrong_subject', 'background_not_changed', 'background_wrong', 'face_identity_changed']
+autoGoodTags=['good_preserve_clothing']
+outputUrl=/outputs/d140a5df88af4dee8f83baf671fe5fae.png
+
+style=minecraft status=completed denoise=0.45 weight=0.78 mode=Balanced cfg=7.4 bg=plain white=0.0062
+identitySafetyMode=True experimentalMode=False
+autoRating=1 autoBadTags=['wrong_subject', 'background_not_changed', 'background_wrong', 'face_identity_changed']
+autoGoodTags=['good_preserve_clothing']
+outputUrl=/outputs/f3939bbc1aa64ce085e2740ea1077566.png
+
+style=low_poly status=completed denoise=0.45 weight=0.78 mode=Balanced cfg=7.3 bg=plain white=0.0062
+identitySafetyMode=True experimentalMode=False
+autoRating=1 autoBadTags=['wrong_subject', 'background_not_changed', 'background_wrong', 'face_identity_changed']
+autoGoodTags=['good_preserve_clothing']
+outputUrl=/outputs/748b3829d5f341d7a71767e8c163e4fd.png
+
+style=storybook status=completed denoise=0.42 weight=0.82 mode=Balanced cfg=7.2 bg=plain white=0.0062
+identitySafetyMode=True experimentalMode=False
+autoRating=3 autoBadTags=['background_not_changed', 'background_wrong']
+autoGoodTags=['good_preserve_person', 'good_preserve_shape', 'good_preserve_identity', 'good_preserve_clothing']
+outputUrl=/outputs/c75d283bb6f0446eb92728a70a30a9ca.png
+
+style=paper_cut status=completed denoise=0.4 weight=0.84 mode=Balanced cfg=7.0 bg=plain white=0.0062
+identitySafetyMode=True experimentalMode=False
+autoRating=3 autoBadTags=['background_not_changed', 'background_wrong']
+autoGoodTags=['good_preserve_person', 'good_preserve_shape', 'good_preserve_identity', 'good_preserve_clothing']
+outputUrl=/outputs/c345b7b081d84bc08dd815c0b027a2ca.png

@@ -1,0 +1,605 @@
+{
+  "negative_prompt": "scary, creepy, horror, ugly, distorted face, bad anatomy, extra fingers, extra limbs, extra eyes, blurry, low quality, messy, dark, text, watermark, logo",
+  "presets": [
+    {
+      "id": "style_001",
+      "name": "3D Animated Movie Vibrant Depth",
+      "category": "cartoon",
+      "prompt": "Change the style of the image to 3D animated movie. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same 3D animated movie style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_002",
+      "name": "3D Animated Movie Cinematic Glow",
+      "category": "cartoon",
+      "prompt": "Change the style of the image to 3D animated movie. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same 3D animated movie style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_003",
+      "name": "3D Animated Movie Playful Adventure",
+      "category": "cartoon",
+      "prompt": "Change the style of the image to 3D animated movie. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same 3D animated movie style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_004",
+      "name": "3D Animated Movie Story Rich",
+      "category": "cartoon",
+      "prompt": "Change the style of the image to 3D animated movie. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same 3D animated movie style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_005",
+      "name": "Stylized Family 3D Cartoon Vibrant Depth",
+      "category": "cartoon",
+      "prompt": "Change the style of the image to stylized family 3D cartoon. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same stylized family 3D cartoon style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_006",
+      "name": "Stylized Family 3D Cartoon Cinematic Glow",
+      "category": "cartoon",
+      "prompt": "Change the style of the image to stylized family 3D cartoon. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same stylized family 3D cartoon style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_007",
+      "name": "Stylized Family 3D Cartoon Playful Adventure",
+      "category": "cartoon",
+      "prompt": "Change the style of the image to stylized family 3D cartoon. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same stylized family 3D cartoon style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_008",
+      "name": "Stylized Family 3D Cartoon Story Rich",
+      "category": "cartoon",
+      "prompt": "Change the style of the image to stylized family 3D cartoon. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same stylized family 3D cartoon style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_009",
+      "name": "Clay Animation Vibrant Depth",
+      "category": "craft",
+      "prompt": "Change the style of the image to clay animation. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same clay animation style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_010",
+      "name": "Clay Animation Cinematic Glow",
+      "category": "craft",
+      "prompt": "Change the style of the image to clay animation. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same clay animation style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_011",
+      "name": "Clay Animation Playful Adventure",
+      "category": "craft",
+      "prompt": "Change the style of the image to clay animation. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same clay animation style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_012",
+      "name": "Clay Animation Story Rich",
+      "category": "craft",
+      "prompt": "Change the style of the image to clay animation. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same clay animation style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_013",
+      "name": "3D Toy Figure Vibrant Depth",
+      "category": "craft",
+      "prompt": "Change the style of the image to 3D toy figure. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same 3D toy figure style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_014",
+      "name": "3D Toy Figure Cinematic Glow",
+      "category": "craft",
+      "prompt": "Change the style of the image to 3D toy figure. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same 3D toy figure style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_015",
+      "name": "3D Toy Figure Playful Adventure",
+      "category": "craft",
+      "prompt": "Change the style of the image to 3D toy figure. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same 3D toy figure style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_016",
+      "name": "3D Toy Figure Story Rich",
+      "category": "craft",
+      "prompt": "Change the style of the image to 3D toy figure. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same 3D toy figure style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_017",
+      "name": "Brick Toy Figure Vibrant Depth",
+      "category": "craft",
+      "prompt": "Change the style of the image to brick toy figure. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same brick toy figure style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_018",
+      "name": "Brick Toy Figure Cinematic Glow",
+      "category": "craft",
+      "prompt": "Change the style of the image to brick toy figure. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same brick toy figure style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_019",
+      "name": "Brick Toy Figure Playful Adventure",
+      "category": "craft",
+      "prompt": "Change the style of the image to brick toy figure. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same brick toy figure style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_020",
+      "name": "Brick Toy Figure Story Rich",
+      "category": "craft",
+      "prompt": "Change the style of the image to brick toy figure. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same brick toy figure style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_021",
+      "name": "Anime Vibrant Depth",
+      "category": "cartoon",
+      "prompt": "Change the style of the image to anime illustration. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same anime illustration style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_022",
+      "name": "Anime Cinematic Glow",
+      "category": "cartoon",
+      "prompt": "Change the style of the image to anime illustration. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same anime illustration style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_023",
+      "name": "Anime Playful Adventure",
+      "category": "cartoon",
+      "prompt": "Change the style of the image to anime illustration. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same anime illustration style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_024",
+      "name": "Anime Story Rich",
+      "category": "cartoon",
+      "prompt": "Change the style of the image to anime illustration. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same anime illustration style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_025",
+      "name": "Manga Ink Vibrant Depth",
+      "category": "sketch",
+      "prompt": "Change the style of the image to manga ink drawing. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same manga ink drawing style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_026",
+      "name": "Manga Ink Cinematic Glow",
+      "category": "sketch",
+      "prompt": "Change the style of the image to manga ink drawing. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same manga ink drawing style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_027",
+      "name": "Manga Ink Playful Adventure",
+      "category": "sketch",
+      "prompt": "Change the style of the image to manga ink drawing. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same manga ink drawing style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_028",
+      "name": "Manga Ink Story Rich",
+      "category": "sketch",
+      "prompt": "Change the style of the image to manga ink drawing. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same manga ink drawing style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_029",
+      "name": "Comic Book Vibrant Depth",
+      "category": "poster",
+      "prompt": "Change the style of the image to comic book. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same comic book style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_030",
+      "name": "Comic Book Cinematic Glow",
+      "category": "poster",
+      "prompt": "Change the style of the image to comic book. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same comic book style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_031",
+      "name": "Comic Book Playful Adventure",
+      "category": "poster",
+      "prompt": "Change the style of the image to comic book. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same comic book style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_032",
+      "name": "Comic Book Story Rich",
+      "category": "poster",
+      "prompt": "Change the style of the image to comic book. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same comic book style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_033",
+      "name": "Children Book Illustration Vibrant Depth",
+      "category": "cartoon",
+      "prompt": "Change the style of the image to children book illustration. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same children book illustration style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_034",
+      "name": "Children Book Illustration Cinematic Glow",
+      "category": "cartoon",
+      "prompt": "Change the style of the image to children book illustration. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same children book illustration style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_035",
+      "name": "Children Book Illustration Playful Adventure",
+      "category": "cartoon",
+      "prompt": "Change the style of the image to children book illustration. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same children book illustration style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_036",
+      "name": "Children Book Illustration Story Rich",
+      "category": "cartoon",
+      "prompt": "Change the style of the image to children book illustration. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same children book illustration style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_037",
+      "name": "Storybook Fantasy Vibrant Depth",
+      "category": "fantasy",
+      "prompt": "Change the style of the image to storybook fantasy. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same storybook fantasy style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_038",
+      "name": "Storybook Fantasy Cinematic Glow",
+      "category": "fantasy",
+      "prompt": "Change the style of the image to storybook fantasy. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same storybook fantasy style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_039",
+      "name": "Storybook Fantasy Playful Adventure",
+      "category": "fantasy",
+      "prompt": "Change the style of the image to storybook fantasy. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same storybook fantasy style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_040",
+      "name": "Storybook Fantasy Story Rich",
+      "category": "fantasy",
+      "prompt": "Change the style of the image to storybook fantasy. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same storybook fantasy style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_041",
+      "name": "Watercolor Vibrant Depth",
+      "category": "painting",
+      "prompt": "Change the style of the image to watercolor painting. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same watercolor painting style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_042",
+      "name": "Watercolor Cinematic Glow",
+      "category": "painting",
+      "prompt": "Change the style of the image to watercolor painting. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same watercolor painting style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_043",
+      "name": "Watercolor Playful Adventure",
+      "category": "painting",
+      "prompt": "Change the style of the image to watercolor painting. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same watercolor painting style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_044",
+      "name": "Watercolor Story Rich",
+      "category": "painting",
+      "prompt": "Change the style of the image to watercolor painting. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same watercolor painting style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_045",
+      "name": "Oil Painting Vibrant Depth",
+      "category": "painting",
+      "prompt": "Change the style of the image to oil painting. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same oil painting style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_046",
+      "name": "Oil Painting Cinematic Glow",
+      "category": "painting",
+      "prompt": "Change the style of the image to oil painting. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same oil painting style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_047",
+      "name": "Oil Painting Playful Adventure",
+      "category": "painting",
+      "prompt": "Change the style of the image to oil painting. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same oil painting style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_048",
+      "name": "Oil Painting Story Rich",
+      "category": "painting",
+      "prompt": "Change the style of the image to oil painting. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same oil painting style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_049",
+      "name": "Starry Brushwork Vibrant Depth",
+      "category": "classic_art",
+      "prompt": "Change the style of the image to expressive starry brushwork painting. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same expressive starry brushwork painting style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_050",
+      "name": "Starry Brushwork Cinematic Glow",
+      "category": "classic_art",
+      "prompt": "Change the style of the image to expressive starry brushwork painting. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same expressive starry brushwork painting style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_051",
+      "name": "Starry Brushwork Playful Adventure",
+      "category": "classic_art",
+      "prompt": "Change the style of the image to expressive starry brushwork painting. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same expressive starry brushwork painting style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_052",
+      "name": "Starry Brushwork Story Rich",
+      "category": "classic_art",
+      "prompt": "Change the style of the image to expressive starry brushwork painting. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same expressive starry brushwork painting style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_053",
+      "name": "Renaissance Master Study Vibrant Depth",
+      "category": "classic_art",
+      "prompt": "Change the style of the image to renaissance master study painting. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same renaissance master study painting style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_054",
+      "name": "Renaissance Master Study Cinematic Glow",
+      "category": "classic_art",
+      "prompt": "Change the style of the image to renaissance master study painting. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same renaissance master study painting style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_055",
+      "name": "Renaissance Master Study Playful Adventure",
+      "category": "classic_art",
+      "prompt": "Change the style of the image to renaissance master study painting. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same renaissance master study painting style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_056",
+      "name": "Renaissance Master Study Story Rich",
+      "category": "classic_art",
+      "prompt": "Change the style of the image to renaissance master study painting. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same renaissance master study painting style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_057",
+      "name": "Renaissance Fresco Vibrant Depth",
+      "category": "classic_art",
+      "prompt": "Change the style of the image to renaissance fresco painting. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same renaissance fresco painting style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_058",
+      "name": "Renaissance Fresco Cinematic Glow",
+      "category": "classic_art",
+      "prompt": "Change the style of the image to renaissance fresco painting. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same renaissance fresco painting style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_059",
+      "name": "Renaissance Fresco Playful Adventure",
+      "category": "classic_art",
+      "prompt": "Change the style of the image to renaissance fresco painting. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same renaissance fresco painting style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_060",
+      "name": "Renaissance Fresco Story Rich",
+      "category": "classic_art",
+      "prompt": "Change the style of the image to renaissance fresco painting. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same renaissance fresco painting style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_061",
+      "name": "Pop Art Poster Vibrant Depth",
+      "category": "poster",
+      "prompt": "Change the style of the image to pop art poster. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same pop art poster style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_062",
+      "name": "Pop Art Poster Cinematic Glow",
+      "category": "poster",
+      "prompt": "Change the style of the image to pop art poster. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same pop art poster style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_063",
+      "name": "Pop Art Poster Playful Adventure",
+      "category": "poster",
+      "prompt": "Change the style of the image to pop art poster. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same pop art poster style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_064",
+      "name": "Pop Art Poster Story Rich",
+      "category": "poster",
+      "prompt": "Change the style of the image to pop art poster. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same pop art poster style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_065",
+      "name": "Paper Cut Art Vibrant Depth",
+      "category": "craft",
+      "prompt": "Change the style of the image to paper cut collage. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same paper cut collage style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_066",
+      "name": "Paper Cut Art Cinematic Glow",
+      "category": "craft",
+      "prompt": "Change the style of the image to paper cut collage. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same paper cut collage style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_067",
+      "name": "Paper Cut Art Playful Adventure",
+      "category": "craft",
+      "prompt": "Change the style of the image to paper cut collage. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same paper cut collage style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_068",
+      "name": "Paper Cut Art Story Rich",
+      "category": "craft",
+      "prompt": "Change the style of the image to paper cut collage. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same paper cut collage style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_069",
+      "name": "Pixel Art Vibrant Depth",
+      "category": "game",
+      "prompt": "Change the style of the image to pixel art. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same pixel art style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_070",
+      "name": "Pixel Art Cinematic Glow",
+      "category": "game",
+      "prompt": "Change the style of the image to pixel art. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same pixel art style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_071",
+      "name": "Pixel Art Playful Adventure",
+      "category": "game",
+      "prompt": "Change the style of the image to pixel art. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same pixel art style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_072",
+      "name": "Pixel Art Story Rich",
+      "category": "game",
+      "prompt": "Change the style of the image to pixel art. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same pixel art style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_073",
+      "name": "Cyberpunk Vibrant Depth",
+      "category": "sci_fi",
+      "prompt": "Change the style of the image to cyberpunk neon illustration. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same cyberpunk neon illustration style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_074",
+      "name": "Cyberpunk Cinematic Glow",
+      "category": "sci_fi",
+      "prompt": "Change the style of the image to cyberpunk neon illustration. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same cyberpunk neon illustration style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_075",
+      "name": "Cyberpunk Playful Adventure",
+      "category": "sci_fi",
+      "prompt": "Change the style of the image to cyberpunk neon illustration. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same cyberpunk neon illustration style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_076",
+      "name": "Cyberpunk Story Rich",
+      "category": "sci_fi",
+      "prompt": "Change the style of the image to cyberpunk neon illustration. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same cyberpunk neon illustration style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_077",
+      "name": "Steampunk Vibrant Depth",
+      "category": "sci_fi",
+      "prompt": "Change the style of the image to steampunk adventure illustration. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same steampunk adventure illustration style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_078",
+      "name": "Steampunk Cinematic Glow",
+      "category": "sci_fi",
+      "prompt": "Change the style of the image to steampunk adventure illustration. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same steampunk adventure illustration style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_079",
+      "name": "Steampunk Playful Adventure",
+      "category": "sci_fi",
+      "prompt": "Change the style of the image to steampunk adventure illustration. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same steampunk adventure illustration style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_080",
+      "name": "Steampunk Story Rich",
+      "category": "sci_fi",
+      "prompt": "Change the style of the image to steampunk adventure illustration. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same steampunk adventure illustration style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_081",
+      "name": "Underwater Cartoon Vibrant Depth",
+      "category": "environment",
+      "prompt": "Change the style of the image to underwater cartoon. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same underwater cartoon style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_082",
+      "name": "Underwater Cartoon Cinematic Glow",
+      "category": "environment",
+      "prompt": "Change the style of the image to underwater cartoon. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same underwater cartoon style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_083",
+      "name": "Underwater Cartoon Playful Adventure",
+      "category": "environment",
+      "prompt": "Change the style of the image to underwater cartoon. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same underwater cartoon style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_084",
+      "name": "Underwater Cartoon Story Rich",
+      "category": "environment",
+      "prompt": "Change the style of the image to underwater cartoon. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same underwater cartoon style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_085",
+      "name": "Jungle Cartoon Vibrant Depth",
+      "category": "environment",
+      "prompt": "Change the style of the image to jungle cartoon. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same jungle cartoon style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_086",
+      "name": "Jungle Cartoon Cinematic Glow",
+      "category": "environment",
+      "prompt": "Change the style of the image to jungle cartoon. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same jungle cartoon style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_087",
+      "name": "Jungle Cartoon Playful Adventure",
+      "category": "environment",
+      "prompt": "Change the style of the image to jungle cartoon. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same jungle cartoon style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_088",
+      "name": "Jungle Cartoon Story Rich",
+      "category": "environment",
+      "prompt": "Change the style of the image to jungle cartoon. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same jungle cartoon style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_089",
+      "name": "Space Cartoon Vibrant Depth",
+      "category": "sci_fi",
+      "prompt": "Change the style of the image to space cartoon. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same space cartoon style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_090",
+      "name": "Space Cartoon Cinematic Glow",
+      "category": "sci_fi",
+      "prompt": "Change the style of the image to space cartoon. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same space cartoon style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_091",
+      "name": "Space Cartoon Playful Adventure",
+      "category": "sci_fi",
+      "prompt": "Change the style of the image to space cartoon. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same space cartoon style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_092",
+      "name": "Space Cartoon Story Rich",
+      "category": "sci_fi",
+      "prompt": "Change the style of the image to space cartoon. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same space cartoon style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_093",
+      "name": "Candyland Cartoon Vibrant Depth",
+      "category": "fantasy",
+      "prompt": "Change the style of the image to candyland cartoon. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same candyland cartoon style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_094",
+      "name": "Candyland Cartoon Cinematic Glow",
+      "category": "fantasy",
+      "prompt": "Change the style of the image to candyland cartoon. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same candyland cartoon style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_095",
+      "name": "Candyland Cartoon Playful Adventure",
+      "category": "fantasy",
+      "prompt": "Change the style of the image to candyland cartoon. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same candyland cartoon style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_096",
+      "name": "Candyland Cartoon Story Rich",
+      "category": "fantasy",
+      "prompt": "Change the style of the image to candyland cartoon. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same candyland cartoon style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    },
+    {
+      "id": "style_097",
+      "name": "Rainbow Fantasy Vibrant Depth",
+      "category": "fantasy",
+      "prompt": "Change the style of the image to rainbow fantasy illustration. Enhance the background with layered scenery, soft atmospheric depth, bright complementary colors, and gentle rim lighting. The person should also match the same rainbow fantasy illustration style, with clean shapes, friendly expressions, balanced proportions, and a polished family friendly finish."
+    },
+    {
+      "id": "style_098",
+      "name": "Rainbow Fantasy Cinematic Glow",
+      "category": "fantasy",
+      "prompt": "Change the style of the image to rainbow fantasy illustration. Enhance the background with cinematic lighting gradients, rich environmental texture, dynamic perspective, and clear foreground background separation. The person should also match the same rainbow fantasy illustration style, with expressive facial features, smooth material shading, appealing character design, and a joyful look."
+    },
+    {
+      "id": "style_099",
+      "name": "Rainbow Fantasy Playful Adventure",
+      "category": "fantasy",
+      "prompt": "Change the style of the image to rainbow fantasy illustration. Enhance the background with playful world building details, vivid color harmony, cheerful props, and warm ambient light. The person should also match the same rainbow fantasy illustration style, with soft yet crisp line quality, charming posture, colorful highlights, and a warm approachable mood."
+    },
+    {
+      "id": "style_100",
+      "name": "Rainbow Fantasy Story Rich",
+      "category": "fantasy",
+      "prompt": "Change the style of the image to rainbow fantasy illustration. Enhance the background with storybook composition depth, handcrafted texture accents, expressive skies, and polished visual contrast. The person should also match the same rainbow fantasy illustration style, with refined details, cute personality, natural pose flow, and a bright uplifting presentation."
+    }
+  ]
+}

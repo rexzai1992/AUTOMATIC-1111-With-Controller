@@ -1,0 +1,318 @@
+{
+  "version": 2,
+  "modeId": "ai_art_venture",
+  "modeLabel": "AI Art Venture",
+  "defaultStyleId": "pixar_3d",
+  "basePrompt": "Transform this photo into the selected artistic style while keeping the person clearly recognizable as the same person. Preserve recognizable identity, face shape, hairstyle, hair color, glasses or beard if present, skin tone, expression vibe, clothing color, shirt type, body pose, hand placement, and the artwork or creation they are holding. The face may become stylized, cartoonized, painterly, anime, toy-like, or 3D, but it must still feel like the same person. Keep the creation clearly visible and recognizable. Preserve the artwork or creation shape, content, placement, and visibility. You may redesign the background into a rich immersive style-matching environment. Change style, rendering, lighting, texture, color mood, and atmosphere while keeping the subject and creation recognizable. High quality, detailed, clean, expressive, polished, professional.",
+  "negativePrompt": "different person, unrecognizable person, gender swap, changed gender, changed face, completely different face shape, changed hairstyle, changed clothing type, suit, tuxedo, dress, uniform, costume, armor, formal outfit, missing shirt, missing person, missing artwork, changed artwork, unreadable artwork, destroyed artwork, missing object, changed object, different pose, hidden face, cropped face, extra fingers, missing fingers, bad hands, malformed hands, duplicated body, duplicated limbs, distorted face, ugly face, creepy face, blurry, low quality, watermark, logo, text",
+  "baseSettings": {
+    "checkpoint": "DreamShaper_8_pruned.safetensors [879db523c3]",
+    "controlNetModel": "control_v11p_sd15_softedge",
+    "controlNetModule": "softedge_teed",
+    "controlMode": "Balanced",
+    "resizeMode": "Crop and Resize",
+    "pixelPerfect": true,
+    "guidanceStart": 0.0,
+    "guidanceEnd": 1.0,
+    "controlWeight": 0.78,
+    "softEdgeWeight": 0.78,
+    "denoisingStrength": 0.4,
+    "cfgScale": 7.4,
+    "steps": 32,
+    "samplerName": "DPM++ 2M Karras",
+    "width": 768,
+    "height": 768,
+    "useIpAdapter": true,
+    "ipAdapterModule": "ip-adapter_face_id_plus",
+    "ipAdapterModel": "ip-adapter-faceid-plusv2_sd15",
+    "ipAdapterWeight": 0.62,
+    "identitySafetyMode": true,
+    "identityTarget": "recognizable_not_exact",
+    "experimentalMode": false
+  },
+  "styles": [
+    {
+      "id": "pixar_3d",
+      "label": "Pixar 3D",
+      "styleRiskLevel": "experimental",
+      "stylePrompt": "3D animated movie style, expressive stylized face, soft cinematic lighting, polished colorful render, family friendly, high quality 3D character design",
+      "overrides": {
+        "denoisingStrength": 0.43,
+        "softEdgeWeight": 0.78,
+        "controlWeight": 0.78,
+        "ipAdapterWeight": 0.68,
+        "cfgScale": 7.5
+      },
+      "backgroundPrompt": ""
+    },
+    {
+      "id": "disney_3d",
+      "label": "Disney 3D",
+      "styleRiskLevel": "experimental",
+      "stylePrompt": "magical 3D animated film style, soft expressive character design, warm cinematic lighting, polished family movie render, colorful charming atmosphere",
+      "overrides": {
+        "denoisingStrength": 0.43,
+        "softEdgeWeight": 0.78,
+        "controlWeight": 0.78,
+        "ipAdapterWeight": 0.68,
+        "cfgScale": 7.5
+      },
+      "backgroundPrompt": ""
+    },
+    {
+      "id": "anime_movie",
+      "label": "Anime Movie",
+      "styleRiskLevel": "balanced",
+      "stylePrompt": "high quality anime movie style, clean linework, cinematic anime lighting, expressive stylized eyes, rich color grading, detailed atmospheric background",
+      "overrides": {
+        "denoisingStrength": 0.41,
+        "softEdgeWeight": 0.8,
+        "controlWeight": 0.8,
+        "ipAdapterWeight": 0.66,
+        "cfgScale": 7.4
+      },
+      "backgroundPrompt": ""
+    },
+    {
+      "id": "watercolor",
+      "label": "Watercolor",
+      "styleRiskLevel": "safe",
+      "stylePrompt": "traditional watercolor painting, soft pigment bloom, paper grain texture, hand-painted washes, gentle colors, artistic brush softness",
+      "overrides": {
+        "denoisingStrength": 0.42,
+        "softEdgeWeight": 0.78,
+        "controlWeight": 0.78,
+        "ipAdapterWeight": 0.64,
+        "cfgScale": 7.5
+      },
+      "backgroundPrompt": ""
+    },
+    {
+      "id": "oil_painting",
+      "label": "Oil Painting",
+      "styleRiskLevel": "balanced",
+      "stylePrompt": "classic oil painting style, rich brush strokes, painterly texture, warm museum lighting, detailed artistic portrait feel",
+      "overrides": {
+        "denoisingStrength": 0.43,
+        "softEdgeWeight": 0.78,
+        "controlWeight": 0.78,
+        "ipAdapterWeight": 0.66,
+        "cfgScale": 7.5,
+        "steps": 34
+      },
+      "backgroundPrompt": ""
+    },
+    {
+      "id": "renaissance",
+      "label": "Renaissance",
+      "styleRiskLevel": "balanced",
+      "stylePrompt": "renaissance inspired painting, classical composition, warm old-master lighting, fine painterly details, elegant artistic atmosphere",
+      "overrides": {
+        "denoisingStrength": 0.43,
+        "softEdgeWeight": 0.78,
+        "controlWeight": 0.78,
+        "ipAdapterWeight": 0.66,
+        "cfgScale": 7.5,
+        "steps": 34
+      },
+      "backgroundPrompt": ""
+    },
+    {
+      "id": "da_vinci",
+      "label": "Da Vinci",
+      "styleRiskLevel": "balanced",
+      "stylePrompt": "Leonardo da Vinci inspired sketch and painting hybrid, sepia tones, classical study drawing texture, old manuscript atmosphere, refined artistic detail",
+      "overrides": {
+        "denoisingStrength": 0.43,
+        "softEdgeWeight": 0.78,
+        "controlWeight": 0.78,
+        "ipAdapterWeight": 0.66,
+        "cfgScale": 7.4,
+        "steps": 34
+      },
+      "backgroundPrompt": ""
+    },
+    {
+      "id": "comic_book",
+      "label": "Comic Book",
+      "styleRiskLevel": "safe",
+      "stylePrompt": "bold comic book ink lines, vivid comic colors, halftone shading, dynamic contrast, graphic novel finish, clean expressive outlines",
+      "overrides": {
+        "denoisingStrength": 0.39,
+        "softEdgeWeight": 0.82,
+        "controlWeight": 0.82,
+        "ipAdapterWeight": 0.64,
+        "cfgScale": 7.3
+      },
+      "backgroundPrompt": ""
+    },
+    {
+      "id": "manga",
+      "label": "Manga",
+      "styleRiskLevel": "balanced",
+      "stylePrompt": "manga illustration style, crisp black linework, screentone shading, expressive stylized face, dramatic panel-like lighting, clean composition",
+      "overrides": {
+        "denoisingStrength": 0.39,
+        "softEdgeWeight": 0.82,
+        "controlWeight": 0.82,
+        "ipAdapterWeight": 0.65,
+        "cfgScale": 7.2
+      },
+      "backgroundPrompt": ""
+    },
+    {
+      "id": "doodle",
+      "label": "Doodle",
+      "styleRiskLevel": "safe",
+      "stylePrompt": "playful doodle illustration style, marker texture, hand-drawn whimsical line energy, colorful simple shapes, fun sketchbook atmosphere",
+      "overrides": {
+        "denoisingStrength": 0.36,
+        "softEdgeWeight": 0.84,
+        "controlWeight": 0.84,
+        "ipAdapterWeight": 0.62,
+        "cfgScale": 6.8
+      },
+      "backgroundPrompt": ""
+    },
+    {
+      "id": "lego_3d",
+      "label": "LEGO 3D",
+      "styleRiskLevel": "experimental",
+      "stylePrompt": "LEGO brick-built 3D style, plastic toy material, colorful brick textures, miniature toy world, playful blocky render",
+      "overrides": {
+        "denoisingStrength": 0.45,
+        "softEdgeWeight": 0.74,
+        "controlWeight": 0.74,
+        "ipAdapterWeight": 0.7,
+        "cfgScale": 7.4
+      },
+      "backgroundPrompt": ""
+    },
+    {
+      "id": "clay_toy",
+      "label": "Clay Toy",
+      "styleRiskLevel": "safe",
+      "stylePrompt": "stop-motion clay toy style, handcrafted clay texture, soft cinematic lighting, charming handmade model look, family friendly",
+      "overrides": {
+        "denoisingStrength": 0.42,
+        "softEdgeWeight": 0.8,
+        "controlWeight": 0.8,
+        "ipAdapterWeight": 0.65,
+        "cfgScale": 7.5
+      },
+      "backgroundPrompt": ""
+    },
+    {
+      "id": "plush_toy",
+      "label": "Plush Toy",
+      "styleRiskLevel": "balanced",
+      "stylePrompt": "plush toy fabric style, stitched details, soft fuzzy textures, cozy lighting, cute toy-like character design",
+      "overrides": {
+        "denoisingStrength": 0.42,
+        "softEdgeWeight": 0.8,
+        "controlWeight": 0.8,
+        "ipAdapterWeight": 0.66,
+        "cfgScale": 7.3
+      },
+      "backgroundPrompt": ""
+    },
+    {
+      "id": "fantasy_epic",
+      "label": "Fantasy Epic",
+      "styleRiskLevel": "balanced",
+      "stylePrompt": "epic fantasy concept art style, magical lighting, glowing atmosphere, ornate details, heroic fantasy environment, cinematic depth",
+      "overrides": {
+        "denoisingStrength": 0.43,
+        "softEdgeWeight": 0.78,
+        "controlWeight": 0.78,
+        "ipAdapterWeight": 0.66,
+        "cfgScale": 7.5
+      },
+      "backgroundPrompt": ""
+    },
+    {
+      "id": "cyberpunk",
+      "label": "Cyberpunk",
+      "styleRiskLevel": "balanced",
+      "stylePrompt": "cyberpunk neon city style, futuristic lighting, glowing signs, vibrant neon reflections, sci-fi atmosphere, cinematic night scene",
+      "overrides": {
+        "denoisingStrength": 0.42,
+        "softEdgeWeight": 0.78,
+        "controlWeight": 0.78,
+        "ipAdapterWeight": 0.66,
+        "cfgScale": 7.5
+      },
+      "backgroundPrompt": ""
+    },
+    {
+      "id": "steampunk",
+      "label": "Steampunk",
+      "styleRiskLevel": "balanced",
+      "stylePrompt": "steampunk fantasy style, brass gears, vintage machinery, Victorian adventure atmosphere, warm mechanical details, cinematic lighting",
+      "overrides": {
+        "denoisingStrength": 0.42,
+        "softEdgeWeight": 0.78,
+        "controlWeight": 0.78,
+        "ipAdapterWeight": 0.66,
+        "cfgScale": 7.4
+      },
+      "backgroundPrompt": ""
+    },
+    {
+      "id": "minecraft",
+      "label": "Minecraft",
+      "styleRiskLevel": "experimental",
+      "stylePrompt": "Minecraft voxel world style, block-based geometry, pixel textures, game-like lighting, stylized square forms, colorful block environment",
+      "overrides": {
+        "denoisingStrength": 0.46,
+        "softEdgeWeight": 0.74,
+        "controlWeight": 0.74,
+        "ipAdapterWeight": 0.7,
+        "cfgScale": 7.4
+      },
+      "backgroundPrompt": ""
+    },
+    {
+      "id": "low_poly",
+      "label": "Low Poly",
+      "styleRiskLevel": "experimental",
+      "stylePrompt": "low poly 3D style, faceted geometric shapes, clean polygonal character design, stylized lighting, simple colorful environment",
+      "overrides": {
+        "denoisingStrength": 0.45,
+        "softEdgeWeight": 0.74,
+        "controlWeight": 0.74,
+        "ipAdapterWeight": 0.7,
+        "cfgScale": 7.3
+      },
+      "backgroundPrompt": ""
+    },
+    {
+      "id": "storybook",
+      "label": "Storybook",
+      "styleRiskLevel": "safe",
+      "stylePrompt": "children's storybook illustration style, warm narrative lighting, painterly textures, charming colorful scenery, family friendly magical atmosphere",
+      "overrides": {
+        "denoisingStrength": 0.4,
+        "softEdgeWeight": 0.8,
+        "controlWeight": 0.8,
+        "ipAdapterWeight": 0.64,
+        "cfgScale": 7.4
+      },
+      "backgroundPrompt": ""
+    },
+    {
+      "id": "paper_cut",
+      "label": "Paper Cut",
+      "styleRiskLevel": "safe",
+      "stylePrompt": "layered paper-cut collage style, stacked cardstock textures, soft shadow depth, handcrafted paper art scene, clean cutout shapes",
+      "overrides": {
+        "denoisingStrength": 0.4,
+        "softEdgeWeight": 0.82,
+        "controlWeight": 0.82,
+        "ipAdapterWeight": 0.64,
+        "cfgScale": 7.3
+      },
+      "backgroundPrompt": ""
+    }
+  ]
+}

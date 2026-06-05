@@ -1,5 +1,7 @@
 const galleryGrid = document.getElementById("galleryGrid");
 const wsStatusBadge = document.getElementById("wsStatusBadge");
+const GALLERY_MAX_ITEMS = 60;
+let lastGalleryLoadMs = 0;
 
 const BAD_FEEDBACK_TAG_GROUPS = [
   {
@@ -8,7 +10,14 @@ const BAD_FEEDBACK_TAG_GROUPS = [
       { id: "wrong_subject", label: "Wrong subject" },
       { id: "same_as_input", label: "Same as input" },
       { id: "person_missing", label: "Person missing" },
+      { id: "person_unrecognizable", label: "Person unrecognizable" },
+      { id: "face_identity_changed", label: "Face identity changed" },
+      { id: "gender_changed", label: "Gender changed" },
+      { id: "clothing_changed", label: "Clothing changed" },
+      { id: "shirt_changed", label: "Shirt changed" },
+      { id: "outfit_changed", label: "Outfit changed" },
       { id: "main_object_missing", label: "Main object missing" },
+      { id: "creation_unrecognizable", label: "Creation unrecognizable" },
       { id: "wrong_composition", label: "Wrong composition" },
       { id: "too_empty", label: "Too empty" },
       { id: "bad_colors", label: "Bad colors" },
@@ -29,13 +38,17 @@ const BAD_FEEDBACK_TAG_GROUPS = [
       { id: "object_missing", label: "Object missing" },
       { id: "object_changed", label: "Object changed" },
       { id: "background_wrong", label: "Background wrong" },
-      { id: "composition_wrong", label: "Composition wrong (legacy)" }
+      { id: "background_not_changed", label: "Background not changed" },
+      { id: "background_too_plain", label: "Background too plain" },
+      { id: "composition_wrong", label: "Composition wrong (legacy)" },
+      { id: "too_much_change", label: "Too much change" }
     ]
   },
   {
     title: "Style and artifact tags",
     tags: [
       { id: "style_wrong", label: "Style wrong" },
+      { id: "style_too_weak", label: "Style too weak" },
       { id: "not_lively_enough", label: "Not lively enough" },
       { id: "changed_too_much", label: "Changed too much (legacy)" },
       { id: "too_cartoon", label: "Too cartoon" }
@@ -65,6 +78,12 @@ const GOOD_FEEDBACK_TAGS = [
   { id: "good_preserve_shape", label: "Good preserve shape" },
   { id: "good_preserve_person", label: "Good preserve person" },
   { id: "good_preserve_artwork", label: "Good preserve artwork" },
+  { id: "good_preserve_identity", label: "Good preserve identity" },
+  { id: "good_preserve_clothing", label: "Good preserve clothing" },
+  { id: "good_preserve_creation", label: "Good preserve creation" },
+  { id: "good_background_change", label: "Good background change" },
+  { id: "good_style_change", label: "Good style change" },
+  { id: "style_good_identity_good", label: "Style + identity good" },
   { id: "good_lively", label: "Good lively" },
   { id: "good_colors", label: "Good colors" },
   { id: "good_style", label: "Good style" },
@@ -162,9 +181,12 @@ function createCard(item) {
   const card = document.createElement("article");
   card.className = "gallery-card";
   card.dataset.jobId = item.jobId || "";
+  const cacheKey = encodeURIComponent(String(item.updatedAt || item.completedAt || item.createdAt || ""));
 
   const image = document.createElement("img");
-  image.src = `${item.outputUrl}?t=${Date.now()}`;
+  image.loading = "lazy";
+  image.decoding = "async";
+  image.src = cacheKey ? `${item.outputUrl}?v=${cacheKey}` : `${item.outputUrl}`;
   image.alt = `Generated drawing by ${item.visitorName || "Guest"}`;
   card.appendChild(image);
 
@@ -183,7 +205,10 @@ function createCard(item) {
 
   const ratingLine = document.createElement("p");
   ratingLine.className = "rating-line";
-  ratingLine.textContent = item.rating ? `Rating: ${item.rating}/5` : "Rating: not rated";
+  const displayRating = Number(item.staffRating ?? item.rating ?? item.autoRating ?? 0);
+  ratingLine.textContent = Number.isInteger(displayRating) && displayRating >= 1 && displayRating <= 5
+    ? `Auto rating: ${displayRating}/5`
+    : "Auto rating: unavailable";
   meta.appendChild(ratingLine);
 
   const actionsRow = document.createElement("div");
@@ -192,6 +217,7 @@ function createCard(item) {
   rateButton.type = "button";
   rateButton.className = "rate-btn";
   rateButton.textContent = "Rate";
+  rateButton.hidden = true;
   actionsRow.appendChild(rateButton);
 
   const previewWrap = document.createElement("div");
@@ -209,6 +235,7 @@ function createCard(item) {
 
   const previewGrid = document.createElement("div");
   previewGrid.className = "before-after-grid";
+  let previewImagesLoaded = false;
 
   const beforeCard = document.createElement("div");
   beforeCard.className = "before-after-card";
@@ -216,17 +243,9 @@ function createCard(item) {
   beforeLabel.className = "before-after-label";
   beforeLabel.textContent = "Before";
   beforeCard.appendChild(beforeLabel);
-  if (item.inputUrl) {
-    const beforeImage = document.createElement("img");
-    beforeImage.src = `${item.inputUrl}?t=${Date.now()}`;
-    beforeImage.alt = `Before drawing by ${item.visitorName || "Guest"}`;
-    beforeCard.appendChild(beforeImage);
-  } else {
-    const beforeEmpty = document.createElement("p");
-    beforeEmpty.className = "before-after-empty";
-    beforeEmpty.textContent = "Before image not available";
-    beforeCard.appendChild(beforeEmpty);
-  }
+  const beforeSlot = document.createElement("div");
+  beforeSlot.className = "before-after-slot";
+  beforeCard.appendChild(beforeSlot);
   previewGrid.appendChild(beforeCard);
 
   const afterCard = document.createElement("div");
@@ -235,77 +254,64 @@ function createCard(item) {
   afterLabel.className = "before-after-label";
   afterLabel.textContent = "After";
   afterCard.appendChild(afterLabel);
-  if (item.outputUrl) {
-    const afterImage = document.createElement("img");
-    afterImage.src = `${item.outputUrl}?t=${Date.now()}`;
-    afterImage.alt = `Generated artwork by ${item.visitorName || "Guest"}`;
-    afterCard.appendChild(afterImage);
-  } else {
-    const afterEmpty = document.createElement("p");
-    afterEmpty.className = "before-after-empty";
-    afterEmpty.textContent = "After image not available";
-    afterCard.appendChild(afterEmpty);
-  }
+  const afterSlot = document.createElement("div");
+  afterSlot.className = "before-after-slot";
+  afterCard.appendChild(afterSlot);
   previewGrid.appendChild(afterCard);
 
   previewPanel.appendChild(previewGrid);
   previewWrap.appendChild(previewPanel);
   actionsRow.appendChild(previewWrap);
+
+  const photoButton = document.createElement("button");
+  photoButton.type = "button";
+  photoButton.className = "photo-print-btn";
+  photoButton.textContent = "Print 4x6";
+  actionsRow.appendChild(photoButton);
+
   meta.appendChild(actionsRow);
 
-  const panel = document.createElement("div");
-  panel.className = "mini-rating-panel";
-  panel.hidden = true;
-
-  const ratingLabel = document.createElement("label");
-  ratingLabel.textContent = "Rating";
-  const ratingSelect = document.createElement("select");
-  ratingSelect.innerHTML = `
-    <option value="">Select</option>
-    <option value="1">1</option>
-    <option value="2">2</option>
-    <option value="3">3</option>
-    <option value="4">4</option>
-    <option value="5">5</option>
-  `;
-  if (item.rating) {
-    ratingSelect.value = String(item.rating);
-  }
-  panel.appendChild(ratingLabel);
-  panel.appendChild(ratingSelect);
-
-  const tagsContainer = document.createElement("div");
-  tagsContainer.className = "mini-tags-wrap";
-  createTagCheckboxes(tagsContainer, item.feedbackTags || []);
-  panel.appendChild(tagsContainer);
-
-  const noteInput = document.createElement("textarea");
-  noteInput.rows = 2;
-  noteInput.placeholder = "Optional feedback note";
-  noteInput.value = item.feedbackNote || "";
-  panel.appendChild(noteInput);
-
-  const saveBtn = document.createElement("button");
-  saveBtn.type = "button";
-  saveBtn.className = "save-mini-rating-btn";
-  saveBtn.textContent = "Save";
-  panel.appendChild(saveBtn);
-
-  const panelStatus = document.createElement("p");
-  panelStatus.className = "mini-panel-status";
-  panelStatus.textContent = item.ratedAt ? `Saved ${formatTime(item.ratedAt)}` : "";
-  panel.appendChild(panelStatus);
-
-  rateButton.addEventListener("click", () => {
-    panel.hidden = !panel.hidden;
-  });
-
   let hidePreviewTimer = null;
+  const loadPreviewImages = () => {
+    if (previewImagesLoaded) {
+      return;
+    }
+    previewImagesLoaded = true;
+    if (item.inputUrl) {
+      const beforeImage = document.createElement("img");
+      beforeImage.loading = "lazy";
+      beforeImage.decoding = "async";
+      beforeImage.src = cacheKey ? `${item.inputUrl}?v=${cacheKey}` : `${item.inputUrl}`;
+      beforeImage.alt = `Before drawing by ${item.visitorName || "Guest"}`;
+      beforeSlot.replaceChildren(beforeImage);
+    } else {
+      const beforeEmpty = document.createElement("p");
+      beforeEmpty.className = "before-after-empty";
+      beforeEmpty.textContent = "Before image not available";
+      beforeSlot.replaceChildren(beforeEmpty);
+    }
+
+    if (item.outputUrl) {
+      const afterImage = document.createElement("img");
+      afterImage.loading = "lazy";
+      afterImage.decoding = "async";
+      afterImage.src = cacheKey ? `${item.outputUrl}?v=${cacheKey}` : `${item.outputUrl}`;
+      afterImage.alt = `Generated artwork by ${item.visitorName || "Guest"}`;
+      afterSlot.replaceChildren(afterImage);
+    } else {
+      const afterEmpty = document.createElement("p");
+      afterEmpty.className = "before-after-empty";
+      afterEmpty.textContent = "After image not available";
+      afterSlot.replaceChildren(afterEmpty);
+    }
+  };
+
   const showPreview = () => {
     if (hidePreviewTimer) {
       clearTimeout(hidePreviewTimer);
       hidePreviewTimer = null;
     }
+    loadPreviewImages();
     previewPanel.hidden = false;
     previewWrap.classList.add("is-open");
   };
@@ -321,44 +327,45 @@ function createCard(item) {
   previewWrap.addEventListener("mouseleave", hidePreview);
   previewButton.addEventListener("focus", showPreview);
   previewButton.addEventListener("blur", hidePreview);
-
-  saveBtn.addEventListener("click", async () => {
-    const numericRating = Number(ratingSelect.value);
-    if (!Number.isInteger(numericRating) || numericRating < 1 || numericRating > 5) {
-      panelStatus.textContent = "Choose rating 1-5.";
+  photoButton.addEventListener("click", async () => {
+    const jobId = String(item.jobId || "").trim();
+    if (!jobId) {
+      window.alert("Job not found");
       return;
     }
 
-    saveBtn.disabled = true;
-    panelStatus.textContent = "Saving...";
+    const printWindow = window.open("", "_blank");
+    photoButton.disabled = true;
+    photoButton.textContent = "Creating...";
     try {
-      const response = await fetch(`/gallery/rate/${item.jobId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          rating: numericRating,
-          feedbackTags: getSelectedTags(tagsContainer),
-          feedbackNote: noteInput.value.trim()
-        })
+      const response = await fetch(`/api/jobs/${encodeURIComponent(jobId)}/create-photo`, {
+        method: "POST"
       });
-      const data = await response.json();
+      const payload = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(data.detail || "Failed to save rating.");
+        throw new Error(String(payload.detail || payload.message || "Unable to create 4x6 photo."));
       }
-      item.rating = data.rating;
-      item.feedbackTags = data.feedbackTags;
-      item.feedbackNote = data.feedbackNote;
-      item.ratedAt = data.ratedAt;
-      ratingLine.textContent = `Rating: ${data.rating}/5`;
-      panelStatus.textContent = `Saved ${formatTime(data.ratedAt)}`;
+
+      const photoUrl = String(payload.photoPrintUrl || "").trim();
+      if (!photoUrl) {
+        throw new Error("Photo print URL missing.");
+      }
+      const cacheBustUrl = `${photoUrl}${photoUrl.includes("?") ? "&" : "?"}v=${Date.now()}`;
+      if (printWindow) {
+        printWindow.location.href = cacheBustUrl;
+      } else {
+        window.open(cacheBustUrl, "_blank", "noopener,noreferrer");
+      }
     } catch (error) {
-      panelStatus.textContent = error.message;
+      if (printWindow) {
+        printWindow.close();
+      }
+      window.alert(error?.message || "Unable to create 4x6 photo.");
     } finally {
-      saveBtn.disabled = false;
+      photoButton.disabled = false;
+      photoButton.textContent = "Print 4x6";
     }
   });
-
-  meta.appendChild(panel);
   card.appendChild(meta);
   return card;
 }
@@ -401,11 +408,16 @@ function upsertItem(item, options = {}) {
     existing.remove();
   }
   galleryGrid.prepend(card);
+  const cards = galleryGrid.querySelectorAll(".gallery-card");
+  if (cards.length > GALLERY_MAX_ITEMS) {
+    cards[cards.length - 1].remove();
+  }
 }
 
 async function loadGallery() {
+  lastGalleryLoadMs = Date.now();
   try {
-    const response = await fetch("/gallery/items");
+    const response = await fetch(`/api/gallery?limit=${GALLERY_MAX_ITEMS}`);
     const data = await response.json();
     const items = Array.isArray(data.items) ? data.items : [];
     if (items.length === 0) {
@@ -427,7 +439,9 @@ function connectWebSocket() {
 
   ws.onopen = async () => {
     setWsStatus(true);
-    await loadGallery();
+    if (Date.now() - lastGalleryLoadMs > 5000) {
+      await loadGallery();
+    }
   };
 
   ws.onclose = () => {

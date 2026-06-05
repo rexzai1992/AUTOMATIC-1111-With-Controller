@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wonderpark Artwork Upload</title>
+  <link rel="stylesheet" href="/static/public_wonderpark.css?v=20260523a">
+</head>
+<body>
+  <main class="wp-shell">
+    <section class="wp-card hero-card">
+      <h1>Wonderpark Artwork Upload</h1>
+      <p class="subhead">Point your camera at the artwork sheet. We auto-capture when it is clear and stable.</p>
+      <ol class="step-flow" aria-label="Upload steps">
+        <li><span>1</span><strong>Scan QR</strong></li>
+        <li><span>2</span><strong>Upload Artwork</strong></li>
+        <li><span>3</span><strong>AI Transformation</strong></li>
+      </ol>
+      <p class="ai-disclaimer">AI generation can sometimes make mistakes and produce unusual images. If that happens, you can regenerate the result.</p>
+    </section>
+
+    <section id="uploadSection" class="wp-card" aria-label="Upload form">
+      <h2>Submit Artwork</h2>
+      <p id="animalUploadText" class="hint">Upload your colored drawing</p>
+      <p class="hint">Please upload a flat scan photo of your coloring page. Avoid angled camera shots.</p>
+
+      <form id="uploadForm" novalidate>
+        <input id="presetAnimalInput" name="presetAnimal" type="hidden" value="">
+        <input id="paperTemplateIdInput" name="paperTemplateId" type="hidden" value="">
+        <label for="customerName" class="field-label">Name</label>
+        <input id="customerName" name="customerName" type="text" maxlength="60" required placeholder="Enter your name">
+
+        <section id="cameraSection" class="camera-section" aria-label="Camera scan">
+          <div class="camera-frame">
+            <video id="cameraVideo" autoplay playsinline muted></video>
+            <img id="cameraPreviewImage" class="camera-preview-image" alt="Captured preview" hidden>
+            <div class="scan-guide" aria-hidden="true"></div>
+          </div>
+          <p id="cameraStatus" class="camera-status">Opening camera...</p>
+          <div class="camera-actions">
+            <button type="button" id="captureNowBtn" class="pick-btn">Capture Now</button>
+            <button type="button" id="rescanBtn" class="pick-btn" hidden>Scan Again</button>
+            <button type="button" id="openGalleryBtn" class="alt-btn">Use Gallery Image</button>
+          </div>
+          <canvas id="cameraCaptureCanvas" width="1280" height="720" hidden></canvas>
+        </section>
+
+        <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Upload artwork" hidden>
+          <input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" hidden>
+          <p class="drop-title">Tap to upload artwork</p>
+          <p class="drop-sub">JPG, PNG, WEBP | Mobile camera or gallery supported</p>
+          <button type="button" id="pickFileBtn" class="pick-btn">Choose Image</button>
+        </div>
+
+        <section id="previewSection" class="preview-section" hidden>
+          <h3>Preview</h3>
+          <p class="hint">Check your captured artwork, then submit.</p>
+          <div class="canvas-wrap">
+            <canvas id="previewCanvas" width="360" height="360"></canvas>
+          </div>
+        </section>
+
+        <div id="warningBox" class="warning-box" hidden></div>
+        <div id="errorBox" class="error-box" hidden></div>
+
+        <button id="submitBtn" type="submit" class="submit-btn" disabled>Submit Artwork</button>
+      </form>
+    </section>
+
+    <section id="thankYouSection" class="wp-card thank-you" hidden>
+      <h2 id="resultTitle">Your artwork has been submitted successfully.</h2>
+      <p id="resultInstruction">Please wait while the AI transforms your artwork.</p>
+      <p class="submission-id">Submission ID: <strong id="submissionIdText">-</strong></p>
+      <div id="resultImageWrap" class="result-image-wrap" hidden>
+        <img id="resultImage" class="result-image" alt="Generated artwork result">
+      </div>
+      <div id="resultActions" class="result-actions" hidden>
+        <button id="approveShowcaseBtn" type="button" class="submit-btn">Add to Showcase</button>
+        <a id="photoPrintBtn" class="alt-btn result-secondary-btn photo-print-action" href="#" target="_blank" rel="noopener noreferrer" hidden>Photo 4x6</a>
+        <button id="regenerateImageBtn" type="button" class="alt-btn result-secondary-btn">Regenerate Image</button>
+      </div>
+      <p id="approveStatusText" class="friendly" hidden></p>
+      <a class="restart-link" href="/public/wonderpark">Upload another artwork</a>
+    </section>
+  </main>
+
+  <script src="/static/public_wonderpark.js?v=20260522j"></script>
+</body>
+</html>

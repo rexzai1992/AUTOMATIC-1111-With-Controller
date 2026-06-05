@@ -9,22 +9,60 @@ INPUT_DIR = BASE_DIR / "inputs"
 OUTPUT_DIR = BASE_DIR / "outputs"
 DATA_DIR = BASE_DIR / "data"
 STATIC_DIR = BASE_DIR / "static"
+PRINTS_DIR = BASE_DIR / "prints"
 GALLERY_JSON_PATH = DATA_DIR / "gallery.json"
 QUEUE_JSON_PATH = DATA_DIR / "queue.json"
+WONDERPARK_SUBMISSIONS_JSON_PATH = DATA_DIR / "wonderpark_submissions.json"
 TEMP_DIR = BASE_DIR / "temp"
+OBJECT_STORAGE_DIR = BASE_DIR / "storage" / "object"
+WONDERPARK_STORAGE_DIR = OBJECT_STORAGE_DIR / "wonderpark"
+WONDERPARK_ORIGINALS_DIR = WONDERPARK_STORAGE_DIR / "originals"
+WONDERPARK_PROCESSED_DIR = WONDERPARK_STORAGE_DIR / "processed"
+WONDERPARK_THUMBNAILS_DIR = WONDERPARK_STORAGE_DIR / "thumbnails"
 
-for directory in (SCANNER_INPUT_DIR, INPUT_DIR, OUTPUT_DIR, DATA_DIR, STATIC_DIR, TEMP_DIR):
+for directory in (
+    SCANNER_INPUT_DIR,
+    INPUT_DIR,
+    OUTPUT_DIR,
+    DATA_DIR,
+    STATIC_DIR,
+    PRINTS_DIR,
+    TEMP_DIR,
+    OBJECT_STORAGE_DIR,
+    WONDERPARK_STORAGE_DIR,
+    WONDERPARK_ORIGINALS_DIR,
+    WONDERPARK_PROCESSED_DIR,
+    WONDERPARK_THUMBNAILS_DIR,
+):
     directory.mkdir(parents=True, exist_ok=True)
 
 if not GALLERY_JSON_PATH.exists():
     GALLERY_JSON_PATH.write_text("[]", encoding="utf-8")
 if not QUEUE_JSON_PATH.exists():
     QUEUE_JSON_PATH.write_text("[]", encoding="utf-8")
+if not WONDERPARK_SUBMISSIONS_JSON_PATH.exists():
+    WONDERPARK_SUBMISSIONS_JSON_PATH.write_text("[]", encoding="utf-8")
 
 ENABLE_FOLDER_WATCHER = True
 ALLOWED_UPLOAD_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".bmp"}
 SCANNER_ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg"}
 API_KEY = ""
+
+# Public Wonderpark upload flow (feature toggle + limits).
+WONDERPARK_PUBLIC_UPLOAD_ENABLED = True
+WONDERPARK_PUBLIC_ROUTE = "/public/wonderpark"
+WONDERPARK_MAX_UPLOAD_BYTES = 12 * 1024 * 1024
+WONDERPARK_ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
+WONDERPARK_ALLOWED_MIME_TYPES = {"image/jpeg", "image/png", "image/webp"}
+WONDERPARK_RATE_LIMIT_WINDOW_SECONDS = 300
+WONDERPARK_RATE_LIMIT_MAX_PER_IP = 5
+WONDERPARK_DUPLICATE_WINDOW_SECONDS = 600
+WONDERPARK_MIN_RECOMMENDED_WIDTH = 1200
+WONDERPARK_MIN_RECOMMENDED_HEIGHT = 900
+WONDERPARK_MAX_PROCESSING_DIMENSION = 2048
+WONDERPARK_THUMBNAIL_MAX_DIMENSION = 640
+WONDERPARK_DEFAULT_GENERATION_MODE = "person_holding_artwork"
+WONDERPARK_DEFAULT_STYLE_ID = "auto"
 
 # CORS settings for local/LAN app integrations.
 # Keep permissive defaults for offline kiosk usage; tighten as needed.

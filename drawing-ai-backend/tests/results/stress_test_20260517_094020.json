@@ -1,0 +1,197 @@
+{
+  "script": "stress_test",
+  "baseUrl": "http://127.0.0.1:8000",
+  "startedAt": "2026-05-17T09:37:06.355020+00:00",
+  "finishedAt": "2026-05-17T09:40:20.694556+00:00",
+  "status": "ok",
+  "summary": {
+    "PASS": 13,
+    "WARNING": 0,
+    "FAIL": 0,
+    "DANGER": 0,
+    "TOTAL": 13
+  },
+  "checks": [
+    {
+      "level": "PASS",
+      "name": "Job count safety",
+      "detail": "Running within default load count=30.",
+      "createdAt": "2026-05-17T09:37:06.355020+00:00"
+    },
+    {
+      "level": "PASS",
+      "name": "Sample image availability",
+      "detail": "Found 37 sample image(s).",
+      "createdAt": "2026-05-17T09:37:06.360534+00:00"
+    },
+    {
+      "level": "PASS",
+      "name": "Submit phase",
+      "detail": "Submitted 30 jobs in 3.625s.",
+      "createdAt": "2026-05-17T09:37:09.990501+00:00"
+    },
+    {
+      "level": "PASS",
+      "name": "Duplicate job detection",
+      "detail": "No duplicate job IDs detected.",
+      "createdAt": "2026-05-17T09:37:09.990501+00:00"
+    },
+    {
+      "level": "PASS",
+      "name": "Queue position updates",
+      "detail": "Queue positions observed up to 29.",
+      "createdAt": "2026-05-17T09:37:09.990501+00:00"
+    },
+    {
+      "level": "PASS",
+      "name": "One-by-one queue processing",
+      "detail": "Max simultaneous processing=1.",
+      "createdAt": "2026-05-17T09:40:20.671806+00:00"
+    },
+    {
+      "level": "PASS",
+      "name": "Backend crash check",
+      "detail": "No health check failures detected during stress run.",
+      "createdAt": "2026-05-17T09:40:20.671806+00:00"
+    },
+    {
+      "level": "PASS",
+      "name": "WebSocket events observed",
+      "detail": "Event counts={'queue_updated': 90, 'job_started': 30, 'generation_complete': 30, 'job_completed': 30}.",
+      "createdAt": "2026-05-17T09:40:20.671806+00:00"
+    },
+    {
+      "level": "PASS",
+      "name": "Failure rate threshold",
+      "detail": "No failed jobs in stress run.",
+      "createdAt": "2026-05-17T09:40:20.671806+00:00"
+    },
+    {
+      "level": "PASS",
+      "name": "Queue stuck threshold",
+      "detail": "No queue stuck interval >60s.",
+      "createdAt": "2026-05-17T09:40:20.671806+00:00"
+    },
+    {
+      "level": "PASS",
+      "name": "Stable Diffusion timeout threshold",
+      "detail": "No timeout-related failures detected.",
+      "createdAt": "2026-05-17T09:40:20.671806+00:00"
+    },
+    {
+      "level": "PASS",
+      "name": "Completed output integrity",
+      "detail": "All completed jobs have reachable outputUrl.",
+      "createdAt": "2026-05-17T09:40:20.671806+00:00"
+    },
+    {
+      "level": "PASS",
+      "name": "Storage cleanup endpoint",
+      "detail": "Cleanup endpoint reachable with non-destructive keepNewest check.",
+      "createdAt": "2026-05-17T09:40:20.693836+00:00"
+    }
+  ],
+  "metrics": {
+    "jobsTested": 30,
+    "totalSubmitted": 30,
+    "completed": 30,
+    "failed": 0,
+    "cancelled": 0,
+    "successRate": 1.0,
+    "averageGenerationTime": 0.0,
+    "minGenerationTime": 0.0,
+    "maxGenerationTime": 0.0,
+    "peakQueueSize": 29,
+    "maxQueueWait": 180,
+    "apiErrorCount": 0,
+    "timeoutCount": 0,
+    "queueStuckCount": 0,
+    "stableDiffusionTimeoutCount": 0,
+    "duplicateJobCount": 0,
+    "webSocketDisconnectCount": 0,
+    "storageGrowthBytes": 13408932,
+    "storageBeforeBytes": 38916178,
+    "storageAfterBytes": 52325110,
+    "avgCpuPercent": 18.69,
+    "avgRamPercent": 50.24,
+    "submitDurationSeconds": 3.625,
+    "delayBetweenSubmissionsSeconds": 0.0
+  },
+  "artifacts": {
+    "trackedJobIds": [
+      "bc1c0d217bf04808abf0e84b3d10fdea",
+      "a5b36bbb090d4d94ae831814df8ce28e",
+      "5b0cbf6b679f46d4950776943581cd45",
+      "4e613deafc604b26b32e2760cde5b7e3",
+      "d66247c3a37544a0ac21d93faebdab54",
+      "f03e5ac7bfc24f17b936226bb0cbf049",
+      "538855e2cce34955a4e37382899a3b96",
+      "9b5fdfb7696249d1a5cf2fbc15a5c6a9",
+      "f44b8e298be245d989f751e992fecce9",
+      "cfca8708e45b4545a85981ff7339ef44",
+      "d03bbb5d82bc4e7bbbc72d3dec8e35de",
+      "59f35c7e70fe4cdba37fe9398f266ac3",
+      "7e0405d879da434588eb384c843094af",
+      "4cf871bb701f4571bd2d31dcd41553b2",
+      "3df44a2087c6477ca198f9a6454f217d",
+      "99eabea9a5ec4186839cafb3b40ed73e",
+      "e7ca19be0ceb4fb58de350ceeed38463",
+      "34585c4743c04627b7b20bfa240a52e5",
+      "e812392f505c4e21bed6d4411ba304d8",
+      "7795ee1b481d4cc6879bc21d05b6ea53",
+      "4303f826133b41a3ae52f77832b50ddb",
+      "dd48656811ee4292ab0a4d1c556f05ee",
+      "8a41b18a1fd943acbee4250231666c88",
+      "354a58e8027f4a26bf1cc2d4d46b3db1",
+      "fb7d27f61dd54e319ee92e8f7b04ebc3",
+      "29ad7db4279945de891a58d085f65ad1",
+      "29c1071a62a94f00b0e6f3c04e93c9b7",
+      "1c444edb31714a5cafcff2b96a8d8c3d",
+      "1b51104c99594f79813ceffb22e69d8e",
+      "d43a88f9f15144ac9ad3540a322bf13a"
+    ],
+    "jobStates": {
+      "bc1c0d217bf04808abf0e84b3d10fdea": "completed",
+      "a5b36bbb090d4d94ae831814df8ce28e": "completed",
+      "5b0cbf6b679f46d4950776943581cd45": "completed",
+      "4e613deafc604b26b32e2760cde5b7e3": "completed",
+      "d66247c3a37544a0ac21d93faebdab54": "completed",
+      "f03e5ac7bfc24f17b936226bb0cbf049": "completed",
+      "538855e2cce34955a4e37382899a3b96": "completed",
+      "9b5fdfb7696249d1a5cf2fbc15a5c6a9": "completed",
+      "f44b8e298be245d989f751e992fecce9": "completed",
+      "cfca8708e45b4545a85981ff7339ef44": "completed",
+      "d03bbb5d82bc4e7bbbc72d3dec8e35de": "completed",
+      "59f35c7e70fe4cdba37fe9398f266ac3": "completed",
+      "7e0405d879da434588eb384c843094af": "completed",
+      "4cf871bb701f4571bd2d31dcd41553b2": "completed",
+      "3df44a2087c6477ca198f9a6454f217d": "completed",
+      "99eabea9a5ec4186839cafb3b40ed73e": "completed",
+      "e7ca19be0ceb4fb58de350ceeed38463": "completed",
+      "34585c4743c04627b7b20bfa240a52e5": "completed",
+      "e812392f505c4e21bed6d4411ba304d8": "completed",
+      "7795ee1b481d4cc6879bc21d05b6ea53": "completed",
+      "4303f826133b41a3ae52f77832b50ddb": "completed",
+      "dd48656811ee4292ab0a4d1c556f05ee": "completed",
+      "8a41b18a1fd943acbee4250231666c88": "completed",
+      "354a58e8027f4a26bf1cc2d4d46b3db1": "completed",
+      "fb7d27f61dd54e319ee92e8f7b04ebc3": "completed",
+      "29ad7db4279945de891a58d085f65ad1": "completed",
+      "29c1071a62a94f00b0e6f3c04e93c9b7": "completed",
+      "1c444edb31714a5cafcff2b96a8d8c3d": "completed",
+      "1b51104c99594f79813ceffb22e69d8e": "completed",
+      "d43a88f9f15144ac9ad3540a322bf13a": "completed"
+    },
+    "webSocketSnapshot": {
+      "eventCounts": {
+        "queue_updated": 90,
+        "job_started": 30,
+        "generation_complete": 30,
+        "job_completed": 30
+      },
+      "disconnectCount": 0,
+      "connectFailures": 0,
+      "path": "/api/ws"
+    }
+  }
+}

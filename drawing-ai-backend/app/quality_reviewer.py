@@ -25,9 +25,29 @@ BAD_TAGS = {
     "wrong_generation",
     "composition_wrong",
     "changed_too_much",
+    "too_much_change",
     "creepy",
+    "background_wrong",
+    "background_not_changed",
+    "background_too_plain",
+    "gender_changed",
+    "clothing_changed",
+    "shirt_changed",
+    "outfit_changed",
+    "person_unrecognizable",
+    "face_identity_changed",
+    "creation_unrecognizable",
     "artwork_missing",
+    "artwork_changed",
     "object_missing",
+    "object_changed",
+    "person_changed",
+    "face_changed",
+    "style_wrong",
+    "style_too_weak",
+    "bad_face",
+    "bad_hands",
+    "blurry",
 }
 
 GOOD_TAGS = {
@@ -38,6 +58,12 @@ GOOD_TAGS = {
     "good_colors",
     "good_style",
     "good_overall",
+    "good_preserve_identity",
+    "good_preserve_clothing",
+    "good_preserve_creation",
+    "good_background_change",
+    "good_style_change",
+    "style_good_identity_good",
 }
 
 _FACE_CASCADE: Optional[cv2.CascadeClassifier] = None
@@ -134,6 +160,14 @@ def _brightness_score(image_bgr: np.ndarray) -> float:
 def _white_ratio(image_bgr: np.ndarray) -> float:
     white_mask = cv2.inRange(image_bgr, (240, 240, 240), (255, 255, 255))
     return _clamp01(float(cv2.countNonZero(white_mask)) / float(white_mask.size))
+
+
+def _plain_ratio(image_bgr: np.ndarray) -> float:
+    hsv = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2HSV)
+    low_sat = cv2.inRange(hsv[:, :, 1], 0, 28)
+    high_val = cv2.inRange(hsv[:, :, 2], 140, 255)
+    mask = cv2.bitwise_and(low_sat, high_val)
+    return _clamp01(float(cv2.countNonZero(mask)) / float(mask.size))
 
 
 def _edge_map(gray: np.ndarray) -> np.ndarray:
@@ -300,6 +334,8 @@ def review_generation_quality(
     brightness_out = _brightness_score(out_cmp)
     white_in = _white_ratio(in_cmp)
     white_out = _white_ratio(out_cmp)
+    plain_in = _plain_ratio(in_cmp)
+    plain_out = _plain_ratio(out_cmp)
     edge_iou = _edge_iou(in_edges, out_edges)
     edge_density_out = _edge_density(out_edges)
     mse_norm = _mse_normalized(in_cmp, out_cmp)
@@ -333,6 +369,7 @@ def review_generation_quality(
 
     if over_changed:
         _add_tag(bad_tags, "over_changed")
+        _add_tag(bad_tags, "too_much_change")
         score -= 1.05
 
     if too_empty:
@@ -355,7 +392,7 @@ def review_generation_quality(
         _add_tag(bad_tags, "scary_or_creepy")
         score -= 0.5
 
-    if mode == "person_holding_artwork":
+    if mode in {"person_holding_artwork", "ai_art_venture"}:
         person_missing = faces_in > 0 and faces_out == 0
         main_object_missing = paper_in > 0.12 and paper_out < max(0.04, paper_in * 0.35)
         person_changed = faces_in > 0 and faces_out > 0 and edge_iou < 0.18
@@ -389,6 +426,117 @@ def review_generation_quality(
         if edge_iou >= 0.2 and edge_iou <= 0.85:
             _add_good(good_tags, "good_preserve_shape")
             score += 0.35
+
+        if mode == "ai_art_venture":
+            background_not_changed = (
+                (white_in > 0.6 and white_out >= max(0.45, white_in - 0.15))
+                or (plain_in > 0.4 and plain_out >= max(0.4, plain_in - 0.08))
+            )
+            background_too_plain = (
+                plain_out > 0.55
+                or white_out > 0.58
+                or (edge_density_out < 0.008 and color_out < 0.11)
+            )
+            background_wrong = background_not_changed or (background_too_plain and color_gain < 0.02)
+            style_too_weak = (
+                same_as_input
+                or (
+                    similarity_score > 0.72
+                    and mse_norm < 0.02
+                    and color_gain < 0.015
+                    and edge_iou > 0.55
+                )
+            )
+
+            if background_not_changed:
+                _add_tag(bad_tags, "background_not_changed")
+                score -= 0.7
+            if background_too_plain:
+                _add_tag(bad_tags, "background_too_plain")
+                score -= 0.65
+            if background_wrong:
+                _add_tag(bad_tags, "background_wrong")
+                score -= 0.4
+            if style_too_weak:
+                _add_tag(bad_tags, "style_too_weak")
+                score -= 0.45
+            identity_changed = (
+                not person_missing
+                and faces_in > 0
+                and faces_out > 0
+                and (
+                    edge_iou < 0.2
+                    or (similarity_score < 0.24 and hist_corr < 0.4)
+                )
+            )
+            person_unrecognizable = (
+                not person_missing
+                and faces_in > 0
+                and faces_out > 0
+                and similarity_score < 0.16
+                and mse_norm > 0.15
+            )
+            clothing_changed = (
+                not person_missing
+                and faces_in > 0
+                and faces_out > 0
+                and hist_corr < 0.27
+                and similarity_score < 0.3
+            )
+            outfit_changed = clothing_changed and color_gain > 0.08
+            shirt_changed = clothing_changed and edge_iou < 0.16
+            creation_unrecognizable = (
+                not main_object_missing
+                and paper_in > 0.1
+                and paper_out > 0.05
+                and edge_iou < 0.16
+            )
+
+            if identity_changed:
+                _add_tag(bad_tags, "face_identity_changed")
+                score -= 0.45
+            if person_unrecognizable:
+                _add_tag(bad_tags, "person_unrecognizable")
+                score -= 0.6
+            if clothing_changed:
+                _add_tag(bad_tags, "clothing_changed")
+                score -= 0.35
+            if shirt_changed:
+                _add_tag(bad_tags, "shirt_changed")
+                score -= 0.25
+            if outfit_changed:
+                _add_tag(bad_tags, "outfit_changed")
+                score -= 0.25
+            if creation_unrecognizable:
+                _add_tag(bad_tags, "creation_unrecognizable")
+                score -= 0.4
+
+            if not identity_changed and not person_unrecognizable and not person_missing:
+                _add_good(good_tags, "good_preserve_identity")
+                score += 0.25
+            if not clothing_changed and not shirt_changed and not outfit_changed and not person_missing:
+                _add_good(good_tags, "good_preserve_clothing")
+                score += 0.2
+            if not main_object_missing and not creation_unrecognizable and paper_out > 0.03:
+                _add_good(good_tags, "good_preserve_creation")
+                score += 0.2
+            if not background_wrong and not background_not_changed and not background_too_plain:
+                _add_good(good_tags, "good_background_change")
+                score += 0.2
+            if not same_as_input and (color_gain > 0.02 or mse_norm > 0.03):
+                _add_good(good_tags, "good_style_change")
+                score += 0.2
+            if not background_wrong and white_out < 0.5 and color_out > 0.12:
+                _add_good(good_tags, "good_lively")
+                _add_good(good_tags, "good_style")
+                score += 0.3
+            if (
+                "good_preserve_identity" in good_tags
+                and "good_preserve_creation" in good_tags
+                and "good_style_change" in good_tags
+            ):
+                _add_good(good_tags, "style_good_identity_good")
+                score += 0.2
     else:
         if same_as_input and color_gain <= 0.015:
             _add_tag(bad_tags, "wrong_subject")

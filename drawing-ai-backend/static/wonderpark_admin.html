@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wonderpark Admin Dashboard</title>
+  <link rel="stylesheet" href="/static/wonderpark_admin.css?v=20260521a">
+</head>
+<body>
+  <main class="wa-shell">
+    <header class="wa-card">
+      <h1>Wonderpark Upload Dashboard</h1>
+      <p>Monitor scanned artwork submissions and processing status.</p>
+    </header>
+
+    <section class="wa-card controls">
+      <div class="field-row">
+        <label>
+          Search
+          <input id="searchInput" type="text" placeholder="Name or submission ID">
+        </label>
+        <label>
+          Status
+          <select id="statusSelect">
+            <option value="">All</option>
+            <option value="pending">pending</option>
+            <option value="queued">queued</option>
+            <option value="processing">processing</option>
+            <option value="completed">completed</option>
+            <option value="failed">failed</option>
+          </select>
+        </label>
+      </div>
+      <div class="button-row">
+        <button id="refreshBtn" type="button">Refresh</button>
+      </div>
+      <p id="errorText" class="error" hidden></p>
+    </section>
+
+    <section class="wa-card summary" id="summaryBox"></section>
+
+    <section class="wa-card">
+      <div id="listContainer" class="list-container"></div>
+    </section>
+  </main>
+
+  <script src="/static/wonderpark_admin.js?v=20260521a"></script>
+</body>
+</html>

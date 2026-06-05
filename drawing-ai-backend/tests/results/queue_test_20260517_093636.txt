@@ -1,0 +1,68 @@
+TEST REPORT: queue_test
+Generated At: 2026-05-17T09:36:36.615430+00:00
+Base URL: http://127.0.0.1:8000
+Status: warning
+
+Summary:
+PASS: 11
+WARNING: 1
+FAIL: 0
+DANGER: 0
+
+Checks:
+[PASS] Sample image availability: Found 37 sample images.
+[PASS] Queue submit: Submitted 10 test jobs.
+[PASS] Duplicate job IDs: No duplicate job IDs detected.
+[PASS] Queue position assignment: Queue positions returned: min=1 max=9.
+[PASS] Cancel queued job: Cancel request accepted for fc77b2efe1504022ac6e906e31bae1c0.
+[PASS] Queue terminal state: All submitted jobs reached terminal state.
+[PASS] One-by-one processing: Max simultaneous processing jobs=1.
+[PASS] Queue stuck detection: No stuck queue interval >60s detected.
+[WARNING] Retry failed job: No failed test job found to retry.
+[PASS] Regenerate with fix: Regenerated job a63b10be5be346039d44a4c07ef4a809 linked to source aaf8462a087643bc9c1f6d85f5c8709c.
+[PASS] Delete completed test job: Deleted job 271fb48040f8499c96ff8fc537b09c50.
+[PASS] Test safety guard: Only TEST_ jobs were targeted by lifecycle operations.
+
+Metrics:
+{
+  "submittedJobs": 10,
+  "submitFailures": 0,
+  "duplicateJobCount": 0,
+  "peakQueueSize": 8,
+  "maxSimultaneousProcessing": 1,
+  "queueStuckCount": 0,
+  "completedCount": 9,
+  "failedCount": 0,
+  "cancelTargetId": "fc77b2efe1504022ac6e906e31bae1c0",
+  "retryTargetId": "",
+  "regeneratedJobId": "a63b10be5be346039d44a4c07ef4a809",
+  "pollTimeoutSeconds": 420
+}
+
+Artifacts:
+{
+  "trackedJobIds": [
+    "aaf8462a087643bc9c1f6d85f5c8709c",
+    "271fb48040f8499c96ff8fc537b09c50",
+    "06e33cb843f6469cbcad8bfc5fa5fa3c",
+    "64fb3c9f87494e68b2fb4fa8d7e66140",
+    "5d91354ca882427c986ebc62325ab6ca",
+    "017e51ed36734c15893f3cc9824e338e",
+    "dfacc2f88d6440028b841923ce61f702",
+    "388609e9ce78433681c80ef477d313ae",
+    "59e89f392d534ed3b3ac3166af115894",
+    "fc77b2efe1504022ac6e906e31bae1c0"
+  ],
+  "jobStates": {
+    "aaf8462a087643bc9c1f6d85f5c8709c": "completed",
+    "271fb48040f8499c96ff8fc537b09c50": "completed",
+    "06e33cb843f6469cbcad8bfc5fa5fa3c": "completed",
+    "64fb3c9f87494e68b2fb4fa8d7e66140": "completed",
+    "5d91354ca882427c986ebc62325ab6ca": "completed",
+    "017e51ed36734c15893f3cc9824e338e": "completed",
+    "dfacc2f88d6440028b841923ce61f702": "completed",
+    "388609e9ce78433681c80ef477d313ae": "completed",
+    "59e89f392d534ed3b3ac3166af115894": "completed",
+    "fc77b2efe1504022ac6e906e31bae1c0": "cancelled"
+  }
+}
