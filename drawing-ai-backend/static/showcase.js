@@ -140,6 +140,8 @@ const centerName = document.getElementById("centerName");
 const centerStatus = document.getElementById("centerStatus");
 const fishCourier = document.getElementById("fishCourier");
 const roamingLayer = document.getElementById("roamingLayer");
+const showcaseMusic = document.getElementById("showcaseMusic");
+const showcaseSoundButton = document.getElementById("showcaseSoundButton");
 
 const state = {
   displayMode: "single",
@@ -161,7 +163,49 @@ const state = {
   roamMotionById: {},
   roamRaf: 0,
   roamLastTs: 0,
+  musicStarted: false,
 };
+
+function setSoundButtonVisible(visible) {
+  if (!showcaseSoundButton) {
+    return;
+  }
+  showcaseSoundButton.classList.toggle("is-hidden", !visible);
+}
+
+async function startShowcaseMusic() {
+  if (!showcaseMusic || state.musicStarted) {
+    return;
+  }
+
+  try {
+    showcaseMusic.volume = 0.6;
+    await showcaseMusic.play();
+    state.musicStarted = true;
+    setSoundButtonVisible(false);
+  } catch {
+    setSoundButtonVisible(true);
+  }
+}
+
+function initializeShowcaseMusic() {
+  if (!showcaseMusic) {
+    return;
+  }
+
+  showcaseMusic.addEventListener("playing", () => {
+    state.musicStarted = true;
+    setSoundButtonVisible(false);
+  });
+
+  if (showcaseSoundButton) {
+    showcaseSoundButton.addEventListener("click", startShowcaseMusic);
+  }
+
+  window.addEventListener("pointerdown", startShowcaseMusic, { once: true, passive: true });
+  window.addEventListener("keydown", startShowcaseMusic, { once: true });
+  startShowcaseMusic();
+}
 
 function createGuideBadge(guide, direction, seed) {
   const badge = document.createElement("span");
@@ -1361,6 +1405,7 @@ async function initializeShowcase() {
   syncViewportSize();
   applyDisplayMode(getDisplayMode());
   initializeCraftpixBackgrounds();
+  initializeShowcaseMusic();
   setWsStatus(false);
   renderCenterCard();
 

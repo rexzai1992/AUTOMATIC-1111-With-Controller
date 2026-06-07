@@ -216,6 +216,29 @@ body {
   inset: 0;
 }
 
+.sound-button {
+  position: absolute;
+  right: calc(18px + var(--safe-right, 0px));
+  bottom: calc(18px + var(--safe-bottom, 0px));
+  z-index: 30;
+  min-width: 88px;
+  min-height: 42px;
+  border: 1px solid rgba(193, 241, 255, 0.46);
+  border-radius: 8px;
+  background: rgba(5, 25, 52, 0.72);
+  color: #f2fbff;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(8px);
+}
+
+.sound-button.is-hidden {
+  display: none;
+}
+
 .center-presentation {
   display: grid;
   place-items: center;
