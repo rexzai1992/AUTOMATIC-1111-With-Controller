@@ -21,6 +21,7 @@ const ROAM_DIRECTION_CHANGE_MAX_MS = 4600;
 const MODE_RATIO_DUAL = 2.0;
 const MODE_RATIO_TRIPLE = 3.2;
 const MODE_RATIO_ULTRAWIDE = 4.3;
+const MUSIC_PROMPT_STORAGE_KEY = "showcaseMusicPromptSeen";
 
 const ACTIVE_STATUSES = new Set(["pending", "queued", "processing", "generating", "active"]);
 const FINAL_STATUSES = new Set(["generated", "shown", "completed", "complete"]);
@@ -164,13 +165,35 @@ const state = {
   roamRaf: 0,
   roamLastTs: 0,
   musicStarted: false,
+  musicPromptSeen: false,
 };
+
+function readStorageFlag(key) {
+  try {
+    return window.localStorage.getItem(key) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function writeStorageFlag(key) {
+  try {
+    window.localStorage.setItem(key, "1");
+  } catch {
+    // Ignore storage failures in restricted browser modes.
+  }
+}
 
 function setSoundButtonVisible(visible) {
   if (!showcaseSoundButton) {
     return;
   }
-  showcaseSoundButton.classList.toggle("is-hidden", !visible);
+  const shouldShow = visible && !state.musicPromptSeen;
+  showcaseSoundButton.classList.toggle("is-hidden", !shouldShow);
+  if (shouldShow) {
+    state.musicPromptSeen = true;
+    writeStorageFlag(MUSIC_PROMPT_STORAGE_KEY);
+  }
 }
 
 async function startShowcaseMusic() {
@@ -182,6 +205,8 @@ async function startShowcaseMusic() {
     showcaseMusic.volume = 0.6;
     await showcaseMusic.play();
     state.musicStarted = true;
+    state.musicPromptSeen = true;
+    writeStorageFlag(MUSIC_PROMPT_STORAGE_KEY);
     setSoundButtonVisible(false);
   } catch {
     setSoundButtonVisible(true);
@@ -193,8 +218,12 @@ function initializeShowcaseMusic() {
     return;
   }
 
+  state.musicPromptSeen = readStorageFlag(MUSIC_PROMPT_STORAGE_KEY);
+
   showcaseMusic.addEventListener("playing", () => {
     state.musicStarted = true;
+    state.musicPromptSeen = true;
+    writeStorageFlag(MUSIC_PROMPT_STORAGE_KEY);
     setSoundButtonVisible(false);
   });
 
