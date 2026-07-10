@@ -1,0 +1,16 @@
+{
+  "sf3d": {
+    "pid": 9672,
+    "create_time": 1781832827.691388,
+    "started_at": "2026-06-19T09:33:47+0800",
+    "command": "start_sf3d_api.bat",
+    "cwd": "C:\\AI\\stable-fast-3d"
+  },
+  "comfyui": {
+    "pid": 19528,
+    "create_time": 1783641678.119055,
+    "started_at": "2026-07-10T08:01:18+0800",
+    "command": "run_nvidia_gpu.bat",
+    "cwd": "C:\\Users\\User\\Downloads\\ComfyUI_windows_portable_nvidia\\ComfyUI_windows_portable"
+  }
+}
