@@ -23,5 +23,46 @@
       "seed": -1,
       "megapixels": 1
     }
+  },
+  "local_ai": {
+    "output_dir": "outputs/local_ai",
+    "services": {
+      "comfyui": {
+        "enabled": true,
+        "autostart": true,
+        "directory": "C:\\Users\\User\\Downloads\\ComfyUI_windows_portable_nvidia\\ComfyUI_windows_portable",
+        "url": "http://127.0.0.1:8188",
+        "health_url": "http://127.0.0.1:8188",
+        "start_command": "run_nvidia_gpu.bat",
+        "log_file": "logs/comfyui.log"
+      },
+      "stable_diffusion": {
+        "enabled": true,
+        "autostart": false,
+        "directory": "C:\\AI ofline\\stable-diffusion-webui",
+        "url": "http://127.0.0.1:7860",
+        "health_url": "http://127.0.0.1:7860/sdapi/v1/sd-models",
+        "start_command": "webui-user.bat --api",
+        "log_file": "logs/stable_diffusion.log"
+      },
+      "sf3d": {
+        "enabled": true,
+        "autostart": false,
+        "autostart_on_generate": true,
+        "directory": "C:\\AI\\stable-fast-3d",
+        "url": "http://127.0.0.1:8003",
+        "health_url": "http://127.0.0.1:8003/health",
+        "start_command": "start_sf3d_api.bat",
+        "log_file": "logs/sf3d.log",
+        "startup_timeout_seconds": 30,
+        "timeout_seconds": 600,
+        "defaults": {
+          "remesh": "triangle",
+          "vertex_count": 3000,
+          "texture_resolution": 512,
+          "foreground_ratio": 0.85
+        }
+      }
+    }
   }
 }

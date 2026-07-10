@@ -69,6 +69,7 @@ if errorlevel 1 (
 
 echo [Run] Starting backend on http://0.0.0.0:8000
 echo [Info] Local links:
+echo        http://127.0.0.1:8000/splash
 echo        http://127.0.0.1:8000/staff
 echo        http://127.0.0.1:8000/gallery
 echo        http://127.0.0.1:8000/comfy/staff
@@ -77,6 +78,7 @@ echo        http://127.0.0.1:8000/public/wonderpark
 echo        http://127.0.0.1:8000/publicgallery
 if defined LAN_IP (
   echo [Info] LAN links:
+  echo        http://%LAN_IP%:8000/splash
   echo        http://%LAN_IP%:8000/staff
   echo        http://%LAN_IP%:8000/gallery
   echo        http://%LAN_IP%:8000/comfy/staff
@@ -87,6 +89,7 @@ if defined LAN_IP (
 call :start_cloudflare_tunnel
 if not errorlevel 1 (
   echo [Info] Public links:
+  echo        https://%TUNNEL_PUBLIC_HOST%/splash
   echo        https://%TUNNEL_PUBLIC_HOST%/staff
   echo        https://%TUNNEL_PUBLIC_HOST%/gallery
   echo        https://%TUNNEL_PUBLIC_HOST%/comfy/staff

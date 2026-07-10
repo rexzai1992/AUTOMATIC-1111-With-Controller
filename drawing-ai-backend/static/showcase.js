@@ -354,6 +354,9 @@ function normalizeRecord(raw) {
   const status = normalizedStatus(raw);
   const hidden = Boolean(raw.hidden) || status === "hidden";
   const source = safeText(raw.source || "public").toLowerCase();
+  if (source !== "public_wonderpark") {
+    return null;
+  }
   if (hidden || BLOCKED_STATUSES.has(status)) {
     return null;
   }
@@ -410,6 +413,9 @@ function normalizeRecord(raw) {
 
   const completedByStatus = FINAL_STATUSES.has(status) || status === "completed";
   const isCompleted = Boolean(finalImageUrl) && (completedByStatus || status === "unknown");
+  if (isCompleted && raw.showcaseVisible !== true) {
+    return null;
+  }
   let isActive = ACTIVE_STATUSES.has(status) || (!isCompleted && Boolean(originalImageUrl));
   // Public Wonderpark should only appear after a real generated image is ready.
   if (source === "public_wonderpark" && !isCompleted) {
@@ -1291,7 +1297,7 @@ function syncGalleryItems(rawItems, isInitial = false) {
 }
 
 async function fetchGallerySnapshot() {
-  const response = await fetch(`/api/gallery?limit=140&offset=0`, { cache: "no-store" });
+  const response = await fetch(`/api/gallery?limit=140&offset=0&source=public_wonderpark&showcaseOnly=true`, { cache: "no-store" });
   if (!response.ok) {
     throw new Error(`Gallery request failed (${response.status})`);
   }

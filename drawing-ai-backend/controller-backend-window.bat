@@ -82,8 +82,16 @@ if errorlevel 1 (
 
 call :start_cloudflare_tunnel
 if not errorlevel 1 (
+    echo [INFO] Public splash: https://%TUNNEL_PUBLIC_HOST%/splash
     echo [INFO] Public URL: https://%TUNNEL_PUBLIC_HOST%/staff
+    echo [INFO] Public API key setup: https://%TUNNEL_PUBLIC_HOST%/admin/api
+    echo [INFO] Public Comfy docs: https://%TUNNEL_PUBLIC_HOST%/api/docs/comfyui
 )
+
+echo [INFO] Local splash: http://127.0.0.1:8000/splash
+echo [INFO] Local URL: http://127.0.0.1:8000/staff
+echo [INFO] Local API key setup: http://127.0.0.1:8000/admin/api
+echo [INFO] Local Comfy docs: http://127.0.0.1:8000/api/docs/comfyui
 
 %PY_CMD% -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --ws websockets
 

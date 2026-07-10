@@ -105,6 +105,7 @@ from app.gallery_store import GalleryStore
 from app.generator import (
     StableDiffusionGenerator,
 )
+from app.local_ai_router import router as local_ai_router
 from app.quality_reviewer import default_auto_review, review_generation_quality
 from app.queue_store import QueueStore, utc_now_iso
 from app.scanner_service import ScannerService
@@ -128,6 +129,7 @@ logging.basicConfig(
 logger = logging.getLogger("drawing-ai-backend")
 
 app = FastAPI(title="drawing-ai-backend", version="3.0.0")
+app.include_router(local_ai_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -161,6 +163,7 @@ api_key_state_lock = threading.Lock()
 
 API_KEY_STATE_PATH = BASE_DIR / "data" / "api_key_state.json"
 API_DOCS_MARKDOWN_PATH = BASE_DIR / "docs" / "API.md"
+COMFY_API_DOCS_MARKDOWN_PATH = BASE_DIR / "docs" / "COMFYUI_API.md"
 
 BAD_FEEDBACK_TAGS = {
     # New primary tags
@@ -2604,6 +2607,8 @@ def _build_generation_complete_event(item: Dict[str, Any]) -> Dict[str, Any]:
         "loraName": item.get("loraName"),
         "hidden": bool(item.get("hidden", False)),
         "hiddenAt": item.get("hiddenAt"),
+        "showcaseVisible": bool(item.get("showcaseVisible", False)),
+        "showcaseStatus": item.get("showcaseStatus"),
         "updatedAt": item.get("updatedAt"),
         "rating": _get_staff_rating(item),
         "staffRating": _get_staff_rating(item),
@@ -5983,6 +5988,10 @@ async def on_startup() -> None:
     queue_worker_stop = False
     await _recover_queue_on_startup()
     queue_worker_task = asyncio.create_task(_queue_worker_loop(), name="queue-worker")
+    from service_manager import autostart_services
+
+    local_ai_autostart = await run_in_threadpool(autostart_services)
+    logger.info("Local AI autostart results: %s", local_ai_autostart)
     logger.info("Application startup complete.")
 
 
@@ -6774,6 +6783,9 @@ async def comfy_staff_generate(
                 "stylePreset": resolved_style_preset,
                 "style_preset": resolved_style_preset,
                 "stylePresetCategory": resolved_style_category or None,
+                "hidden": True,
+                "showcaseVisible": False,
+                "showcaseStatus": "staff_only",
             },
         )
 
@@ -7122,6 +7134,13 @@ def _load_api_docs_markdown() -> str:
         return "API documentation file not found: docs/API.md"
 
 
+def _load_comfy_api_docs_markdown() -> str:
+    try:
+        return COMFY_API_DOCS_MARKDOWN_PATH.read_text(encoding="utf-8")
+    except OSError:
+        return "ComfyUI API documentation file not found: docs/COMFYUI_API.md"
+
+
 @app.get("/admin/api", tags=["Admin"], summary="Admin API key manager")
 async def admin_api_page(request: Request) -> HTMLResponse:
     active_key = _get_active_api_key()
@@ -7239,11 +7258,59 @@ async def admin_api_docs_page() -> HTMLResponse:
       <p class="muted">This page mirrors <span class="mono">docs/API.md</span> and includes example parameters for all public API endpoints.</p>
       <ul>
         <li><a href="/admin/api">/admin/api</a> (key manager)</li>
+        <li><a href="/api/docs/comfyui">/api/docs/comfyui</a> (ComfyUI API docs)</li>
         <li><a href="/docs">/docs</a> (OpenAPI Swagger UI)</li>
       </ul>
     </div>
     <div class="card">
       <h2>docs/API.md</h2>
+      <pre>{escaped}</pre>
+    </div>
+  </div>
+</body>
+</html>"""
+    return HTMLResponse(html_content)
+
+
+@app.get("/api/docs/comfy ui", tags=["Docs"], summary="ComfyUI API docs view")
+@app.get("/api/docs/comfy-ui", tags=["Docs"], summary="ComfyUI API docs view")
+@app.get("/api/docs/comfyui", tags=["Docs"], summary="ComfyUI API docs view")
+async def comfy_api_docs_page() -> HTMLResponse:
+    markdown_text = _load_comfy_api_docs_markdown()
+    escaped = html.escape(markdown_text)
+    html_content = f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ComfyUI API Docs</title>
+  <style>
+    body {{ font-family: Arial, sans-serif; background: #0f172a; color: #e2e8f0; margin: 0; }}
+    .wrap {{ max-width: 1100px; margin: 24px auto; padding: 0 16px; }}
+    .card {{ background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 16px; margin-bottom: 16px; }}
+    h1, h2 {{ margin: 0 0 12px 0; }}
+    .muted {{ color: #94a3b8; }}
+    .mono {{ font-family: Consolas, monospace; background: #1f2937; padding: 2px 6px; border-radius: 6px; }}
+    a {{ color: #93c5fd; text-decoration: none; }}
+    pre {{ white-space: pre-wrap; word-break: break-word; background: #020617; color: #e2e8f0; padding: 14px; border-radius: 10px; border: 1px solid #1f2937; }}
+    ul {{ margin: 0; padding-left: 18px; }}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>ComfyUI API Documentation</h1>
+      <p class="muted">This page mirrors <span class="mono">docs/COMFYUI_API.md</span> for the ComfyUI staff workflow endpoints.</p>
+      <ul>
+        <li><a href="/comfy/staff">/comfy/staff</a> (staff dashboard)</li>
+        <li><a href="/api/comfy/staff/status">/api/comfy/staff/status</a> (status JSON)</li>
+        <li><a href="/api/comfy/presets">/api/comfy/presets</a> (preset JSON)</li>
+        <li><a href="/admin/api/docs">/admin/api/docs</a> (full API docs)</li>
+        <li><a href="/docs">/docs</a> (OpenAPI Swagger UI)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>docs/COMFYUI_API.md</h2>
       <pre>{escaped}</pre>
     </div>
   </div>
@@ -7329,9 +7396,14 @@ def _filter_gallery_items_for_api(
     items: List[Dict[str, Any]],
     mode: Optional[str],
     style_id: Optional[str],
+    source: Optional[str] = None,
+    engine: Optional[str] = None,
+    showcase_only: bool = False,
 ) -> List[Dict[str, Any]]:
     mode_filter = _normalize_generation_mode(mode) if str(mode or "").strip() else ""
     style_filter = _normalize_style_id(style_id) if str(style_id or "").strip() else ""
+    source_filter = _normalize_source(source) if str(source or "").strip() else ""
+    engine_filter = _normalize_generation_engine(engine) if str(engine or "").strip() else ""
 
     def _matches(item: Dict[str, Any]) -> bool:
         item_mode, item_style = _resolve_mode_and_style_ids(
@@ -7341,6 +7413,17 @@ def _filter_gallery_items_for_api(
         if mode_filter and item_mode != mode_filter:
             return False
         if style_filter and item_style != style_filter:
+            return False
+        if source_filter and _normalize_source(item.get("source")) != source_filter:
+            return False
+        if engine_filter:
+            settings = item.get("generationSettings") if isinstance(item.get("generationSettings"), dict) else {}
+            item_engine = _normalize_generation_engine(
+                item.get("generationEngine") or settings.get("generationEngine")
+            )
+            if item_engine != engine_filter:
+                return False
+        if showcase_only and not bool(item.get("showcaseVisible", False)):
             return False
         return True
 
@@ -7528,10 +7611,20 @@ async def api_gallery(
     offset: int = Query(0, ge=0),
     mode: Optional[str] = Query(None),
     styleId: Optional[str] = Query(None),
+    source: Optional[str] = Query(None),
+    engine: Optional[str] = Query(None),
+    showcaseOnly: bool = Query(False),
     absolute: bool = Query(False),
 ) -> Dict[str, Any]:
     items = await run_in_threadpool(gallery_store.list_items, False)
-    filtered = _filter_gallery_items_for_api(items, mode, styleId)
+    filtered = _filter_gallery_items_for_api(
+        items,
+        mode,
+        styleId,
+        source=source,
+        engine=engine,
+        showcase_only=bool(showcaseOnly),
+    )
     total = len(filtered)
     paged = filtered[offset : offset + limit]
     payload_items = [_build_api_gallery_item(item, request, bool(absolute)) for item in paged]
@@ -7552,10 +7645,20 @@ async def api_gallery_latest(
     request: Request,
     mode: Optional[str] = Query(None),
     styleId: Optional[str] = Query(None),
+    source: Optional[str] = Query(None),
+    engine: Optional[str] = Query(None),
+    showcaseOnly: bool = Query(False),
     absolute: bool = Query(False),
 ) -> Dict[str, Any]:
     items = await run_in_threadpool(gallery_store.list_items, False)
-    filtered = _filter_gallery_items_for_api(items, mode, styleId)
+    filtered = _filter_gallery_items_for_api(
+        items,
+        mode,
+        styleId,
+        source=source,
+        engine=engine,
+        showcase_only=bool(showcaseOnly),
+    )
     if not filtered:
         raise HTTPException(status_code=404, detail="No gallery items found.")
     return _build_api_gallery_item(filtered[0], request, bool(absolute))
@@ -7572,10 +7675,20 @@ async def api_before_after(
     offset: int = Query(0, ge=0),
     mode: Optional[str] = Query(None),
     styleId: Optional[str] = Query(None),
+    source: Optional[str] = Query(None),
+    engine: Optional[str] = Query(None),
+    showcaseOnly: bool = Query(False),
     absolute: bool = Query(False),
 ) -> Dict[str, Any]:
     items = await run_in_threadpool(gallery_store.list_items, False)
-    filtered = _filter_gallery_items_for_api(items, mode, styleId)
+    filtered = _filter_gallery_items_for_api(
+        items,
+        mode,
+        styleId,
+        source=source,
+        engine=engine,
+        showcase_only=bool(showcaseOnly),
+    )
     paged = filtered[offset : offset + limit]
     response_items: List[Dict[str, Any]] = []
     for item in paged:

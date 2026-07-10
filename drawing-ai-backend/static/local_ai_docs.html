@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Local AI Docs</title>
+  <style>
+    :root{color-scheme:dark;font-family:Inter,Segoe UI,sans-serif} body{margin:0;background:#08111f;color:#e8f1fc}
+    main{max-width:980px;margin:auto;padding:28px 18px 60px} a{color:#8dc8ff} h1,h2{color:#fff}
+    section{background:#0e1c2e;border:1px solid #203750;border-radius:14px;padding:18px;margin:14px 0}
+    code,pre{font-family:Consolas,monospace} code{color:#b8ddff} pre{background:#050b14;border-radius:10px;padding:14px;overflow:auto;white-space:pre-wrap}
+    table{width:100%;border-collapse:collapse} td,th{text-align:left;padding:8px;border-bottom:1px solid #263c55}
+  </style>
+</head>
+<body><main>
+  <p><a href="/splash">← Splash dashboard</a></p>
+  <h1>Local AI Gateway</h1>
+  <p>The controller coordinates separate APIs. It does not load SF3D, ComfyUI, or Stable Diffusion models into the controller process.</p>
+  <section><h2>Services</h2><table>
+    <tr><th>Service</th><th>Local URL</th><th>Default</th></tr>
+    <tr><td>Controller</td><td><code>http://127.0.0.1:8000</code></td><td>running with launcher</td></tr>
+    <tr><td>ComfyUI</td><td><code>http://127.0.0.1:8188</code></td><td>autostart, duplicate-safe</td></tr>
+    <tr><td>Stable Diffusion</td><td><code>http://127.0.0.1:7860</code></td><td>external/start-all.bat</td></tr>
+    <tr><td>SF3D API</td><td><code>http://127.0.0.1:8003</code></td><td>starts on first generation</td></tr>
+  </table></section>
+  <section><h2>Dashboard and gateway routes</h2><pre>GET  /splash
+GET  /local-ai
+GET  /api/local-ai/health
+GET  /api/local-ai/services
+POST /api/local-ai/services/{service_name}/start
+POST /api/local-ai/services/{service_name}/stop
+POST /api/local-ai/services/{service_name}/restart
+POST /api/local-ai/sf3d/generate
+POST /api/local-ai/image/generate
+POST /api/local-ai/workflow/run</pre></section>
+  <section><h2>Generate a GLB</h2><pre>curl -X POST http://127.0.0.1:8000/api/local-ai/sf3d/generate ^
+  -F "image=@test.png" ^
+  -F "remesh=triangle" ^
+  -F "vertex_count=3000" ^
+  -F "texture_resolution=512" ^
+  -F "foreground_ratio=0.85"</pre>
+  <p>Controller copies: <code>outputs/local_ai/3d/</code> and <code>outputs/local_ai/previews/</code>.</p></section>
+  <section><h2>Stable Diffusion and ComfyUI</h2>
+  <pre>POST /api/local-ai/image/generate
+{"prompt":"a small friendly robot","steps":20,"width":512,"height":512}
+
+POST /api/local-ai/workflow/run
+{ ...ComfyUI API workflow JSON... }</pre></section>
+  <section><h2>SF3D setup notes</h2>
+  <p>The FastAPI wrapper is custom because the official project ships command-line and Gradio entry points, not this REST contract.</p>
+  <ol>
+    <li>Request access to <a href="https://huggingface.co/stabilityai/stable-fast-3d">stabilityai/stable-fast-3d</a>.</li>
+    <li>Create a read token in Hugging Face settings.</li>
+    <li>Run <code>%USERPROFILE%\miniconda3\condabin\conda.bat activate sf3d</code>, then <code>huggingface-cli login</code>.</li>
+    <li>Start <code>C:\AI\stable-fast-3d\start_sf3d_api.bat</code>.</li>
+  </ol>
+  <p>Windows support in the official SF3D repository is experimental and its texture/UV extensions require Visual Studio 2022 C++ Build Tools.</p></section>
+  <section><h2>Troubleshooting</h2>
+  <p><code>model_loaded=false</code>: inspect the <code>model_error</code> returned by SF3D <code>/health</code>. Common causes are missing Hugging Face access/login or unbuilt C++/CUDA extensions.</p>
+  <p>An externally started healthy service is shown as unmanaged. The controller deliberately refuses to stop it because it does not own that PID.</p></section>
+</main></body></html>

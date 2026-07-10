@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Local AI Splash</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, "Segoe UI", system-ui, sans-serif;
+      --bg: #050a13;
+      --panel: rgba(13, 27, 45, .92);
+      --border: #203a56;
+      --text: #edf6ff;
+      --muted: #93a8c0;
+      --blue: #60a5fa;
+      --green: #34d399;
+      --red: #fb7185;
+      --amber: #fbbf24;
+    }
+    * { box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background:
+        radial-gradient(circle at 10% 0%, #123159 0, transparent 34%),
+        radial-gradient(circle at 95% 15%, #173b32 0, transparent 29%),
+        var(--bg);
+      color: var(--text);
+    }
+    main { width: min(1180px, 100%); margin: 0 auto; padding: 34px 20px 56px; }
+    header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 22px;
+    }
+    h1 { margin: 0; font-size: clamp(32px, 6vw, 58px); letter-spacing: -.04em; }
+    h2 { margin: 0; font-size: 22px; }
+    p { line-height: 1.5; }
+    .subtitle { margin: 8px 0 0; color: var(--muted); }
+    .toplinks, .buttons { display: flex; flex-wrap: wrap; gap: 9px; }
+    .summary {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      min-height: 50px;
+      margin: 16px 0 22px;
+      padding: 12px 15px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: rgba(7, 17, 31, .82);
+      color: #bcd1e8;
+    }
+    .summary.error { border-color: #7f3340; color: #ffd2d9; }
+    .spinner {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+      border: 2px solid #45637f;
+      border-top-color: #dbeafe;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    .spinner[hidden] { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .card {
+      min-width: 0;
+      border: 1px solid var(--border);
+      border-radius: 19px;
+      padding: 21px;
+      background: linear-gradient(150deg, var(--panel), rgba(8, 19, 33, .96));
+      box-shadow: 0 22px 55px #0007;
+    }
+    .card-header { display: flex; justify-content: space-between; align-items: center; gap: 14px; }
+    .service-name { display: flex; align-items: center; gap: 11px; min-width: 0; }
+    .status-light {
+      width: 13px;
+      height: 13px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: #64748b;
+      box-shadow: 0 0 0 5px #64748b20, 0 0 16px #64748b;
+    }
+    .status-light.on { background: var(--green); box-shadow: 0 0 0 5px #34d39920, 0 0 18px #34d399; }
+    .status-light.off { background: var(--red); box-shadow: 0 0 0 5px #fb718520, 0 0 18px #fb7185; }
+    .status-light.starting, .status-light.port-busy {
+      background: var(--amber);
+      box-shadow: 0 0 0 5px #fbbf2420, 0 0 18px #fbbf24;
+    }
+    .status-light.error { background: #f97316; box-shadow: 0 0 0 5px #f9731620, 0 0 18px #f97316; }
+    .badge {
+      padding: 6px 10px;
+      border: 1px solid #35516f;
+      border-radius: 999px;
+      background: #17283c;
+      color: #c9dbed;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      white-space: nowrap;
+    }
+    .meta { margin-top: 19px; display: grid; gap: 11px; }
+    .meta-row { display: grid; grid-template-columns: 116px minmax(0, 1fr); gap: 12px; align-items: start; }
+    .meta-label { color: var(--muted); font-size: 13px; }
+    .meta-value { min-width: 0; overflow-wrap: anywhere; font-size: 13px; }
+    .url { font-family: Consolas, monospace; color: #93c5fd; }
+    .detail {
+      min-height: 42px;
+      margin: 17px 0 0;
+      padding: 11px 12px;
+      border-radius: 10px;
+      background: #050d18;
+      color: #9eb5cb;
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+    .detail.problem { color: #ffd1d8; border: 1px solid #5c2934; }
+    .buttons { margin-top: 17px; }
+    button, a.button {
+      min-height: 38px;
+      border: 1px solid #355473;
+      border-radius: 10px;
+      padding: 8px 13px;
+      background: #153454;
+      color: #eef7ff;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 650;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    button:hover:not(:disabled), a.button:hover { background: #20507d; }
+    button.danger { background: #54252e; border-color: #71333f; }
+    button.danger:hover:not(:disabled) { background: #72313d; }
+    button:disabled { opacity: .42; cursor: not-allowed; }
+    .empty { color: var(--muted); }
+    @media (max-width: 760px) {
+      main { padding: 24px 14px 40px; }
+      header { align-items: flex-start; flex-direction: column; }
+      .grid { grid-template-columns: 1fr; }
+      .card { padding: 17px; }
+      .meta-row { grid-template-columns: 96px minmax(0, 1fr); }
+      button, a.button { flex: 1 1 42%; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>Local AI Splash</h1>
+      <p class="subtitle">See what is on, wake up what is off, and keep every engine in its own process.</p>
+    </div>
+    <nav class="toplinks">
+      <a class="button" href="/local-ai/docs">Local AI Docs</a>
+      <a class="button" href="/docs">OpenAPI</a>
+    </nav>
+  </header>
+
+  <div id="message" class="summary" role="status" aria-live="polite">
+    <span id="spinner" class="spinner"></span>
+    <span id="messageText">Checking local services…</span>
+  </div>
+
+  <section class="grid" id="services" aria-label="Local AI services"></section>
+</main>
+
+<script>
+const labels = {
+  controller: "Controller",
+  comfyui: "ComfyUI",
+  stable_diffusion: "Stable Diffusion",
+  sf3d: "Stable Fast 3D"
+};
+const descriptions = {
+  controller: "Unified FastAPI controller",
+  comfyui: "Workflow and node-based image generation",
+  stable_diffusion: "Stable Diffusion WebUI API",
+  sf3d: "Single-image low-poly GLB generation"
+};
+const stateLabels = {
+  running: "On",
+  stopped: "Off",
+  starting: "Starting",
+  error: "Error",
+  port_busy: "Port Busy",
+  unknown: "Unknown"
+};
+
+let busyService = null;
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+async function api(path, options) {
+  const response = await fetch(path, options);
+  const text = await response.text();
+  let payload;
+  try { payload = text ? JSON.parse(text) : {}; }
+  catch { payload = { error: text || `HTTP ${response.status}` }; }
+  if (!response.ok) throw new Error(readableError(payload));
+  return payload;
+}
+
+function readableError(payload) {
+  if (!payload) return "Unknown error";
+  if (typeof payload === "string") return payload;
+  if (typeof payload.detail === "string") return payload.detail;
+  if (payload.detail && typeof payload.detail === "object") return readableError(payload.detail);
+  return payload.error || payload.details || JSON.stringify(payload);
+}
+
+function normalizeState(status) {
+  return ["running", "stopped", "starting", "error", "port_busy"].includes(status)
+    ? status
+    : "unknown";
+}
+
+function visualClass(status) {
+  return {
+    running: "on",
+    stopped: "off",
+    starting: "starting",
+    error: "error",
+    port_busy: "port-busy",
+    unknown: "unknown"
+  }[normalizeState(status)];
+}
+
+function healthDetail(name, service) {
+  if (name === "controller") return "Controller API is responding.";
+  const health = service.health || {};
+  const payload = health.payload || {};
+  if (name === "sf3d" && payload.model_error) {
+    return `Model error: ${payload.model_error}`;
+  }
+  if (name === "sf3d" && payload.model_loading) return "SF3D model is loading into memory.";
+  if (health.healthy) {
+    const latency = health.response_time_ms == null ? "" : ` · ${health.response_time_ms} ms`;
+    return `Health check passed${latency}.`;
+  }
+  if (health.error) return health.error;
+  if (service.status === "port_busy") return `Port ${service.port} is occupied, but the configured health check failed.`;
+  return "Service is not currently healthy.";
+}
+
+function docsUrl(name, service) {
+  if (name === "controller") return "/docs";
+  if (name === "sf3d") return `${String(service.url).replace(/\/$/, "")}/docs`;
+  if (name === "comfyui") return "/api/docs/comfyui";
+  return null;
+}
+
+function card(name, service) {
+  const state = normalizeState(service.status);
+  const managed = Boolean(service.managed);
+  const isController = name === "controller";
+  const isBusy = busyService === name;
+  const running = state === "running";
+  const stopDisabled = isBusy || isController || !managed;
+  const restartDisabled = isBusy || isController || !managed;
+  const startDisabled = isBusy || isController || running || state === "port_busy";
+  const detail = healthDetail(name, service);
+  const detailProblem = ["error", "port_busy"].includes(state)
+    || (name === "sf3d" && Boolean(service.health?.payload?.model_error));
+  const ownership = isController
+    ? "Controller process"
+    : managed ? `Managed PID ${service.pid || "unknown"}` : running ? "External / unmanaged" : "Not running";
+  const checked = service.health?.response_time_ms == null
+    ? "Just now"
+    : `${service.health.response_time_ms} ms response`;
+  const docs = docsUrl(name, service);
+
+  return `<article class="card" data-service="${escapeHtml(name)}">
+    <div class="card-header">
+      <div class="service-name">
+        <span class="status-light ${visualClass(state)}" aria-hidden="true"></span>
+        <div>
+          <h2>${escapeHtml(labels[name] || name)}</h2>
+          <span class="empty">${escapeHtml(descriptions[name] || "")}</span>
+        </div>
+      </div>
+      <span class="badge">${escapeHtml(stateLabels[state])}</span>
+    </div>
+    <div class="meta">
+      <div class="meta-row"><span class="meta-label">URL</span><span class="meta-value url">${escapeHtml(service.url || location.origin)}</span></div>
+      <div class="meta-row"><span class="meta-label">Ownership</span><span class="meta-value">${escapeHtml(ownership)}</span></div>
+      <div class="meta-row"><span class="meta-label">Last check</span><span class="meta-value">${escapeHtml(checked)}</span></div>
+    </div>
+    <div class="detail ${detailProblem ? "problem" : ""}">${escapeHtml(detail)}</div>
+    <div class="buttons">
+      ${isController ? "" : `
+        <button ${startDisabled ? "disabled" : ""} onclick="act('${name}','start')">On</button>
+        <button class="danger" ${stopDisabled ? "disabled" : ""} onclick="act('${name}','stop')">Off</button>
+        <button ${restartDisabled ? "disabled" : ""} onclick="act('${name}','restart')">Restart</button>
+      `}
+      <a class="button" href="${escapeHtml(service.url || location.origin)}" target="_blank" rel="noopener">Open</a>
+      ${docs ? `<a class="button" href="${escapeHtml(docs)}" target="_blank" rel="noopener">Docs</a>` : ""}
+    </div>
+  </article>`;
+}
+
+function setMessage(message, { loading = false, error = false } = {}) {
+  document.querySelector("#messageText").textContent = message;
+  document.querySelector("#spinner").hidden = !loading;
+  document.querySelector("#message").classList.toggle("error", error);
+}
+
+async function refresh({ quiet = false } = {}) {
+  if (!quiet) setMessage("Checking local services…", { loading: true });
+  try {
+    const data = await api("/api/local-ai/health");
+    const controller = {
+      status: "running",
+      url: location.origin,
+      managed: true,
+      health: { healthy: true }
+    };
+    const cards = [card("controller", controller)];
+    for (const [name, service] of Object.entries(data.services || {})) cards.push(card(name, service));
+    document.querySelector("#services").innerHTML = cards.join("");
+    if (!quiet) {
+      const online = Object.values(data.services || {}).filter(service => service.status === "running").length;
+      setMessage(`Status updated. ${online} of ${Object.keys(data.services || {}).length} AI services are on.`);
+    }
+  } catch (error) {
+    setMessage(`Status check failed: ${error.message}`, { error: true });
+  }
+}
+
+async function act(name, action) {
+  if (busyService) return;
+  busyService = name;
+  setMessage(`${action === "start" ? "Turning on" : action === "stop" ? "Turning off" : "Restarting"} ${labels[name] || name}…`, { loading: true });
+  await refresh({ quiet: true });
+  try {
+    const result = await api(`/api/local-ai/services/${name}/${action}`, { method: "POST" });
+    if (!result.success) throw new Error(readableError(result));
+    setMessage(`${labels[name] || name}: ${action} completed.`);
+  } catch (error) {
+    setMessage(`${labels[name] || name}: ${error.message}`, { error: true });
+  } finally {
+    busyService = null;
+    await refresh({ quiet: true });
+  }
+}
+
+refresh();
+setInterval(() => {
+  if (!busyService) refresh({ quiet: true });
+}, 5000);
+</script>
+</body>
+</html>

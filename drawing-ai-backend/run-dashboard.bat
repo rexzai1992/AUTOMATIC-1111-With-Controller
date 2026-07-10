@@ -50,6 +50,7 @@ start "" "https://%TUNNEL_PUBLIC_HOST%/gallery"
 
 echo.
 echo [OK] Dashboard ready.
+echo Local AI Splash:   https://%TUNNEL_PUBLIC_HOST%/splash
 echo Staff:             https://%TUNNEL_PUBLIC_HOST%/staff
 echo Gallery:           https://%TUNNEL_PUBLIC_HOST%/gallery
 echo Comfy Staff:       https://%TUNNEL_PUBLIC_HOST%/comfy/staff

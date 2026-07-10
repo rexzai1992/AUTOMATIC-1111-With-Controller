@@ -75,18 +75,21 @@ start "" "https://%TUNNEL_PUBLIC_HOST%/staff"
 
 echo.
 echo [OK] System ready.
+echo Local splash:       http://localhost:8000/splash
 echo Local staff:        http://localhost:8000/staff
 echo Local gallery:      http://localhost:8000/gallery
 echo Local comfy staff:  http://localhost:8000/comfy/staff
 echo Local showcase:     http://localhost:8000/showcase
 echo Local wonderpark:   http://localhost:8000/public/wonderpark
 if defined LAN_IP (
+echo LAN splash:         http://%LAN_IP%:8000/splash
 echo LAN staff:          http://%LAN_IP%:8000/staff
 echo LAN gallery:        http://%LAN_IP%:8000/gallery
 echo LAN comfy staff:    http://%LAN_IP%:8000/comfy/staff
 echo LAN showcase:       http://%LAN_IP%:8000/showcase
 echo LAN wonderpark:     http://%LAN_IP%:8000/public/wonderpark
 )
+echo Public splash:      https://%TUNNEL_PUBLIC_HOST%/splash
 echo Public staff:       https://%TUNNEL_PUBLIC_HOST%/staff
 echo Public gallery:     https://%TUNNEL_PUBLIC_HOST%/gallery
 echo Public comfy staff: https://%TUNNEL_PUBLIC_HOST%/comfy/staff

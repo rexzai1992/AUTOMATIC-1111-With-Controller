@@ -42,9 +42,14 @@ curl -X POST http://SERVER_IP:8000/api/auth/generate-key
 Notes:
 
 - If `API_KEY` is already set, call with `X-API-Key`.
+- `POST /api/auth/generate-key` only returns a key string. It does not apply or save it.
+- To generate and apply a runtime key in one step, use `POST /admin/api/generate` or open `GET /admin/api`.
+- The applied runtime key is saved in `data/api_key_state.json`.
 - Runtime key management UI is available at:
   - `GET /admin/api`
   - `GET /admin/api/docs`
+- ComfyUI-specific API docs are available at:
+  - `GET /api/docs/comfyui`
 
 ## 3. Endpoint Reference
 
@@ -60,9 +65,20 @@ Admin page for API key management actions:
 
 Admin docs page that mirrors `docs/API.md` and shows parameter examples.
 
+### GET `/api/docs/comfyui`
+
+ComfyUI docs page that mirrors `docs/COMFYUI_API.md`.
+
+Aliases:
+
+- `GET /api/docs/comfy-ui`
+- `GET /api/docs/comfy%20ui`
+
 ### POST `/admin/api/generate`
 
 Generate and apply a new runtime API key immediately.
+
+This is the full setup endpoint for runtime API-key auth. The generated key is applied to the running app and persisted to `data/api_key_state.json`.
 
 Example response:
 
@@ -117,7 +133,9 @@ Alternative delete endpoint for script/CLI usage.
 
 ### POST `/api/auth/generate-key`
 
-Generate a new API key string (helper endpoint; does not apply automatically).
+Generate a new API key string only.
+
+Important: this helper endpoint does not apply or persist the key. For full setup, use `POST /admin/api/generate` or the `GET /admin/api` page.
 
 Use this key in header:
 
@@ -208,6 +226,9 @@ Query parameters:
 - `offset` (int, default `0`)
 - `mode` (string, optional; mapped from `generationMode`)
 - `styleId` (string, optional)
+- `source` (string, optional): `staff`, `api`, or `public_wonderpark`
+- `engine` (string, optional): `stable_diffusion` or `comfyui`
+- `showcaseOnly` (bool, default `false`): only items approved for showcase
 - `absolute` (bool, default `false`)
 
 Example curl:
